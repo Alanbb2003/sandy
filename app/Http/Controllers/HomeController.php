@@ -38,7 +38,7 @@ class HomeController extends Controller
     public function adminManageStock(){
         $barang = Products::all();
         $barang = Products::join('category','product.id','=','category.id')
-        ->select('product.*','category.nama as category')
+        ->select('product.*','category.nama_category as category')
         ->get();
         $kategori = Category::all();
         return view('admin.manageStock',compact('barang','kategori'));
