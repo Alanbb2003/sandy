@@ -15,8 +15,9 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <!-- CDN -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    {{-- <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.min.css"> --}}
     
 </head>
 <body>
@@ -113,6 +114,5 @@
 </body>
 @yield("script")
  <!-- CDN -->
-     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></scr>
-     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+     {{-- <script src="https://cdn.datatables.net/2.0.3/js/dataTables.min.js"></scr> --}}
 </html>

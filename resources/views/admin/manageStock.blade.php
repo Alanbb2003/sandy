@@ -67,9 +67,11 @@
 
         <table class="table border" id="tableKategori">
           <thead>
-            <th>ID</th>
-            <th>kategori</th>
-            <th>Action</th>
+            <tr>
+              <th>ID</th>
+              <th>kategori</th>
+              <th>Action</th>
+            </tr>
           </thead>
           <tbody>
           @foreach ($kategori as $k)
@@ -98,7 +100,7 @@
         <div class="card">
             <div class="card-header"> <b>Manage Barang</b> </div>
             <div class="card-body">
-                <table class="table border" id="tableBarang">
+                <table class="table border" id="tableBarang" name=>
                   <thead>
                     <th>ID</th>
                     <th>Nama Barang</th>
