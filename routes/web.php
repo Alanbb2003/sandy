@@ -23,11 +23,17 @@ Auth::routes();
 
 //user route
 Route::middleware(['auth','user-role:user'])->group(function(){
-    Route::get("/home",[HomeController::class,'userHome'])->name('home');
+    Route::prefix('/home',)->group(function(){
+        Route::get("/",[HomeController::class,'userHome'])->name('home');
+
+    });
 });
 
 //admin route
 Route::middleware(['auth','user-role:admin'])->group(function(){
-    Route::get("/Dashboard",[HomeController::class,'adminHome'])->name('homeAdmin');
+    Route::prefix('/dashboard',)->group(function(){
+        Route::get("/",[HomeController::class,'adminHome'])->name('homeAdmin');
+        Route::get('/barang',[HomeController::class,'adminManageStock']);
+    });
 });
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

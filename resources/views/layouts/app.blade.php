@@ -15,6 +15,9 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <!-- CDN -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    
 </head>
 <body>
     <div id="app">
@@ -31,16 +34,35 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
                         @guest
-                            
+                        <nav class="navbar">
+                            <div class="container-fluid">
+                              <form class="d-flex" role="search">
+                                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                                <button class="btn btn-outline-success" type="submit">Search</button>
+                              </form>
+                            </div>
+                        </nav>
                         @else
                             @if (Auth::user()->role == 'admin')
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                {{ Auth::user()->name }}
-                            </a>
+                            <nav class="navbar navbar-expand-lg ">
+                                  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                                    <div class="navbar-nav">
+                                      <a class="nav-link" href="#">Home</a>
+                                      <a class="nav-link" href="{{ url('/dashboard/barang') }}">Barang</a>
+                                      <a class="nav-link" href="#">Pricing</a>
+                                      <a class="nav-link" href="#">Disabled</a>
+                                    </div>
+                                  </div>
+                              </nav>
                             @elseif (Auth::user()->role == 'user')
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                {{ Auth::user()->name }}
-                            </a>
+                            <nav class="navbar">
+                                <div class="container-fluid">
+                                  <form class="d-flex" role="search">
+                                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                                    <button class="btn btn-outline-success" type="submit">Search</button>
+                                  </form>
+                                </div>
+                            </nav>
                             @endif
                         @endguest
                     </ul>
@@ -88,7 +110,8 @@
             @yield('content')
         </main>
     </div>
-
-    
 </body>
+@yield("script")
+ <!-- CDN -->
+     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></scr>
 </html>
