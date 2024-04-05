@@ -9,7 +9,7 @@
           Input barang baru
         </button>
       </div>
-      <div class="collapse card p-2 my-2" id="insertBarang" style="background-color:rgb(220, 223, 227)">
+      <div class="collapse card p-2 my-2" id="insertBarang" style="background-color:rgb(233, 237, 242)">
         <form class="row g-3" action="{{url('/dashboard/barang') }}" method="POST">
           @csrf
           <div class="col-md-4">
@@ -38,6 +38,14 @@
             <div class="alert alert-danger">{{ $message }}</div>
             @enderror
 
+          <div class="col-md-2">
+            <label for="inputJumlah" class="form-label">Satuan</label>
+            <input type="text" class="form-control  @error('inputSatuan') is-invalid @enderror" id="inputSatuan" name="inputSatuan">
+          </div>
+            @error('inputSatuan')
+            <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
+
           <div class="col-12">
             <button type="submit" class="btn btn-primary">Insert</button>
           </div>
@@ -50,7 +58,7 @@
             Kategori
           </button>
       </div>
-      <div class="collapse card p-2 my-2" id="insertKategori" style="background-color:rgb(220, 223, 227)">
+      <div class="collapse card p-2 my-2" id="insertKategori" style="background-color:rgb(233, 237, 242)">
         <form class="row g-3 mb-2" action="{{url('/dashboard/barang') }}" method="POST">
           @csrf
           <div class="col-md-5 form-floating">
@@ -65,7 +73,7 @@
           </div>
         </form>
 
-        <table class="table border" id="tableKategori">
+        <table class="display responsive nowrap" id="tableKategori" style="width:100%">
           <thead>
             <tr>
               <th>ID</th>
@@ -78,13 +86,11 @@
           <tr>
             <td>{{$k->id}}</td>
             <td>{{$k->nama_category}}</td>
-            {{-- <td>{{date("d/M/Y",strtotime($k->crea))}}</td>
-            <td>{{date("d/m/Y",strtotime($k->Tgl_Lahir))}}</td> --}}
-            {{-- <td style="width: 100px;">
+            <td style="width: 100px;">
               <div class="container d-flex-inline flex-row"></div>
-              <a href="{{ url("admin/employee/".$k->KaryawanID) }}" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
-              <a href="{{url("/admin/employee/".$k->KaryawanID."/destroy")}}" data-method="DELETE" data-confirm="Yakin hapus karyawan ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
-            </td> --}}
+              <a href="#" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
+              <a href="#" data-method="DELETE" data-confirm="Yakin hapus karyawan ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
+            </td>
           </tr>
           @endforeach
           </tbody>
@@ -100,15 +106,17 @@
         <div class="card">
             <div class="card-header"> <b>Manage Barang</b> </div>
             <div class="card-body">
-                <table class="table border" id="tableBarang" name=>
+                <table class="display responsive nowrap" id="tableBarang" style="width:100%">
                   <thead>
-                    <th>ID</th>
-                    <th>Nama Barang</th>
-                    <th>kategori</th>
-                    <th>Deskripsi</th>
-                    <th>Jumlah</th>
-                    <th>Satuan</th>
-                    <th>Action</th>
+                    <tr>
+                      <th>ID</th>
+                      <th data-priority="1">Nama Barang</th>
+                      <th>kategori</th>
+                      <th>Deskripsi</th>
+                      <th data-priority="3">Jumlah</th>
+                      <th>Satuan</th>
+                      <th data-priority="2">Action</th>
+                    </tr>
                   </thead>
                   <tbody>
                   @foreach ($barang as $k)
@@ -119,13 +127,11 @@
                     <td>{{$k->deskripsi}}</td>
                     <td>{{$k->jumlah_barang}}</td>
                     <td>{{$k->satuan_jumlah}}</td>
-                    {{-- <td>{{date("d/M/Y",strtotime($k->crea))}}</td>
-                    <td>{{date("d/m/Y",strtotime($k->Tgl_Lahir))}}</td> --}}
-                    {{-- <td style="width: 100px;">
+                    <td style="width: 100px;">
                       <div class="container d-flex-inline flex-row"></div>
-                      <a href="{{ url("admin/employee/".$k->KaryawanID) }}" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
-                      <a href="{{url("/admin/employee/".$k->KaryawanID."/destroy")}}" data-method="DELETE" data-confirm="Yakin hapus karyawan ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
-                    </td> --}}
+                      <a href="#" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
+                      <a href="#" data-method="DELETE" data-confirm="Yakin hapus karyawan ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
+                    </td>
                   </tr>
                   @endforeach
                   </tbody>
@@ -138,6 +144,15 @@
 
 @section('script')
 <script>
-    let table = new DataTable('#tableBarang');
+  // type="text/javascript"
+    $(document).ready(function(){
+        $('#tableBarang').dataTable({
+          responsive: true
+        } );
+        $('#tableKategori').dataTable(
+          
+        );
+    });
+    // let table = new DataTable('#tableBarang');
 </script>
 @endsection
