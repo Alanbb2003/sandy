@@ -19,7 +19,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+Auth::routes([
+    'verify'=>true
+]);
 
 //user route
 Route::middleware(['auth','user-role:user'])->group(function(){
@@ -27,7 +29,7 @@ Route::middleware(['auth','user-role:user'])->group(function(){
         Route::get("/",[HomeController::class,'userHome'])->name('home');
 
     });
-});
+})->middleware('verified');
 
 //admin route
 Route::middleware(['auth','user-role:admin'])->group(function(){
