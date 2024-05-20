@@ -28,7 +28,7 @@ class HomeController extends Controller
         return view('home');
     }
     public function userHome(){
-        return view('home',["msg"=>"I am user role"]);
+        return view('customer.homeCustomer',["msg"=>"I am user role"]);
     }
 
     // admin

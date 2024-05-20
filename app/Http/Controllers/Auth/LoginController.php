@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-
+use RealRashid\SweetAlert\Facades\Alert;
 class LoginController extends Controller
 {
     /*
@@ -44,17 +45,23 @@ class LoginController extends Controller
             'email'=>'required|email',
             'password'=>'required'
         ]);
-        
-        if(auth()->attempt(['email'=>$input["email"],'password'=>$input["password"]])){
-            if(auth()->user()->role == 'user'){
-                return redirect()->route('home');
-            }
-            else if(auth()->user()->role == 'admin'){
-                return redirect()->route('homeAdmin');
-            }
+        $email = User::where("email","=",$request->email)->first();
+        if ($email == null) {
+            alert()->error('Error!','Email belum terdaftar'); 
+            return back();
         }
-        else{
-            return redirect()->route("login")->with("error",'Incorect email or password');
-        }
+        else {
+            if(auth()->attempt(['email'=>$input["email"],'password'=>$input["password"]])){
+                if(auth()->user()->role == 'user'){
+                    return redirect()->route('home');
+                }
+                else if(auth()->user()->role == 'admin'){
+                    return redirect()->route('homeAdmin');
+                }
+            }
+            else{
+                return redirect()->route("login")->with("error",'Incorect email or password');
+            } 
+        }  
     }
 }

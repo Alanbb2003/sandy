@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,7 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
     Route::prefix('/dashboard',)->group(function(){
         Route::get("/",[HomeController::class,'adminHome'])->name('homeAdmin');
         Route::get('/barang',[HomeController::class,'adminManageStock']);
+        Route::post('/barang/kategori',[AdminController::class,"addKategori"]);
     });
 });
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

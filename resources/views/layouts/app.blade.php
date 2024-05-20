@@ -19,7 +19,6 @@
     <!-- CDN -->
     {{-- <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css" /> --}}
     <link href="https://cdn.datatables.net/v/dt/dt-2.0.3/b-3.0.1/b-colvis-3.0.1/b-html5-3.0.1/fc-5.0.0/r-3.0.0/sb-1.7.0/sp-2.3.0/datatables.min.css" rel="stylesheet">
- 
     
 </head>
 <body>
@@ -110,6 +109,7 @@
         </nav>
 
         <main class="py-4">
+            @include('sweetalert::alert')
             @yield('content')
         </main>
     </div>

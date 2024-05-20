@@ -5,11 +5,11 @@
   <div class="row">
     <div class="col">
       <div class="my-3 card">
-        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#insertBarang" aria-expanded="false" aria-controls="collapseExample">
+        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#insertBarang" aria-expanded="false" aria-controls="insertBarang">
           Input barang baru
         </button>
       </div>
-      <div class="collapse card p-2 my-2" id="insertBarang" style="background-color:rgb(233, 237, 242)">
+      <div class="collapse p-2 my-2" id="insertBarang" style="background-color:rgb(233, 237, 242)">
         <form class="row g-3" action="{{url('/dashboard/barang') }}" method="POST">
           @csrf
           <div class="col-md-4">
@@ -46,6 +46,10 @@
             <div class="alert alert-danger">{{ $message }}</div>
             @enderror
 
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Default file input example</label>
+            <input class="form-control" type="file" id="formFile">
+          </div>
           <div class="col-12">
             <button type="submit" class="btn btn-primary">Insert</button>
           </div>
@@ -54,16 +58,16 @@
     </div>
     <div class="col">
       <div class="my-3 card">
-          <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#insertKategori" aria-expanded="false" aria-controls="collapseExample">
+          <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#insertKategori" aria-expanded="false" aria-controls="insertKategori">
             Kategori
           </button>
       </div>
-      <div class="collapse card p-2 my-2" id="insertKategori" style="background-color:rgb(233, 237, 242)">
-        <form class="row g-3 mb-2" action="{{url('/dashboard/barang') }}" method="POST">
+      <div class="collapse p-2 my-2" id="insertKategori" style="background-color:rgb(233, 237, 242)">
+        <form class="row g-3 mb-2" action="{{url('/dashboard/barang/kategori') }}" method="POST">
           @csrf
           <div class="col-md-5 form-floating">
             <input type="text" class="form-control  @error('inputkategori') is-invalid @enderror" id="inputkategori" name="inputkategori" placeholder="nama kategori">
-            <label for="inputNamaBarang">Nama kategori</label>
+            <label for="inputNamaKategori">Nama kategori</label>
           </div>
           @error('inputkategori')
           <div class="alert alert-danger">{{ $message }}</div>
@@ -89,7 +93,7 @@
             <td style="width: 100px;">
               <div class="container d-flex-inline flex-row"></div>
               <a href="#" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
-              <a href="#" data-method="DELETE" data-confirm="Yakin hapus karyawan ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
+              <a href="#" data-method="DELETE" data-confirm="Yakin hapus kategori ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
             </td>
           </tr>
           @endforeach
