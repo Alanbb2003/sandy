@@ -60,7 +60,9 @@ class LoginController extends Controller
                 }
             }
             else{
-                return redirect()->route("login")->with("error",'Incorect email or password');
+                alert()->error('Error!','Email atau password salah');
+                return back();
+                // return redirect()->route("login")->with("error",'Incorect email or password');
             } 
         }  
     }

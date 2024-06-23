@@ -27,10 +27,10 @@ Auth::routes([
 //user route
 Route::middleware(['auth','user-role:user'])->group(function(){
     Route::prefix('/home',)->group(function(){
-        Route::get("/",[HomeController::class,'userHome'])->name('home');
+        Route::get("/",[HomeController::class,'userHome'])->name('home')->middleware('verified');
 
     });
-})->middleware('verified');
+});
 
 //admin route
 Route::middleware(['auth','user-role:admin'])->group(function(){
@@ -40,4 +40,4 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::post('/barang/kategori',[AdminController::class,"addKategori"]);
     });
 });
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
