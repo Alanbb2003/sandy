@@ -72,7 +72,7 @@
             <div class="row g-0">
 
               <div class="col-md-5 d-flex align-items-center">
-                <img src="{{asset('Images/logo_fxn_ufo.png')}}"
+                <img src="{{asset('images/dev/login.jpg')}}"
                 alt="picture here" class="img-fluid mt-4" style="border-radius: 1rem 0 0 1rem;" />
               </div>
 

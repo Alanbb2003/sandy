@@ -5,11 +5,14 @@
   <div class="row">
     <div class="col">
       <div class="my-3 card">
-        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#insertBarang" aria-expanded="false" aria-controls="insertBarang">
+        <a href="{{url("/dashboard/barang/new")}}" class="btn btn-primary" type="button">
           Input barang baru
-        </button>
+        </a>
+        {{-- <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#insertBarang" aria-expanded="false" aria-controls="insertBarang">
+          Input barang baru
+        </button> --}}
       </div>
-      <div class="collapse p-2 my-2" id="insertBarang" style="background-color:rgb(233, 237, 242)">
+      {{-- <div class="collapse p-2 my-2" id="insertBarang" style="background-color:rgb(233, 237, 242)">
         <form class="row g-3" action="{{url('/dashboard/barang') }}" method="POST">
           @csrf
           <div class="col-md-4">
@@ -54,7 +57,7 @@
             <button type="submit" class="btn btn-primary">Insert</button>
           </div>
         </form>
-      </div>
+      </div> --}}
     </div>
     <div class="col">
       <div class="my-3 card">

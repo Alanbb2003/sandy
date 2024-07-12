@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
+    {{-- <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">{{ __('Register') }}</div>
@@ -72,7 +72,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 
 <section class="vh-100" style="background-color: white;">
@@ -83,7 +83,7 @@
             <div class="row g-0">
 
               <div class="col-md-6 col-lg-5 d-none d-md-block">
-                <img src="{{asset('images/register/6368592.jpg')}}"
+                <img src="{{asset('images/dev/register.jpg')}}"
                   alt="Register form" class="img-fluid mt-4" style="border-radius: 1rem 0 0 1rem;" />
                   <a href="http://www.freepik.com/author/stories" class="small text-muted ms-5"></a>
               </div>
@@ -92,7 +92,7 @@
 
                 <div class="card-body p-4 p-lg-5 text-black">
 
-                  <form action="" method="POST">
+                  <form action="{{ route('register') }}" method="POST">
                     @csrf
                     <div class="d-flex align-items-center mb-3 pb-1">
                       <i class="fas fa-cubes fa-2x me-3" style="color: #ff6219;"></i>
@@ -101,38 +101,45 @@
 
                     <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign up your account</h5>
 
+                 
                     <div class="form-floating mb-4">
-                      <input type="text" id="regUser" name="regUser" class="form-control form-control-lg" placeholder="Username"/>
-                      <label class="form-label" for="regUser">Username</label>
+                        <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus placeholder="Nama lengkap">
+                        <label for="name" class="form-label">Nama Lengkap</label>
+                        @error('name')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                     </div>
 
                     <div class="form-floating mb-4">
-                      <input type="text" id="regNama" name="regNama" class="form-control form-control-lg" placeholder="Full Name"/>
-                      <label class="form-label" for="regNama">Full Name</label>
+                        <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="Email">
+                        <label for="email" class="form-label">Email</label>
+                        @error('email')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                    
+                    <div class="form-floating mb-4">
+                        <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="Password">
+                        <label for="password" class="form-label">Password</label>
+                        @error('password')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                     </div>
 
                     <div class="form-floating mb-4">
-                      <input type="email" id="regEmail" name="regEmail" class="form-control form-control-lg" placeholder="Email"/>
-                      <label class="form-label" for="regEmail">Email</label>
+                        <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password" placeholder="Confirm Password">
+                        <label for="password-confirm" class="form-label">Confirm Password</label>
                     </div>
 
-                    <div class="form-floating mb-4">
-                      <input type="text" id="regTelp" name="regTelp" class="form-control form-control-lg" placeholder="No Telp"/>
-                      <label class="form-label" for="regNama">No Telp</label>
-                    </div>
-
-                    <div class="form-floating mb-4">
-                      <input type="password" id="regPass" name="regPass" class="form-control form-control-lg" placeholder="Password"/>
-                      <label class="form-label" for="regPass">Password</label>
-                    </div>
-
-                    <div class="form-floating mb-4">
-                      <input type="password" id="conPass" name="conPass" class="form-control form-control-lg" placeholder="Confirmation Password" />
-                      <label class="form-label" for="conPass">Confirmation Password</label>
-                    </div>
 
                     <div class="pt-1 mb-4">
-                      <button class="btn btn-dark btn-lg btn-block" type="submit">Register</button>
+                      <button class="btn btn-primary btn-lg btn-block" type="submit">Register</button>
                     </div>
 
                     <p class="mb-5 pb-lg-2" style="color: #393f81;">have an account ? <a href="{{url('/login')}}"

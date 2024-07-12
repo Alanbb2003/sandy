@@ -3,16 +3,34 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8 d-flex" style="background-color: blue">
-          <div style="background-color: rgb(214, 176, 122)">a</div>
-          <div style="background-color: rgb(37, 100, 62)">b</div>
-          <div style="background-color: rgb(163, 169, 42)">c</div>
-          <div style="background-color: rgb(255, 0, 0)">d</div>
-          <div style="background-color: rgb(95, 136, 120)">e</div>
-          <div class="row info">
-            sa
-            <div class="col dark">a</div>
-          </div>
+        <div class="col-sm-3 p-1 d-flex flex-row" style="background-color: blue;">
+          {{-- <div class="row text-center"> --}}
+            {{-- @foreach ($kos as $k) --}}
+            {{-- <div class="col-md-3 mx-1" style="float:left"> --}}
+              <div class="card mb-4">
+                <img class="card-img-top" src="{{asset('images/dev/login.jpg')}}" alt="">
+                {{-- <img class="card-img-top"
+                     src="{{ asset("storage/gambar/".$k->kos_gambar) }}" alt="Card image cap"> --}}
+                <div class="card-body">
+                  <p class="card-text">harga</p>
+                  <h5 class="card-title">nama barang</h5>
+                  <a class="btn btn-primary" href="">Detail</a>
+                </div>
+              </div>
+
+              <div class="card mb-4">
+                <img class="card-img-top" src="{{asset('images/dev/login.jpg')}}" alt="">
+                {{-- <img class="card-img-top"
+                     src="{{ asset("storage/gambar/".$k->kos_gambar) }}" alt="Card image cap"> --}}
+                <div class="card-body">
+                  <p class="card-text">harga</p>
+                  <h5 class="card-title">nama barang</h5>
+                  <a class="btn btn-primary" href="">Detail</a>
+                </div>
+              </div>
+            {{-- </div> --}}
+            {{-- @endforeach --}}
+            {{-- </div> --}}
         </div>
     </div>
 
