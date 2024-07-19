@@ -52,7 +52,7 @@
                                     <div class="navbar-nav">
                                       <a class="nav-link" href="#">Home</a>
                                       <a class="nav-link" href="{{ url('/dashboard/barang') }}">Barang</a>
-                                      <a class="nav-link" href="#">Pricing</a>
+                                      <a class="nav-link" href="#">Pelanggan</a>
                                       <a class="nav-link" href="#">Disabled</a>
                                     </div>
                                   </div>

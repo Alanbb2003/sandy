@@ -52,7 +52,6 @@
           </tbody>
         </table>
       </div>
-      
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
@@ -106,15 +105,20 @@
     </div>
   </div>
 </div> --}}
+
+
 <br>
 <div class="container" id="insertBarang" style="background-color:rgb(233, 237, 242)">
-    <form class="row g-3" action="{{url('/dashboard/barang/new') }}" method="POST">
+    <form class="row g-3" action="{{url('/dashboard/barang/new') }}" method="POST" enctype="multipart/form-data">
       @csrf
       <div class="mb-3 d-flex">
         <img id="frame" src="" width="100px" height="100px" class="img-thumbnail mt-1"/>
         <div class="container-fluid">
           <label for="thumbnail" class="form-label">Foto produk promosi</label>
           <input class="form-control" type="file" id="thumbnail" name="thumbnail">
+          @error('thumbnail')
+          <div class="alert alert-danger">{{ $message }}</div>
+          @enderror
         </div>
       </div>
 
@@ -127,15 +131,15 @@
       <div class="col-md-4">
         <label for="inputNamaBarang" class="form-label">Nama Barang</label>
         <input type="text" class="form-control  @error('inputNamaBarang') is-invalid @enderror" id="inputNamaBarang" name="inputNamaBarang">
+        @error('inputNamaBarang')
+        <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
       </div>
-      @error('inputNamaBarang')
-      <div class="alert alert-danger">{{ $message }}</div>
-      @enderror
-
+    
       <div class="col-md-3">
         <label for="" class="form-label">Kategori</label>
-        <select class="form-select" id="inputKaryawan" name="inputKaryawan" placeholder="select Karyawan..." >
-          <option value="">Select None...</option>
+        <select class="form-select" id="inputKategori" name="inputKategori" placeholder="select Kategori..." >
+          {{-- <option value="">Select None...</option> --}}
           @foreach ($kategori as $k)
             <option value="{{$k->id}}">{{$k->nama_category}}</option>
           @endforeach
@@ -151,20 +155,38 @@
       @enderror
 
       <div class="col-md-2">
-          <label for="inputJumlah" class="form-label">jumlah</label>
-          <input type="number" min="0" class="form-control  @error('inputJumlah') is-invalid @enderror" id="inputJumlah" name="inputJumlah">
-      </div>
-        @error('inputJumlah')
+          <label for="inputJumlah" class="form-label">jumlah terkecil</label>
+          <input type="number" min="0" class="form-control  @error('inputJumlahKecil') is-invalid @enderror" id="inputJumlahKecil" name="inputJumlahKecil">
+          @error('inputJumlahKecil')
+          <div class="alert alert-danger">{{ $message }}</div>
+          @enderror
+        </div>
+      
+      <div class="col-md-2">
+        <label for="inputJumlah" class="form-label">Satuan terkecil</label>
+        <input type="text" class="form-control  @error('inputSatuanKecil') is-invalid @enderror" id="inputSatuanKecil" name="inputSatuanKecil">
+        @error('inputSatuanKecil')
         <div class="alert alert-danger">{{ $message }}</div>
         @enderror
+      </div>
 
       <div class="col-md-2">
-        <label for="inputJumlah" class="form-label">Satuan</label>
-        <input type="text" class="form-control  @error('inputSatuan') is-invalid @enderror" id="inputSatuan" name="inputSatuan">
-      </div>
-        @error('inputSatuan')
+        <label for="inputJumlah" class="form-label">jumlah terkecil dalam -></label>
+        <input type="number" min="0" class="form-control  @error('inputJumlahBesar') is-invalid @enderror" id="inputJumlahBesar" name="inputJumlahBesar">
+        @error('inputJumlahBesar')
         <div class="alert alert-danger">{{ $message }}</div>
         @enderror
+      </div>
+    
+    <div class="col-md-2">
+      <label for="inputJumlah" class="form-label">Satuan terbesar</label>
+      <input type="text" class="form-control  @error('inputSatuanBesar') is-invalid @enderror" id="inputSatuanBesar" name="inputSatuanBesar">
+      @error('inputSatuanBesar')
+      <div class="alert alert-danger">{{ $message }}</div>
+      @enderror
+    </div>
+        
+        
 
       <div class="col-12">
         <button type="submit" class="btn btn-primary">Tambah</button>
