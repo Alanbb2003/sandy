@@ -47,4 +47,8 @@ class HomeController extends Controller
         $kategori = Category::all();
         return view('admin.forms.addStock',compact('kategori'));
     }
+    public function adminMembership(){
+
+        return view('admin.manageMembership');
+    }
 }

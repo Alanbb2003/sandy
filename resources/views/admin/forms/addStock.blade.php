@@ -105,7 +105,44 @@
     </div>
   </div>
 </div> --}}
+<div class="modal fade" id="editModal-" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit Status</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="" action="{{url('/dashboard/barang/new/kategori/'.$id.'/update') }}" method="POST">
+           @csrf
+            <div class="col-md-6">
+              <label for="EditNamaStatus" class="form-label">Nama Status</label>
+              <input type="text" class="form-control  @error('EditNamaStatus') is-invalid @enderror" id="EditNamaStatus" name="EditNamaStatus" value="{{$u->Nama_Status}}">
+            </div>
+            @error('inputNamaStatus')
+            <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
+            <div class="form-group">
+              <label for="EditDeskripsi" class="form-label">Deskripsi</label>
+              <input type="text" class="form-control  @error('EditDeskripsi') is-invalid @enderror" id="EditDeskripsi" name="EditDeskripsi" value="{{$u->Deskripsi}}">
+            </div>
+            @error('inputDeskripsi')
+            <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
 
+            <div class="col-12 mt-2">
+              <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        {{-- <button type="button" class="btn btn-primary">Save changes</button> --}}
+      </div>
+    </div>
+  </div>
+</div>
 
 <br>
 <div class="container" id="insertBarang" style="background-color:rgb(233, 237, 242)">
@@ -160,7 +197,7 @@
           @error('inputJumlahKecil')
           <div class="alert alert-danger">{{ $message }}</div>
           @enderror
-        </div>
+      </div>
       
       <div class="col-md-2">
         <label for="inputJumlah" class="form-label">Satuan terkecil</label>
@@ -178,22 +215,37 @@
         @enderror
       </div>
     
-    <div class="col-md-2">
-      <label for="inputJumlah" class="form-label">Satuan terbesar</label>
-      <input type="text" class="form-control  @error('inputSatuanBesar') is-invalid @enderror" id="inputSatuanBesar" name="inputSatuanBesar">
-      @error('inputSatuanBesar')
-      <div class="alert alert-danger">{{ $message }}</div>
-      @enderror
-    </div>
-        
-        
+      <div class="col-md-2">
+        <label for="inputJumlah" class="form-label">Satuan terbesar</label>
+        <input type="text" class="form-control  @error('inputSatuanBesar') is-invalid @enderror" id="inputSatuanBesar" name="inputSatuanBesar">
+        @error('inputSatuanBesar')
+        <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
+      </div>
 
+      <div class="col-md-2">
+        <label for="inputJumlah" class="form-label"> Harga jumlah terkecil</label>
+        Rp.<input type="number" min="0" class="form-control  @error('inputHargaKecil') is-invalid @enderror" id="inputHargaKecil" name="inputHargaKecil">
+        @error('inputHargaKecil')
+        <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
+      </div>
+
+      <div class="col-md-2">
+          <label for="inputJumlah" class="form-label">Harga jumlah terbesar</label>
+          Rp.<input type="number" min="0" class="form-control  @error('inputHargaBesar') is-invalid @enderror" id="inputHargaBesar" name="inputHargaBesar">
+          @error('inputHargaBesar')
+          <div class="alert alert-danger">{{ $message }}</div>
+          @enderror
+      </div>
       <div class="col-12">
         <button type="submit" class="btn btn-primary">Tambah</button>
       </div>
     </form>
   </div>
+
 @endsection
+
 @section('script')
 <script>
 $(document).ready(function(){

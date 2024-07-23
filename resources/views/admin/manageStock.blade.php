@@ -117,11 +117,11 @@
                   <thead>
                     <tr>
                       <th>ID</th>
+                      <th>Thumbnail</th>
                       <th data-priority="1">Nama Barang</th>
                       <th>kategori</th>
                       <th>Deskripsi</th>
                       <th data-priority="3">Jumlah</th>
-                      <th>Satuan</th>
                       <th data-priority="2">Action</th>
                     </tr>
                   </thead>
@@ -129,11 +129,11 @@
                   @foreach ($barang as $k)
                   <tr>
                     <td>{{$k->id}}</td>
-                    <td>{{$k->nama_barang}}</td> 
+                    <td>{{$k->fotoPromosi}}</td>
+                    <td>{{$k->namaBarang}}</td> 
                     <td>{{$k->category}}</td>
                     <td>{{$k->deskripsi}}</td>
-                    <td>{{$k->jumlah_barang}}</td>
-                    <td>{{$k->satuan_jumlah}}</td>
+                    <td>{{$k->jumlahTerkecil}} {{$k-> satuanTerkecil}} / {{$k->jumlahTerkecil/$k->isiSatuanBesar}} {{$k->satuanBesar}}</td> 
                     <td style="width: 100px;">
                       <div class="container d-flex-inline flex-row"></div>
                       <a href="#" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
