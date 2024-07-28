@@ -56,6 +56,7 @@ class AdminController extends Controller
         $productbaru->satuanBesar = strtoupper($request->inputSatuanBesar);
         $productbaru->hargaKecil = $request->inputHargaKecil;
         $productbaru->hargaBesar = $request->inputHargaBesar;
+        $productbaru->Status = 1;
         $productbaru->save();
 
         if ($files) {
@@ -95,6 +96,24 @@ class AdminController extends Controller
             return back();
         } catch (\Exception $e) {
             return $e->getMessage();
+        }
+    }
+
+    public function updateKategori(Request $request)
+    {
+        try {
+            $category = Category::find($request->input('categoryId'));
+            if (!$category) {
+                return response()->json(['error' => 'Category not found.'], 404);
+            }
+            $category->nama_category = strtoupper($request->input('categoryName')) ;
+            $category->save();
+            return response()->json([
+                'id' => $category->id,
+                'nama_category' => strtoupper($category->nama_category) 
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update category. Please try again.'], 500);
         }
     }
 

@@ -36,8 +36,10 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::get("/",[HomeController::class,'adminHome'])->name('homeAdmin');
         Route::get('/barang',[HomeController::class,'adminManageStock']);
         Route::get('/barang/new',[HomeController::class,'adminBarangNew']);
+        Route::get('/barang/new/get-categories',[HomeController::class,'getCategories']);
         Route::post('/barang/new',[AdminController::class,'addBarang']);
         Route::post('/barang/new/kategori',[AdminController::class,"addKategori"]);
+        Route::post('/barang/new/kategori/update-category', [AdminController::class, 'updateKategori']);
         // Route::post('/barang/kategori',[AdminController::class,"addKategori"]);
     });
 });

@@ -59,7 +59,7 @@
         </form>
       </div> --}}
     </div>
-    <div class="col">
+    {{-- <div class="col">
       <div class="my-3 card">
           <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#insertKategori" aria-expanded="false" aria-controls="insertKategori">
             Kategori
@@ -103,7 +103,7 @@
           </tbody>
         </table>
       </div>
-    </div>
+    </div> --}}
   </div>
   
 </div>

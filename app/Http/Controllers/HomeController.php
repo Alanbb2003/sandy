@@ -27,6 +27,11 @@ class HomeController extends Controller
     {
         return view('home');
     }
+    public function welcome(){
+        $barang = Products::join('category','product.id','=','category.id')
+        ->select('product.*','category.nama_category as category')
+        ->get();
+    }
     public function userHome(){
         return view('customer.homeCustomer',["msg"=>"I am user role"]);
     }
@@ -36,7 +41,7 @@ class HomeController extends Controller
         return view('admin.homeAdmin',["msg"=>"I am admin role"]);
     }
     public function adminManageStock(){
-        $barang = Products::all();
+        // $barang = Products::all();
         $barang = Products::join('category','product.id','=','category.id')
         ->select('product.*','category.nama_category as category')
         ->get();
@@ -46,6 +51,14 @@ class HomeController extends Controller
     public function adminBarangNew(){
         $kategori = Category::all();
         return view('admin.forms.addStock',compact('kategori'));
+    }
+    public function getCategories(){
+        try {
+            $categories = Category::all();
+            return response()->json($categories);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to fetch categories. Please try again.'], 500);
+        }
     }
     public function adminMembership(){
 
