@@ -50,7 +50,7 @@ class AdminController extends Controller
         $productbaru->namaBarang = $request->inputNamaBarang;
         $productbaru->fk_kategori = $request->inputKategori;
         $productbaru->deskripsi = $request->inputDeskripsi;
-        $productbaru->jumlahTerkecil = $request->inputJumlahKecil;
+        $productbaru->totalQuantity = $request->inputJumlahKecil;
         $productbaru->satuanTerkecil = strtoupper($request->inputSatuanKecil);
         $productbaru->isiSatuanBesar= $request->inputJumlahBesar;
         $productbaru->satuanBesar = strtoupper($request->inputSatuanBesar);
@@ -117,22 +117,22 @@ class AdminController extends Controller
         }
     }
 
-    public function editKategori(Request $request,$id){
-        $input = $request->all();
+    // public function editKategori(Request $request,$id){
+    //     $input = $request->all();
 
-        try {
-            $Kat = Category::where('ID','=',$id)->first();
-            $Kat->nama_category = strtoupper($input["inputkategori"]);
-            $Kat->save();
-            alert()->success('Success!','Berhasil mengubah kategori');
-            return back();
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
-    }
+    //     try {
+    //         $Kat = Category::where('ID','=',$id)->first();
+    //         $Kat->nama_category = strtoupper($input["inputkategori"]);
+    //         $Kat->save();
+    //         alert()->success('Success!','Berhasil mengubah kategori');
+    //         return back();
+    //     } catch (\Exception $e) {
+    //         return $e->getMessage();
+    //     }
+    // }
 
     public function editBarang(Request $request,$id){
-        $barang = Products::where('ID','=',$id)->first();
+        $barang = Products::where('id','=',$id)->first();
         $this->validate($request,[
             'inputNamaBarang'=>'required',
             'inputjumlahkecil'=>'required'

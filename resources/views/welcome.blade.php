@@ -2,41 +2,8 @@
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-sm-3 p-1 d-flex flex-row" style="background-color: blue;">
-          {{-- <div class="row text-center"> --}}
-            {{-- @foreach ($kos as $k) --}}
-            {{-- <div class="col-md-3 mx-1" style="float:left"> --}}
-              <div class="card mb-4">
-                <img class="card-img-top" src="{{asset('images/dev/login.jpg')}}" alt="">
-                {{-- <img class="card-img-top"
-                     src="{{ asset("storage/gambar/".$k->kos_gambar) }}" alt="Card image cap"> --}}
-                <div class="card-body">
-                  <p class="card-text">harga</p>
-                  <h5 class="card-title">nama barang</h5>
-                  <a class="btn btn-primary" href="">Detail</a>
-                </div>
-              </div>
+    @include('customer.rowBarang')
 
-              <div class="card mb-4">
-                <img class="card-img-top" src="{{asset('images/dev/login.jpg')}}" alt="">
-                {{-- <img class="card-img-top"
-                     src="{{ asset("storage/gambar/".$k->kos_gambar) }}" alt="Card image cap"> --}}
-                <div class="card-body">
-                  <p class="card-text">harga</p>
-                  <h5 class="card-title">nama barang</h5>
-                  <a class="btn btn-primary" href="">Detail</a>
-                </div>
-              </div>
-            {{-- </div> --}}
-            {{-- @endforeach --}}
-            {{-- </div> --}}
-        </div>
-    </div>
-
-
-
-    
     <footer class="row row-cols-1 row-cols-sm-2 row-cols-md-5 py-5 my-5 border-top">
         <div class="col mb-3">
           <a href="/" class="d-flex align-items-center mb-3 link-body-emphasis text-decoration-none">
@@ -69,4 +36,44 @@
       </footer>
 </div>
 
+@endsection
+
+@section('script')
+<script>
+$(document).ready(function(){
+    $(document).on('click', '.detail-product', function() {
+        // Extract data from the button
+        var productName = $(this).data('product-name');
+        var productId = $(this).data('product-id');
+
+        // Encode the product name to ensure it works in the URL
+        var encodedProductName = encodeURIComponent(productName);
+
+        // Create a form dynamically
+        var form = $('<form>', {
+            'action': '/product/' + encodedProductName,
+            'method': 'GET'
+        });
+
+        // Add the CSRF token to the form
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+        form.append($('<input>', {
+            'type': 'hidden',
+            'name': '_token',
+            'value': csrfToken
+        }));
+
+        // Add the product ID to the form
+        form.append($('<input>', {
+            'type': 'hidden',
+            'name': 'productId',
+            'value': productId
+        }));
+
+        // Append the form to the body and submit it
+        $('body').append(form);
+        form.submit();
+    });
+  });
+</script>
 @endsection

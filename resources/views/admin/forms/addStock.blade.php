@@ -108,7 +108,7 @@
 
 <!-- Button trigger kategori -->
 <div class="mx-5 my-3 card">
-  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#insertKategori" aria-expanded="false" aria-controls="insertKategori">
+  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" href="#insertKategori" data-bs-target="#insertKategori" aria-expanded="false" aria-controls="insertKategori">
     Tambah Kategori
   </button>
 </div>

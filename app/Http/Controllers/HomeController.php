@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Pictures;
 use App\Models\Products;
 use Illuminate\Http\Request;
 
@@ -31,9 +32,7 @@ class HomeController extends Controller
         $barang = Products::join('category','product.id','=','category.id')
         ->select('product.*','category.nama_category as category')
         ->get();
-    }
-    public function userHome(){
-        return view('customer.homeCustomer',["msg"=>"I am user role"]);
+        return view('welcome',compact('barang'));
     }
 
     // admin
@@ -63,5 +62,41 @@ class HomeController extends Controller
     public function adminMembership(){
 
         return view('admin.manageMembership');
+    }
+
+
+    //user/pelanggan
+    public function userHome(){
+        $barang = Products::join('category','product.id','=','category.id')
+        ->select('product.*','category.nama_category as category')
+        ->get();
+        return view('customer.homeCustomer',["msg"=>"I am user role"]);
+    }
+    // public function detailBarang($id){
+    //     $barang = Products::join('category','product.id','=','category.id')
+    //     ->select('product.*','category.nama_category as category')
+    //     ->where('product.id','=',$id)
+    //     ->get();
+    //     // $barang = Products::where('id','=',$id)->first(); 
+    //     $pic=Pictures::where('productID','=',$id)->get();
+    //     return view('customer.detailBarang',compact('barang','pic'));
+    // }
+    public function detailBarang(Request $request, $productName){
+        $productId = $request->input('productId');
+
+        $barang = Products::join('category','product.id','=','category.id')
+        ->select('product.*','category.nama_category as category')
+        ->where('product.id','=',$productId)
+        ->first();
+
+        $pic=Pictures::where('productID','=',$productId)->get();
+
+        echo $barang;
+        // echo $pic;
+        return view('customer.detailBarang',compact('barang','pic'));
+    }
+
+    public function searchBarang(){
+        
     }
 }

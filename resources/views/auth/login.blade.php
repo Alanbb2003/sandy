@@ -63,6 +63,7 @@
         </div>
     </div>
 </div> --}}
+<a href="/" class="btn btn-info">back</a>
 
 <section class="vh-100" style="background-color: white;">
     <div class="container py-5 h-100">

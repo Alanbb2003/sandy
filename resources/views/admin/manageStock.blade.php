@@ -129,11 +129,15 @@
                   @foreach ($barang as $k)
                   <tr>
                     <td>{{$k->id}}</td>
-                    <td>{{$k->fotoPromosi}}</td>
+                    <td>
+                      <a target="_blank" href="{{asset('images/uploads/'.$k->fotoPromosi)}}">
+                        <img class="card-img-top thumbnail" src="{{asset('images/uploads/'.$k->fotoPromosi)}}" alt="Gambar Barang">
+                      </a>
+                    </td>
                     <td>{{$k->namaBarang}}</td> 
                     <td>{{$k->category}}</td>
                     <td>{{$k->deskripsi}}</td>
-                    <td>{{$k->jumlahTerkecil}} {{$k-> satuanTerkecil}} / {{$k->jumlahTerkecil/$k->isiSatuanBesar}} {{$k->satuanBesar}}</td> 
+                    <td>{{$k->totalQuantity}} {{$k-> satuanTerkecil}} / {{$k->totalQuantity/$k->isiSatuanBesar}} {{$k->satuanBesar}}</td> 
                     <td style="width: 100px;">
                       <div class="container d-flex-inline flex-row"></div>
                       <a href="#" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
