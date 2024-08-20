@@ -37,6 +37,11 @@ Route::middleware(['auth','user-role:user'])->group(function(){
         // Route::get("/",[HomeController::class,'userHome'])->name('home')->middleware('verified');
         Route::get('/', [HomeController::class,"welcome"])->name('home')->middleware('verified');
         Route::get("/product/{productName}",[HomeController::class,'detailBarang']);
+        
+        Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+        Route::get('/cart', [CartController::class, 'view'])->name('cart.view');
+        Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+        Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
     });
 });
 

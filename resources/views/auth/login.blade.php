@@ -63,7 +63,6 @@
         </div>
     </div>
 </div> --}}
-<a href="/" class="btn btn-info">back</a>
 
 <section class="vh-100" style="background-color: white;">
     <div class="container py-5 h-100">
@@ -73,6 +72,8 @@
             <div class="row g-0">
 
               <div class="col-md-5 d-flex align-items-center">
+                
+                <a href="/" class="mx-5" style="position: absolute; top: 5%"><i class="fa-solid fa-circle-arrow-left fa-xl"></i></a>
                 <img src="{{asset('images/dev/login.jpg')}}"
                 alt="picture here" class="img-fluid mt-4" style="border-radius: 1rem 0 0 1rem;" />
               </div>

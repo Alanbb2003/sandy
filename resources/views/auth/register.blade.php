@@ -83,6 +83,9 @@
             <div class="row g-0">
 
               <div class="col-md-6 col-lg-5 d-none d-md-block">
+                
+                <a href="/" class="mx-5" style="position: absolute; top: 5%"><i class="fa-solid fa-circle-arrow-left fa-xl"></i></a>
+
                 <img src="{{asset('images/dev/register.jpg')}}"
                   alt="Register form" class="img-fluid mt-4" style="border-radius: 1rem 0 0 1rem;" />
                   <a href="http://www.freepik.com/author/stories" class="small text-muted ms-5"></a>
