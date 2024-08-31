@@ -214,6 +214,10 @@
         
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
+                        <a href="{{ url('/cart') }}" class="mt-2 mx-1">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </a>
+                        
                         @guest
                             @if (Route::has('login'))
                                 <li class="nav-item">

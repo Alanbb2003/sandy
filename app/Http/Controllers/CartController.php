@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Products;
 use Illuminate\Http\Request;
+use Laravel\Ui\Presets\React;
 use RealRashid\SweetAlert\Facades\Alert;
 class CartController extends Controller
 {
@@ -39,24 +40,21 @@ class CartController extends Controller
         // }
 
         // session()->put('cart', $cart);
-        if (session()->has('cart')) {
-            echo "ada";
-        }else{
-            echo "tidak";
-        }
 
         $cart = session()->get('cart', []);
         // Cek apakah produk sudah ada dalam keranjang dengan unit yang sama
         if (isset($cart[$productId])) {
             // Jika unit yang ditambahkan sama dengan unit yang sudah ada dalam keranjang
-            if ($cart[$productId]['unit'] == $unit) {
+            if ($cart[$productId]['unitHidden'] == $unit) {
                 // Tambahkan jumlah sesuai dengan yang diminta
                 $cart[$productId]['quantity'] += $quantity;
             } else {
                 // Jika unit berbeda, tambahkan produk baru dengan key unik berdasarkan unit
                 $cart[$productId . '_' . $unit] = [
+                    "id"=>$productId. '_' . $unit,
                     "name" => $product->namaBarang,
                     "quantity" => $quantity,
+                    "unitHidden"=>$unit,
                     "unit" => $unit === 'small' ? $product->satuanTerkecil : $product->satuanBesar,
                     "price" => $unit === 'small' ? $product->hargaKecil : $product->hargaBesar,
                     "image" => $product->fotoPromosi,
@@ -65,8 +63,10 @@ class CartController extends Controller
         } else {
             // Jika produk belum ada dalam keranjang, tambahkan sebagai item baru
             $cart[$productId] = [
+                "id"=>$productId .'_' . $unit,
                 "name" => $product->namaBarang,
                 "quantity" => $quantity,
+                "unitHidden"=>$unit,
                 "unit" => $unit === 'small' ? $product->satuanTerkecil : $product->satuanBesar,
                 "price" => $unit === 'small' ? $product->hargaKecil : $product->hargaBesar,
                 "image" => $product->fotoPromosi,
@@ -83,12 +83,36 @@ class CartController extends Controller
     public function view()
     {
         $cart = session()->get('cart', []);
-        return view('cart.index', compact('cart'));
+        return view('customer.cart', compact('cart'));
     }
-
-    public function remove(Request $request)
+    public function addOne($id){
+        $productId = $id;
+        $cart = session()->get('cart', []);
+        if (isset($cart[$productId])) {
+            $cart[$productId]['quantity'] += 1;
+        }
+        session()->put('cart', $cart);
+        // alert()->success('Success!','Berhasil menambahkan jumlah');
+        return back();
+    }
+    public function removeOne($id){
+        $productId = $id;
+        $cart = session()->get('cart', []);
+        if (isset($cart[$productId])) {
+            if($cart[$productId]['quantity'] == 1){
+                unset($cart[$productId]);
+            }else{
+                $cart[$productId]['quantity'] -= 1;
+            }
+            
+        }
+        session()->put('cart', $cart);
+        // alert()->success('Success!','Berhasil mengurangi jumlah');
+        return back();
+    }
+    public function remove($id)
     {
-        $productId = $request->input('product_id');
+        $productId = $id;
         $cart = session()->get('cart', []);
 
         if (isset($cart[$productId])) {
@@ -96,20 +120,21 @@ class CartController extends Controller
             session()->put('cart', $cart);
         }
 
-        return response()->json(['message' => 'Item removed from cart successfully.']);
+        // alert()->success('Success!','Berhasil');
+        return back();
     }
 
-    public function update(Request $request)
-    {
-        $productId = $request->input('product_id');
-        $quantity = $request->input('quantity');
+    // public function update(Request $request)
+    // {
+    //     $productId = $request->input('product_id');
+    //     $quantity = $request->input('quantity');
 
-        $cart = session()->get('cart', []);
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity'] = $quantity;
-            session()->put('cart', $cart);
-        }
+    //     $cart = session()->get('cart', []);
+    //     if (isset($cart[$productId])) {
+    //         $cart[$productId]['quantity'] = $quantity;
+    //         session()->put('cart', $cart);
+    //     }
 
-        return response()->json(['message' => 'Cart updated successfully.']);
-    }
+    //     return response()->json(['message' => 'Cart updated successfully.']);
+    // }
 }

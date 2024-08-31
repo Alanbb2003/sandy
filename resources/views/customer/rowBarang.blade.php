@@ -10,7 +10,8 @@
             <div class="">
               <p class="card-text">Rp.{{$k->hargaKecil}}</p>
               <h5 class="card-title">{{$k->namaBarang}}</h5>
-              <button  class="btn btn-primary detail-product" data-product-name={{$k->namaBarang}} data-product-id={{$k->id}}>detail</button>
+              <a href="{{url('/product/'.$k->slugBarang )}}" class="btn btn-primary nodecor">detail</a>
+              {{-- <button  class="btn btn-primary detail-product" data-product-name={{$k->namaBarang}} data-product-id={{$k->id}}>detail</button> --}}
             </div>
           </div>
           @endforeach

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container mt-4">
     <div class="row">
         <div class="col">
             {{-- <div class="col"> --}}
@@ -17,13 +17,14 @@
         </div>
 
         <div class="col">
+            <h3>{{ $barang->namaBarang }}</h3>
+            <p>{{ $barang->deskripsi }}</p>
             <p>Price: Rp.{{ $barang->hargaKecil }} per {{ $barang->totalQuantity }} {{$barang->satuanTerkecil}}</p>
             @if($barang->satuanBesar && $barang->hargaBesar)
             <p>Price: Rp.{{ $barang->hargaBesar }} per  {{$barang->totalQuantity/$barang->isiSatuanBesar}} {{$barang->satuanBesar}}</p>
             @endif
             
-            <h3>{{ $barang->namaBarang }}</h3>
-            <p>{{ $barang->deskripsi }}</p>
+            
             
 
             <div>
@@ -42,7 +43,7 @@
                         @endif
                     </select>
                     {{-- <button class="btn btn-primary add-to-cart">Add to Cart</button> --}}
-                    <div class="col-12">
+                    <div class="col-12 mt-4">
                         <button type="submit" class="btn btn-primary">Tambah ke keranjang</button>
                     </div>
                 </form>
@@ -86,7 +87,7 @@
                                     <td>${{ $details['price'] }}</td>
                                     <td>${{ $details['price'] * $details['quantity'] }}</td>
                                     <td>
-                                        <button class="btn btn-danger remove-from-cart" data-product-id="{{ $id }}">Remove</button>
+                                        <a class="btn btn-danger remove-from-cart" href="{{url('/cart/remove/'.$id )}}">Remove</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -95,7 +96,7 @@
                 </table>
             </div>
             
-            <script>
+
             {{-- <button class="btn btn-primary add-to-cart" data-barang-id="{{ $barang->id }}">Add to Cart</button> --}}
         </div>
     </div>

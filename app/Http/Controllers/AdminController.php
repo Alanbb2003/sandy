@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Pictures;
 use App\Models\Products;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use RealRashid\SweetAlert\Facades\Alert;
 class AdminController extends Controller
 {
@@ -21,6 +22,7 @@ class AdminController extends Controller
         ]);
         $barang = Products::select("ID")->orderBy("ID","DESC")->first();
         // echo $barang;
+        
         $files = $request->file('images');
         $thumbnail = $request->file('thumbnail');
         $uploadedFiles = [];
@@ -48,6 +50,7 @@ class AdminController extends Controller
         $productbaru = new Products();
         $productbaru->fotoPromosi = $thumbnailname;
         $productbaru->namaBarang = $request->inputNamaBarang;
+        $productbaru->slugBarang = Str::slug($request->inputNamaBarang);
         $productbaru->fk_kategori = $request->inputKategori;
         $productbaru->deskripsi = $request->inputDeskripsi;
         $productbaru->totalQuantity = $request->inputJumlahKecil;

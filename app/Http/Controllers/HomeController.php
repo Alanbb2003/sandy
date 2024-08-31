@@ -72,30 +72,32 @@ class HomeController extends Controller
         ->get();
         return view('customer.homeCustomer',["msg"=>"I am user role"]);
     }
-    // public function detailBarang($id){
+
+    // public function detailBarang(Request $request, $productName){
+    //     $productId = $request->input('productId');
+
     //     $barang = Products::join('category','product.id','=','category.id')
     //     ->select('product.*','category.nama_category as category')
-    //     ->where('product.id','=',$id)
-    //     ->get();
-    //     // $barang = Products::where('id','=',$id)->first(); 
-    //     $pic=Pictures::where('productID','=',$id)->get();
+    //     ->where('product.id','=',$productId)
+    //     ->first();
+
+    //     $pic=Pictures::where('productID','=',$productId)->get();
+
     //     return view('customer.detailBarang',compact('barang','pic'));
     // }
-    public function detailBarang(Request $request, $productName){
-        $productId = $request->input('productId');
-
+    public function showdetailBarang($slugBarang){
+        $slug = $slugBarang;
+        $product = Products::where('slugBarang', $slug)->firstOrFail();
         $barang = Products::join('category','product.id','=','category.id')
         ->select('product.*','category.nama_category as category')
-        ->where('product.id','=',$productId)
-        ->first();
+        ->where('product.slugBarang','=',$slug)
+        ->firstOrFail();
 
-        $pic=Pictures::where('productID','=',$productId)->get();
+        $pic=Pictures::where('productID','=',$product->id)->get();
 
-        echo $barang;
-        // echo $pic;
         return view('customer.detailBarang',compact('barang','pic'));
     }
-
+    
     public function searchBarang(){
         
     }
