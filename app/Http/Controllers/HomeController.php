@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alamat;
 use App\Models\Category;
 use App\Models\Pictures;
 use App\Models\Products;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -32,7 +34,8 @@ class HomeController extends Controller
         $barang = Products::join('category','product.id','=','category.id')
         ->select('product.*','category.nama_category as category')
         ->get();
-        return view('welcome',compact('barang'));
+        $category = Category ::all();
+        return view('welcome',compact('barang','category'));
     }
 
     // admin
@@ -72,6 +75,11 @@ class HomeController extends Controller
         ->get();
         return view('customer.homeCustomer',["msg"=>"I am user role"]);
     }
+    public function returnBarang(){
+        $category  = Category::all();
+
+
+    }
 
     // public function detailBarang(Request $request, $productName){
     //     $productId = $request->input('productId');
@@ -97,7 +105,19 @@ class HomeController extends Controller
 
         return view('customer.detailBarang',compact('barang','pic'));
     }
-    
+    public function checkoutPage(){
+        $userID = Auth::user()->id;
+        $address = Alamat::where('fkUserID',$userID)->get();
+
+        
+        return view('customer.checkout', compact('address'));
+    }
+    public function addressPage(){
+        $userID = Auth::user()->id;
+        $address = Alamat::where('fkUserID',$userID)->get();
+        echo $address;
+        return view('customer.adressInput',compact('address'));
+    }
     public function searchBarang(){
         
     }

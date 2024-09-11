@@ -192,51 +192,52 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
-                        @guest
-                            <form class="d-flex" role="search">
-                                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                                <button class="btn btn-outline-success" type="submit">Search</button>
-                            </form>
-                        @else
-                            @if (Auth::user()->role == 'admin')
-                                <a class="nav-link" href="#">Home</a>
-                                <a class="nav-link" href="{{ url('/dashboard/barang') }}">Barang</a>
-                                <a class="nav-link" href="#">Pelanggan</a>
-                                <a class="nav-link" href="#">Disabled</a>
-                            @elseif (Auth::user()->role == 'user')
-                                <form class="d-flex" role="search">
-                                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                                    <button class="btn btn-outline-success" type="submit">Search</button>
-                                </form>
-                            @endif
-                        @endguest
+                        <form class="d-flex" role="search">
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>
+                        <a href="{{ url('/') }}" class="mt-2 mx-1">
+                            <i class="fa-regular fa-address-card"> Membership</i>
+                        </a>
                     </ul>
         
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
-                        <a href="{{ url('/cart') }}" class="mt-2 mx-1">
-                            <i class="fa-solid fa-cart-shopping"></i>
+                        <a href="{{ url('/cart') }}" class="btn mt-2 mx-1 position-relative">
+                            <i class="fa-solid fa-cart-shopping fa-lg">
+                                                           
+                            </i>
+                            @if(session('cart'))
+                            @php
+                                $items_in_cart = count(Session('cart'));
+                            @endphp
+                                <span class="position-absolute top-0 start-100 translate-middle badge bg-danger">
+                                {{$items_in_cart}}
+                                <span class="visually-hidden">unread messages</span>
+                                </span>   
+                            @endif
+                            
                         </a>
                         
                         @guest
                             @if (Route::has('login'))
-                                <li class="nav-item">
+                                <li class="nav-item mt-2 mx-1 position-relative">
                                     <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
                                 </li>
                             @endif
         
-                            @if (Route::has('register'))
+                            @if (Route::has('register mt-2 mx-1 position-relative'))
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                                 </li>
                             @endif
                         @else
-                            <li class="nav-item">
+                            <li class="nav-item mt-2 mx-1 position-relative">
                                 <a class="nav-link" href="#" role="button">
                                     {{ Auth::user()->name }}
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item mt-2 mx-1 position-relative">
                                 <a class="nav-link" href="{{ route('logout') }}"
                                    onclick="event.preventDefault();
                                                 document.getElementById('logout-form').submit();">
@@ -252,6 +253,7 @@
                 </div>
             </div>
         </nav>
+        
         <main class="py-4">
             @include('sweetalert::alert')
             @yield('content')

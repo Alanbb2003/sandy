@@ -22,15 +22,15 @@
                         <td><img src="{{ asset('images/uploads/'.$details['image'] )}}" width="50" height="50" class="img-thumbnail" /></td>
                         <td>{{ $details['name'] }}</td>
                         <td>
-                            
+                            <a href="{{url('/cart/addOne/'.$id )}}" class="btn nodecor mb-2">+</a>
                             {{ $details['quantity'] }}
-                        
+                            <a href="{{url('/cart/removeOne/'.$id )}}" class="btn nodecor mb-2">-</a>
                         </td>
                         <td>{{ $details['unit'] }}</td>
                         <td>${{ $details['price'] }}</td>
                         <td>${{ $details['price'] * $details['quantity'] }}</td>
                         <td>
-                            <button class="btn btn-danger remove-from-cart" data-product-id="{{ $id }}">Remove</button>
+                            <a class="btn btn-danger remove-from-cart nodecor" href="{{url('/cart/remove/'.$id )}}">Remove</a>
                         </td>
                     </tr>
                 @endforeach
@@ -65,7 +65,9 @@
         @endif
         </div>
     </div>
-    <a href="{{url('')}}" class="btn btn-primary nodecor">Checkout</a>
+    <div class="mt-1">
+        <a href="{{url('/checkout' )}}" class="btn btn-primary nodecor">Checkout</a>
+    </div>
 </div>
 
 

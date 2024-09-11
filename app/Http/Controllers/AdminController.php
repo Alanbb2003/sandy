@@ -94,6 +94,7 @@ class AdminController extends Controller
         try {
             $kategoribaru = new Category();
             $kategoribaru->nama_category = strtoupper($input["inputkategori"]);
+            $kategoribaru->slugKategori = Str::slug($input["inputkategori"]);
             $kategoribaru->save();
             alert()->success('Success!','Berhasil menambahkan kategori');
             return back();
@@ -110,6 +111,7 @@ class AdminController extends Controller
                 return response()->json(['error' => 'Category not found.'], 404);
             }
             $category->nama_category = strtoupper($request->input('categoryName')) ;
+            $category->slugKategori = Str::slug($request->input('categoryName'));
             $category->save();
             return response()->json([
                 'id' => $category->id,

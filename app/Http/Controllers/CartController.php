@@ -13,33 +13,19 @@ class CartController extends Controller
         $productId = $request->input('IDbarang');
         $quantity = $request->input('quantity', 1);
         $unit = $request->input('unit');
-        echo $quantity;
-        echo $unit;
-        echo $productId;
 
         $product = Products::find($productId);
         if (!$product) {
             return response()->json(['message' => 'Product not found.'], 404);
         }
-
-        $cart = session()->get('cart', []);
-
-        // if (isset($cart[$productId])) {
-        //     $cart[$productId]['quantity'] += $quantity;
-        // } else {
-        //     if($unit == "small"){
-        //         $cart[$productId] = [
-        //             "name" => $product->name,
-        //             "quantity" => $quantity,
-        //             "unit"=>$product->satuanTerkecil,
-        //             "price" => $product->hargaKecil,
-        //             "image" => $product->fotoPromosi
-        //         ];
-        //     }
-            
-        // }
-
-        // session()->put('cart', $cart);
+        $jumlahKecil = $product->totalQuantity;
+        $jumlahBesar = $product->totalQuantity / $product->isiSatuanBesar;
+        // $availablequantity = kalau unit == "small"" di isi jumlah kecil jika tidak jumlah besar
+        $availableQuantity = $unit == "small" ? $jumlahKecil : $jumlahBesar;
+        if ($availableQuantity < $quantity) {
+            toast("Beberapa Produk sedang kosong, produk ini hanya tersedia $availableQuantity", 'warning');
+            return back();
+        }
 
         $cart = session()->get('cart', []);
         // Cek apakah produk sudah ada dalam keranjang dengan unit yang sama
@@ -87,12 +73,30 @@ class CartController extends Controller
     }
     public function addOne($id){
         $productId = $id;
+        $product = Products::where('id',$productId)->first();
+        echo($product);
+        $productsmall = $product->totalQuantity;
+        $productbig = $product->totalQuantity / $product->isiSatuanBesar;
+
         $cart = session()->get('cart', []);
         if (isset($cart[$productId])) {
-            $cart[$productId]['quantity'] += 1;
+            if($cart[$productId]['unitHidden'] == "small"){
+                if($productsmall <= $cart[$productId]['quantity']){
+                    toast("Beberapa Produk sedang kosong, produk ini hanya tersedia $productsmall",'warning');
+                    return back();
+                }else{
+                    $cart[$productId]['quantity'] += 1;
+                }
+            }else{
+                if($productbig <= $cart[$productId]['quantity']){
+                    toast("Beberapa Produk sedang kosong, produk ini hanya tersedia $productbig",'warning');
+                    return back();
+                }else{
+                    $cart[$productId]['quantity'] += 1;
+                }
+            }
         }
         session()->put('cart', $cart);
-        // alert()->success('Success!','Berhasil menambahkan jumlah');
         return back();
     }
     public function removeOne($id){
@@ -107,7 +111,7 @@ class CartController extends Controller
             
         }
         session()->put('cart', $cart);
-        // alert()->success('Success!','Berhasil mengurangi jumlah');
+        toast("Berhasil mengurangi produk",'info');
         return back();
     }
     public function remove($id)
@@ -120,7 +124,7 @@ class CartController extends Controller
             session()->put('cart', $cart);
         }
 
-        // alert()->success('Success!','Berhasil');
+        toast("Berhasil menghilangkan produk",'info');
         return back();
     }
 
