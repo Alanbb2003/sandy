@@ -11,6 +11,41 @@ use RealRashid\SweetAlert\Facades\Alert;
 class AdminController extends Controller
 {
     //
+    //view
+    public function adminHome(){
+        return view('admin.homeAdmin',["msg"=>"I am admin role"]);
+    }
+    
+    public function adminManageStock(){
+        // $barang = Products::all();
+        $barang = Products::join('category','product.id','=','category.id')
+        ->select('product.*','category.nama_category as category')
+        ->get();
+        $kategori = Category::all();
+        return view('admin.manageStock',compact('barang','kategori'));
+    }
+
+    public function adminBarangNew(){
+        $kategori = Category::all();
+        return view('admin.forms.addStock',compact('kategori'));
+    }
+
+    public function getCategories(){
+        try {
+            $categories = Category::all();
+            return response()->json($categories);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to fetch categories. Please try again.'], 500);
+        }
+    }
+    
+    public function adminMembership(){
+
+        return view('admin.manageMembership');
+    }
+
+
+    //function
     public function addBarang(Request $request){
         $input = $request->all();
         $this->validate($request,[

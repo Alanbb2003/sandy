@@ -35,27 +35,27 @@ Route::prefix('/cart')->group(function() {
     Route::get('/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 });
 
-Route::get('/checkout',[HomeController::class,"checkoutPage"])->middleware('verified');
-Route::get('/address',[HomeController::class,"addressPage"]);
-Route::post('/address/add',[UserController::class,"addAlamat"])->middleware('verified');
+Route::get('/checkout',[UserController::class,"checkoutPage"])->middleware('verified');
+Route::get('/address',[USerController::class,"addressPage"])->middleware('verified');
+Route::post('/address/add',[UserController::class,"addAlamat"]);
 //user route
+
 Route::middleware(['auth','user-role:user'])->group(function(){
     Route::prefix('/home',)->group(function(){
-        // Route::get("/",[HomeController::class,'userHome'])->name('home')->middleware('verified');
         Route::get('/', [HomeController::class,"welcome"])->name('home')->middleware('verified');
-        Route::get('/checkout',[HomeController::class,"checkoutPage"])->middleware('verified');
-        Route::get('/address',[HomeController::class,"addressPage"]);
-        Route::post('/address/add',[UserController::class,"addAlamat"])->middleware('verified');
+        // Route::get('/checkout',[HomeController::class,"checkoutPage"])->middleware('verified');
+        // Route::get('/address',[HomeController::class,"addressPage"]);
+        // Route::post('/address/add',[UserController::class,"addAlamat"])->middleware('verified');
     });
 });
 
 //admin route
 Route::middleware(['auth','user-role:admin'])->group(function(){
     Route::prefix('/dashboard',)->group(function(){
-        Route::get("/",[HomeController::class,'adminHome'])->name('homeAdmin');
-        Route::get('/barang',[HomeController::class,'adminManageStock']);
-        Route::get('/barang/new',[HomeController::class,'adminBarangNew']);
-        Route::get('/barang/new/get-categories',[HomeController::class,'getCategories']);
+        Route::get("/",[AdminController::class,'adminHome'])->name('homeAdmin');
+        Route::get('/barang',[AdminController::class,'adminManageStock']);
+        Route::get('/barang/new',[AdminController::class,'adminBarangNew']);
+        Route::get('/barang/new/get-categories',[AdminController::class,'getCategories']);
         Route::post('/barang/new',[AdminController::class,'addBarang']);
         Route::post('/barang/new/kategori',[AdminController::class,"addKategori"]);
         Route::post('/barang/new/kategori/update-category', [AdminController::class, 'updateKategori']);

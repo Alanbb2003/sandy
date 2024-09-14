@@ -121,8 +121,8 @@
                       <th>Thumbnail</th>
                       <th data-priority="1">Nama Barang</th>
                       <th>kategori</th>
-                      <th>Deskripsi</th>
                       <th data-priority="3">Jumlah</th>
+                      <th>Harga</th>
                       <th data-priority="2">Action</th>
                     </tr>
                   </thead>
@@ -137,8 +137,8 @@
                     </td>
                     <td>{{$k->namaBarang}}</td> 
                     <td>{{$k->category}}</td>
-                    <td>{{$k->deskripsi}}</td>
                     <td>{{$k->totalQuantity}} {{$k-> satuanTerkecil}} / {{$k->totalQuantity/$k->isiSatuanBesar}} {{$k->satuanBesar}}</td> 
+                    <td> Rp.{{$k->hargaKecil}}/ Rp.{{$k->hargaBesar}}</td>
                     <td style="width: 100px;">
                       <div class="container d-flex-inline flex-row"></div>
                       <a href="#" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>

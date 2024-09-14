@@ -3,8 +3,8 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="card col">
-            <form action="{{url('/address/add') }}" method="POST">
+        <div class="card col mx-3">
+            <form action="{{ url('/address/add') }}" method="POST">
                 @csrf
                 <div class="mb-1">
                     <label for="InputnamaDepan" class="form-label">Nama Depan</label>
@@ -25,51 +25,60 @@
                         </span>
                     @enderror
                 </div>
-
+            
                 <div class="mb-1">
                     <label for="InputDetail" class="form-label">Detail Alamat</label>
-                    <input type="text" class="form-control" id="InputDetail" aria-describedby="NamaBHelp" value="{{ old('InputDetail') }}">
+                    <input id="InputDetail" type="text" class="form-control @error('InputDetail') is-invalid @enderror" name="InputDetail" value="{{ old('InputDetail') }}" required autocomplete="InputDetail" autofocus placeholder="Detail Alamat">
+                    @error('InputDetail')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
                 </div>
-
+            
                 <div class="mb-1">
                     <label for="InputnoHp" class="form-label">Nomor telefon</label>
-                    <input type="text" class="form-control" id="InputnoHp" aria-describedby="NomorHelp">
+                    <input type="text" class="form-control" id="InputnoHp" name="InputnoHp" value="{{ old('InputnoHp') }}" placeholder="Nomor telefon">
                 </div>
-
+            
                 <div class="mb-1">
                     <label for="InputKodePos" class="form-label">Kode Pos</label>
-                    <input type="text" class="form-control" id="InputKodePos" aria-describedby="PosHelp">
+                    <input type="text" class="form-control" id="InputKodePos" name="InputKodePos" value="{{ old('InputKodePos') }}" placeholder="Kode Pos">
                 </div>
-
+            
                 <div class="mb-1">
-                    <label for="" class="form-label">Provinsi:</label>
+                    <label for="provinsi" class="form-label">Provinsi:</label>
                     <select name="provinsi" id="provinsi" class="form-control">
-        
+                        <option value="">Pilih Provinsi</option>
+                        <!-- Populate with data dynamically -->
                     </select>
                 </div>
-
+            
                 <div class="mb-1">
-                    <label for="" class="form-label">Kabupaten/Kota:</label>
+                    <label for="kota" class="form-label">Kabupaten/Kota:</label>
                     <select name="kota" id="kota" class="form-control">
-        
+                        <option value="">Pilih Kota</option>
+                        <!-- Populate with data dynamically -->
                     </select>
                 </div>
-
+            
                 <div class="mb-1">
-                    <label for="" class="form-label">Kecamatan:</label>
+                    <label for="kecamatan" class="form-label">Kecamatan:</label>
                     <select name="kecamatan" id="kecamatan" class="form-control">
-        
+                        <option value="">Pilih Kecamatan</option>
+                        <!-- Populate with data dynamically -->
                     </select>
                 </div>
-
+            
                 <div class="mb-1">
-                    <label for="" class="form-label">Kelurahan:</label>
+                    <label for="kelurahan" class="form-label">Kelurahan:</label>
                     <select name="kelurahan" id="kelurahan" class="form-control">
-        
+                        <option value="">Pilih Kelurahan</option>
+                        <!-- Populate with data dynamically -->
                     </select>
                 </div>
-
-                <div class="col-12 my-2">
+            
+                <div class="mb-2">
                     <button type="submit" class="btn btn-primary">Tambah</button>
                 </div>
             </form>
