@@ -4,7 +4,8 @@
 <div class="container">
     <div class="row">
         <div class="card col mx-3">
-            <form action="{{ url('/address/add') }}" method="POST">
+            <h2>Alamat Baru</h2>
+            <form action="{{url('/address/add')}}" method="POST">
                 @csrf
                 <div class="mb-1">
                     <label for="InputnamaDepan" class="form-label">Nama Depan</label>
@@ -28,7 +29,7 @@
             
                 <div class="mb-1">
                     <label for="InputDetail" class="form-label">Detail Alamat</label>
-                    <input id="InputDetail" type="text" class="form-control @error('InputDetail') is-invalid @enderror" name="InputDetail" value="{{ old('InputDetail') }}" required autocomplete="InputDetail" autofocus placeholder="Detail Alamat">
+                    <input id="InputDetail" type="text" name="InputDetail" class="form-control @error('InputDetail') is-invalid @enderror"  value="{{ old('InputDetail') }}" required autocomplete="InputDetail" autofocus placeholder="Detail Alamat">
                     @error('InputDetail')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
@@ -37,34 +38,43 @@
                 </div>
             
                 <div class="mb-1">
-                    <label for="InputnoHp" class="form-label">Nomor telefon</label>
-                    <input type="text" class="form-control" id="InputnoHp" name="InputnoHp" value="{{ old('InputnoHp') }}" placeholder="Nomor telefon">
+                    <label for="InputnoHP" class="form-label">Nomor telefon</label>
+                    <input id="InputnoHP" type="text" name="InputnoHP" class="form-control @error('InputnoHP') is-invalid @enderror"  value="{{ old('InputnoHP') }}" required autocomplete="InputnoHP" autofocus placeholder="Nomor telefon">
+                    @error('InputnoHP')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
                 </div>
-            
+
                 <div class="mb-1">
                     <label for="InputKodePos" class="form-label">Kode Pos</label>
-                    <input type="text" class="form-control" id="InputKodePos" name="InputKodePos" value="{{ old('InputKodePos') }}" placeholder="Kode Pos">
+                    <input id="InputKodePos" type="text" name="InputKodePos" class="form-control @error('InputKodePos') is-invalid @enderror"  value="{{ old('InputKodePos') }}" required autocomplete="InputKodePos" autofocus placeholder="Kode Pos">
+                    @error('InputKodePos')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
                 </div>
             
                 <div class="mb-1">
                     <label for="provinsi" class="form-label">Provinsi:</label>
-                    <select name="provinsi" id="provinsi" class="form-control">
+                    <select class="form-select" id="provinsi" name="provinsi" placeholder="Pilih Provinsi" >
                         <option value="">Pilih Provinsi</option>
-                        <!-- Populate with data dynamically -->
                     </select>
                 </div>
             
                 <div class="mb-1">
                     <label for="kota" class="form-label">Kabupaten/Kota:</label>
-                    <select name="kota" id="kota" class="form-control">
-                        <option value="">Pilih Kota</option>
+                    <select name="kota" id="kota" class="form-select" placeholder="Pilih Kabupaten/Kota">
+                        <option value="">Pilih Kabupaten/Kota</option>
                         <!-- Populate with data dynamically -->
                     </select>
                 </div>
             
                 <div class="mb-1">
                     <label for="kecamatan" class="form-label">Kecamatan:</label>
-                    <select name="kecamatan" id="kecamatan" class="form-control">
+                    <select name="kecamatan" id="kecamatan" class="form-select" placeholder="Pilih Kecamatan">
                         <option value="">Pilih Kecamatan</option>
                         <!-- Populate with data dynamically -->
                     </select>
@@ -72,7 +82,7 @@
             
                 <div class="mb-1">
                     <label for="kelurahan" class="form-label">Kelurahan:</label>
-                    <select name="kelurahan" id="kelurahan" class="form-control">
+                    <select name="kelurahan" id="kelurahan" class="form-select" placeholder="Pilih Kelurahan">
                         <option value="">Pilih Kelurahan</option>
                         <!-- Populate with data dynamically -->
                     </select>
@@ -90,17 +100,90 @@
                 <div>Belum ada alamat</div>
             @else
                 @foreach ($address as $a)
-                <div class="col">
+                <div class="col my-2">
                     <div class="row">{{$a->namaDepan}} {{$a->namaBelakang}}</div>
                     <div class="row">{{$a->noHP}}</div>
-                    <div class="row">{{$a->detailAlamat}}</div>
+                    <div class="row">{{$a->detailAlamat}}, {{$a->provinsi}}, {{$a->kota}}, {{$a->kecamatan}}, {{$a->kelurahan}}</div>
+
+                    <button class="btn btn-info" onclick="editAddress({{ json_encode($a) }})">Edit</button>
                 </div>
                 @endforeach
             @endif
         </div>
     </div>
 </div>
-
+<!-- Edit Address Modal -->
+<div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editAddressModalLabel">Edit Alamat</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editAddressForm" action="{{ url('/address/edit') }}" method="POST">
+            @csrf
+            @method('PUT')
+            <input type="hidden" id="addressId" name="addressId">
+            
+            <div class="mb-3">
+              <label for="editNamaDepan" class="form-label">Nama Depan</label>
+              <input type="text" class="form-control" id="editNamaDepan" name="editNamaDepan" required>
+            </div>
+            
+            <div class="mb-3">
+              <label for="editNamaBelakang" class="form-label">Nama Belakang</label>
+              <input type="text" class="form-control" id="editNamaBelakang" name="editNamaBelakang" required>
+            </div>
+            
+            <div class="mb-3">
+              <label for="editNoHp" class="form-label">Nomor Telefon</label>
+              <input type="text" class="form-control" id="editNoHp" name="editNoHp" required>
+            </div>
+  
+            <!-- Provinsi -->
+            <div class="mb-3">
+              <label for="editProvinsi" class="form-label">Provinsi</label>
+              <select class="form-select" id="editProvinsi" name="editProvinsi" required>
+                <option>Pilih Provinsi</option>
+              </select>
+            </div>
+            
+            <!-- Kota -->
+            <div class="mb-3">
+              <label for="editKota" class="form-label">Kabupaten/Kota</label>
+              <select class="form-select" id="editKota" name="editKota" required>
+                <option>Pilih Kota</option>
+              </select>
+            </div>
+            
+            <!-- Kecamatan -->
+            <div class="mb-3">
+              <label for="editKecamatan" class="form-label">Kecamatan</label>
+              <select class="form-select" id="editKecamatan" name="editKecamatan" required>
+                <option>Pilih Kecamatan</option>
+              </select>
+            </div>
+            
+            <!-- Kelurahan -->
+            <div class="mb-3">
+              <label for="editKelurahan" class="form-label">Kelurahan</label>
+              <select class="form-select" id="editKelurahan" name="editKelurahan" required>
+                <option>Pilih Kelurahan</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label for="editKodePos" class="form-label">Kode Pos</label>
+              <input type="text" class="form-control" id="editKodePos" name="editKodePos" required>
+            </div>
+  
+            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 @endsection
 
 @section('script')
@@ -110,7 +193,7 @@
     .then(provinces => 
         {
             var data = provinces;
-            var tampung = '<option>Pilih</option>';
+            var tampung = '<option>Pilih Provinsi</option>';
             data.forEach(element => {
                 tampung += `<option data-reg="${element.id}" value="${element.name}">${element.name}</option>`;
             });
@@ -172,4 +255,74 @@ selectKecamatan.addEventListener('change',(e)=>{
     });
 });
 </script>
+<script>
+    function editAddress(address) {
+    document.getElementById('addressId').value = address.id;
+    document.getElementById('editNamaDepan').value = address.namaDepan;
+    document.getElementById('editNamaBelakang').value = address.namaBelakang;
+    document.getElementById('editNoHp').value = address.noHP;
+    document.getElementById('editKodePos').value = address.kodePos;
+
+    var modal = new bootstrap.Modal(document.getElementById('editAddressModal'));
+    modal.show();
+}
+</script>
+<script>
+    // Fetch Provinces
+    fetch('https://alanbb2003.github.io/api-wilayah-indonesia/api/provinces.json')
+    .then(response => response.json())
+    .then(provinces => {
+        let tampung = '<option>Pilih Provinsi</option>';
+        provinces.forEach(element => {
+            tampung += `<option data-reg="${element.id}" value="${element.name}">${element.name}</option>`;
+        });
+        document.getElementById('editProvinsi').innerHTML = tampung;
+    });
+
+    // Event listener for Provinsi change
+    document.getElementById('editProvinsi').addEventListener('change', (e) => {
+        let provinsiId = e.target.options[e.target.selectedIndex].dataset.reg;
+        fetch(`https://alanbb2003.github.io/api-wilayah-indonesia/api/regencies/${provinsiId}.json`)
+        .then(response => response.json())
+        .then(regencies => {
+            let tampung = '<option>Pilih Kota</option>';
+            regencies.forEach(element => {
+                tampung += `<option data-dist="${element.id}" value="${element.name}">${element.name}</option>`;
+            });
+            document.getElementById('editKota').innerHTML = tampung;
+            document.getElementById('editKecamatan').innerHTML = '';
+            document.getElementById('editKelurahan').innerHTML = '';
+        });
+    });
+
+    // Event listener for Kota change
+    document.getElementById('editKota').addEventListener('change', (e) => {
+        let kotaId = e.target.options[e.target.selectedIndex].dataset.dist;
+        fetch(`https://alanbb2003.github.io/api-wilayah-indonesia/api/districts/${kotaId}.json`)
+        .then(response => response.json())
+        .then(districts => {
+            let tampung = '<option>Pilih Kecamatan</option>';
+            districts.forEach(element => {
+                tampung += `<option data-vill="${element.id}" value="${element.name}">${element.name}</option>`;
+            });
+            document.getElementById('editKecamatan').innerHTML = tampung;
+            document.getElementById('editKelurahan').innerHTML = '';
+        });
+    });
+
+    // Event listener for Kecamatan change
+    document.getElementById('editKecamatan').addEventListener('change', (e) => {
+        let kecamatanId = e.target.options[e.target.selectedIndex].dataset.vill;
+        fetch(`https://alanbb2003.github.io/api-wilayah-indonesia/api/villages/${kecamatanId}.json`)
+        .then(response => response.json())
+        .then(villages => {
+            let tampung = '<option>Pilih Kelurahan</option>';
+            villages.forEach(element => {
+                tampung += `<option value="${element.name}">${element.name}</option>`;
+            });
+            document.getElementById('editKelurahan').innerHTML = tampung;
+        });
+    });
+</script>
+
 @endsection

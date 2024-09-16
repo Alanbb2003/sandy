@@ -37,7 +37,8 @@ Route::prefix('/cart')->group(function() {
 
 Route::get('/checkout',[UserController::class,"checkoutPage"])->middleware('verified');
 Route::get('/address',[USerController::class,"addressPage"])->middleware('verified');
-Route::post('/address/add',[UserController::class,"addAlamat"]);
+Route::post('/address/add',[UserController::class,"addAlamat"])->middleware('verified');
+Route::put('/address/edit', [UserController::class, 'updateAddress'])->middleware('verified');
 //user route
 
 Route::middleware(['auth','user-role:user'])->group(function(){
@@ -56,7 +57,7 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::get('/barang',[AdminController::class,'adminManageStock']);
         Route::get('/barang/new',[AdminController::class,'adminBarangNew']);
         Route::get('/barang/new/get-categories',[AdminController::class,'getCategories']);
-        Route::post('/barang/new',[AdminController::class,'addBarang']);
+        Route::post('/barang/new',[AdminController::class,'addBarang']);    
         Route::post('/barang/new/kategori',[AdminController::class,"addKategori"]);
         Route::post('/barang/new/kategori/update-category', [AdminController::class, 'updateKategori']);
         // Route::post('/barang/kategori',[AdminController::class,"addKategori"]);

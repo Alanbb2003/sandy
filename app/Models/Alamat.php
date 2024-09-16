@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Alamat extends Model
 {
     use HasFactory;
-    public $table = "adress_book";
+    public $table = "address_book";
     protected $primaryKey = "id";
+    protected $fillable = [
+       'fkUserID', 'namaDepan', 'namaBelakang', 'noHP', 'provinsi', 
+        'kota', 'kecamatan', 'kelurahan', 'kodePos', 'detailAlamat'
+    ];
 }

@@ -35,36 +35,70 @@ class UserController extends Controller
     // function
     public function addAlamat(Request $request){
         $userID = Auth::user()->id;
-        
-        $this->validate($request,[
-            'InputnamaDepan'=>'required',
-            'InputnamaBelakang'=>'required',
-            'InputDetail'=>'required',
-            'provinsi'=>'required',
-            'InputKodePos'=>'required',
-            'InputnoHP'=>'required',
-        ]);
         // dd($request->all());
+
+        // Validate the request
+        $this->validate($request, [
+            'InputnamaDepan' => 'required',
+            'InputnamaBelakang' => 'required',
+            'InputDetail' => 'required',
+            'provinsi' => 'required',
+            'InputKodePos' => 'required',
+            'InputnoHP' => 'required',
+        ]);
+
+        
         try {
-            $Adress = new Alamat();
-            $Adress->fkUserID = $userID;
-            $Adress->namaDepan = $request->InputnamaDepan;
-            $Adress->namaBelakang = $request->InputnamaBelakang;
-            $Adress->noHP = $request->InputnoHP;
-            $Adress->provinsi = $request->provinsi;
-            $Adress->kota = $request->kota ?? null;
-            $Adress->kecamatan = $request->kecamatan ?? null;
-            $Adress->kelurahan = $request->kelurahan ?? null;
-            $Adress->kodePos = $request->InputKodePos;
-            $Adress->detailAlamat = $request->InputDetail;
-
-            $Adress->save();
-
-            alert()->success('Success!','Berhasil menambahkan alamat');
-            return back();
+            // Use mass assignment to create the address
+            Alamat::create([
+                'fkUserID' => $userID,
+                'namaDepan' => $request->InputnamaDepan,
+                'namaBelakang' => $request->InputnamaBelakang,
+                'noHP' => $request->InputnoHP,
+                'provinsi' => $request->provinsi,
+                'kota' => $request->kota,
+                'kecamatan' => $request->kecamatan,
+                'kelurahan' => $request->kelurahan,
+                'kodePos' => $request->InputKodePos,
+                'detailAlamat' => $request->InputDetail,
+            ]);
+    
+            alert()->success('Success!', 'Berhasil menambahkan alamat');
+            return redirect('/checkout');
+    
         } catch (\Exception $e) {
-            // return $e->getMessage();
             abort(500, 'Error while adding address');
         }
+    }
+
+    public function updateAddress(Request $request) {
+        $address = Alamat::find($request->addressId);
+        
+        $this->validate($request, [
+            'editNamaDepan' => 'required',
+            'editNamaBelakang' => 'required',
+            'editNoHp' => 'required',
+            'editProvinsi' => 'required',
+            'editKota' => 'required',
+            'editKecamatan' => 'required',
+            'editKelurahan' => 'required',
+            'editKodePos' => 'required',
+        ]);
+    
+        $address->namaDepan = $request->editNamaDepan;
+        $address->namaBelakang = $request->editNamaBelakang;
+        $address->noHP = $request->editNoHp;
+        $address->provinsi = $request->editProvinsi;
+        $address->kota = $request->editKota;
+        $address->kecamatan = $request->editKecamatan;
+        $address->kelurahan = $request->editKelurahan;
+        $address->kodePos = $request->editKodePos;
+    
+        $address->save();
+        alert()->success('Success!', 'Berhasil menambahkan alamat');
+        return redirect()->back();
+    }
+    public function checkoutFunc(Request $request){
+        
     }
 }
