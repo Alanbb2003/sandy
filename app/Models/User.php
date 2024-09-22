@@ -48,4 +48,8 @@ class User extends Authenticatable implements MustVerifyEmail
             get: fn($value) => ["user","admin"][$value],
         );
     }
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class, 'fkUserID');
+    }
 }

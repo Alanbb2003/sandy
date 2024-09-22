@@ -36,9 +36,12 @@ Route::prefix('/cart')->group(function() {
 });
 
 Route::get('/checkout',[UserController::class,"checkoutPage"])->middleware('verified');
+Route::post('/checkout',[UserController::class,"checkoutFunc"])->middleware('verified');
 Route::get('/address',[USerController::class,"addressPage"])->middleware('verified');
 Route::post('/address/add',[UserController::class,"addAlamat"])->middleware('verified');
 Route::put('/address/edit', [UserController::class, 'updateAddress'])->middleware('verified');
+Route::get('/membership',[UserController::class,'membershipPage'])->middleware('verified');
+Route::post('/wishlist/toggle', [UserController::class, 'toggleWishlist'])->middleware('auth');
 //user route
 
 Route::middleware(['auth','user-role:user'])->group(function(){

@@ -10,4 +10,9 @@ class Products extends Model
     use HasFactory;
     public $table = "product";
     protected $primaryKey = "id";
+
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class, 'fkProductID');
+    }
 }

@@ -17,7 +17,26 @@
         </div>
 
         <div class="col">
-            <h3>{{ $barang->namaBarang }}</h3>
+            <div class="row">
+                <div class="col">
+                    <h3>{{ $barang->namaBarang }}</h3>
+                </div>
+                <div class="col">
+                    <button class="wishlist-toggle btn" data-product-id="{{ $barang->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Wishlist">
+                        @if(Auth::check())
+                            @if(Auth::user()->wishlists->contains('fkProductID', $barang->id))
+                                <i class="fa-solid fa-heart"></i> <!-- Solid heart if in wishlist -->
+                            @else
+                                <i class="fa-regular fa-heart"></i> <!-- Regular heart if not in wishlist -->
+                            @endif
+                        @else
+                            <i class="fa-regular fa-heart"></i> <!-- Default regular heart for guests -->
+                        @endif
+                    </button>
+                </div>
+            </div>
+            
+            
             <p>{{ $barang->deskripsi }}</p>
             <p>Price: Rp.{{ $barang->hargaKecil }} per {{ $barang->totalQuantity }} {{$barang->satuanTerkecil}}</p>
             @if($barang->satuanBesar && $barang->hargaBesar)
@@ -107,6 +126,61 @@
 
 @section('script')
 <script>
-
-</script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            var tooltip = new bootstrap.Tooltip(tooltipTriggerEl);
+            
+            tooltipTriggerEl.addEventListener('click', function () {
+                // Hide tooltip after clicking
+                tooltip.hide();
+            });
+            
+            return tooltip;
+        });
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all wishlist buttons
+        let wishlistButtons = document.querySelectorAll('.wishlist-toggle');
+  
+        wishlistButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                // Get product ID from the button's data attribute
+                let productId = this.getAttribute('data-product-id');
+  
+                @if(Auth::check())
+                    // If the user is logged in, call the AJAX function to toggle wishlist
+                    toggleWishlist(productId, this);
+                @else
+                    // If the user is not logged in, redirect to login page
+                    window.location.href = '{{ route("login") }}';
+                @endif
+            });
+        });
+    });
+  
+    function toggleWishlist(productId, button) {
+        // Make an AJAX request to toggle wishlist status
+        fetch('/wishlist/toggle', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ product_id: productId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update the button based on the response
+            if (data.in_wishlist) {
+                button.innerHTML = '<i class="fa-solid fa-heart"></i>';
+            } else {
+                button.innerHTML = '<i class="fa-regular fa-heart"></i>';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
 @endsection

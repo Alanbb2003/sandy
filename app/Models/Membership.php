@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Dtrans extends Model
+class Membership extends Model
 {
     use HasFactory;
-    public $table = "dtrans";
+    public $table = "membership";
+    protected $primaryKey = "memberID";
 }

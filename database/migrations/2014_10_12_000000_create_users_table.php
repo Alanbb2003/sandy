@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('password');
             //0 = customer 1 = admin
             $table->tinyInteger('role')->default(0);
+            $table->date('tanggalLahir')->nullable();
+            $table->string('noHp')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
