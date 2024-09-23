@@ -137,9 +137,9 @@
                     </td>
                     <td>{{$k->namaBarang}}</td> 
                     <td>{{$k->category}}</td>
-                    <td>{{$k->smallQuantity}} {{$k-> satuanTerkecil}} 
+                    <td>{{$k->totalQuantity}} {{$k-> satuanTerkecil}} 
                       @if($k->satuanBesar)
-                       / {{$k->bigQuantity}} {{$k->satuanBesar}}
+                       / {{$k->totalQuantity/$k->isiSatuanBesar}} {{$k->satuanBesar}}
                       @endif
                      
                     </td> 
