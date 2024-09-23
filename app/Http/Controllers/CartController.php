@@ -18,8 +18,8 @@ class CartController extends Controller
         if (!$product) {
             return response()->json(['message' => 'Product not found.'], 404);
         }
-        $jumlahKecil = $product->totalQuantity;
-        $jumlahBesar = $product->totalQuantity / $product->isiSatuanBesar;
+        $jumlahKecil = $product->smallQuantity;
+        $jumlahBesar = $product->bigQuantity;
         // $availablequantity = kalau unit == "small"" di isi jumlah kecil jika tidak jumlah besar
         $availableQuantity = $unit == "small" ? $jumlahKecil : $jumlahBesar;
         if ($availableQuantity < $quantity) {
@@ -75,8 +75,8 @@ class CartController extends Controller
         $productId = $id;
         $product = Products::where('id',$productId)->first();
         echo($product);
-        $productsmall = $product->totalQuantity;
-        $productbig = $product->totalQuantity / $product->isiSatuanBesar;
+        $productsmall = $product->smallQuantity;
+        $productbig = $product->bigQuantity;
 
         $cart = session()->get('cart', []);
         if (isset($cart[$productId])) {

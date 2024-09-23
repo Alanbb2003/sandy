@@ -137,12 +137,21 @@
                     </td>
                     <td>{{$k->namaBarang}}</td> 
                     <td>{{$k->category}}</td>
-                    <td>{{$k->totalQuantity}} {{$k-> satuanTerkecil}} / {{$k->totalQuantity/$k->isiSatuanBesar}} {{$k->satuanBesar}}</td> 
-                    <td> Rp.{{$k->hargaKecil}}/ Rp.{{$k->hargaBesar}}</td>
+                    <td>{{$k->smallQuantity}} {{$k-> satuanTerkecil}} 
+                      @if($k->satuanBesar)
+                       / {{$k->bigQuantity}} {{$k->satuanBesar}}
+                      @endif
+                     
+                    </td> 
+                    <td> Rp.{{ number_format($k->hargaKecil, 0, ',', '.') }}
+                      @if($k->satuanBesar)
+                       / {{ number_format($k->hargaBesar, 0, ',', '.') }}
+                      @endif
+                    </td>
                     <td style="width: 100px;">
                       <div class="container d-flex-inline flex-row"></div>
                       <a href="#" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
-                      <a href="#" data-method="DELETE" data-confirm="Yakin hapus karyawan ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
+                      <a href="#" data-method="DELETE" data-confirm="Yakin hapus barang ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
                     </td>
                   </tr>
                   @endforeach

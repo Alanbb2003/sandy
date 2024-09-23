@@ -35,12 +35,15 @@
                     </button>
                 </div>
             </div>
+            <div class="row mt-3">
+                <h5>Deskripsi:</h5>
+                <p>{{ $barang->deskripsi }}</p>
+            </div>
             
-            
-            <p>{{ $barang->deskripsi }}</p>
-            <p>Price: Rp.{{ $barang->hargaKecil }} per {{ $barang->totalQuantity }} {{$barang->satuanTerkecil}}</p>
+            <h5>Price:</h5>
+            <p>Rp.{{ $barang->hargaKecil }} per 1 {{$barang->satuanTerkecil}}</p>
             @if($barang->satuanBesar && $barang->hargaBesar)
-            <p>Price: Rp.{{ $barang->hargaBesar }} per  {{$barang->totalQuantity/$barang->isiSatuanBesar}} {{$barang->satuanBesar}}</p>
+            <p>Rp.{{ $barang->hargaBesar }} per  1 {{$barang->satuanBesar}}</p>
             @endif
             
             

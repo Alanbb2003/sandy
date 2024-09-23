@@ -27,8 +27,8 @@
                             <a href="{{url('/cart/removeOne/'.$id )}}" class="btn nodecor mb-2">-</a>
                         </td>
                         <td>{{ $details['unit'] }}</td>
-                        <td>${{ $details['price'] }}</td>
-                        <td>${{ $details['price'] * $details['quantity'] }}</td>
+                        <td>Rp.{{ number_format($details['price'], 0, ',', '.') }}</td>
+                        <td>Rp.{{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }}</td>
                         <td>
                             <a class="btn btn-danger remove-from-cart nodecor" href="{{url('/cart/remove/'.$id )}}">Remove</a>
                         </td>
@@ -59,7 +59,7 @@
 
                     </div>
 
-                    <p>Total :Rp.{{ $details['price'] * $details['quantity'] }}</p>
+                    <p>Total :Rp.{{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }}</p>
                 </div>                
             @endforeach
         @endif

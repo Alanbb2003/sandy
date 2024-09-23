@@ -88,9 +88,9 @@ class AdminController extends Controller
         $productbaru->slugBarang = Str::slug($request->inputNamaBarang);
         $productbaru->fk_kategori = $request->inputKategori;
         $productbaru->deskripsi = $request->inputDeskripsi;
-        $productbaru->totalQuantity = $request->inputJumlahKecil;
+        $productbaru->smallQuantity = $request->inputJumlahKecil;
         $productbaru->satuanTerkecil = strtoupper($request->inputSatuanKecil);
-        $productbaru->isiSatuanBesar= $request->inputJumlahBesar;
+        $productbaru->bigQuantity= $request->inputJumlahBesar;
         $productbaru->satuanBesar = strtoupper($request->inputSatuanBesar);
         $productbaru->hargaKecil = $request->inputHargaKecil;
         $productbaru->hargaBesar = $request->inputHargaBesar;

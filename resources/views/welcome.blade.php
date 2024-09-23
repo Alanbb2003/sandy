@@ -52,43 +52,7 @@
 @endsection
 
 @section('script')
-{{-- <script>
-$(document).ready(function(){
-    $(document).on('click', '.detail-product', function() {
-        // Extract data from the button
-        var productName = $(this).data('product-name');
-        var productId = $(this).data('product-id');
 
-        // Encode the product name to ensure it works in the URL
-        var encodedProductName = encodeURIComponent(productName);
-
-        // Create a form dynamically
-        var form = $('<form>', {
-            'action': '/product/' + encodedProductName,
-            'method': 'GET'
-        });
-
-        // Add the CSRF token to the form
-        var csrfToken = $('meta[name="csrf-token"]').attr('content');
-        form.append($('<input>', {
-            'type': 'hidden',
-            'name': '_token',
-            'value': csrfToken
-        }));
-
-        // Add the product ID to the form
-        form.append($('<input>', {
-            'type': 'hidden',
-            'name': 'productId',
-            'value': productId
-        }));
-
-        // Append the form to the body and submit it
-        $('body').append(form);
-        form.submit();
-    });
-  });
-</script> --}}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
       var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -147,4 +111,5 @@ $(document).ready(function(){
       .catch(error => console.error('Error:', error));
   }
 </script>
+
 @endsection

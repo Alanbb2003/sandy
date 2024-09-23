@@ -60,6 +60,7 @@
       <div class="col-sm-12 p-1 d-flex flex-wrap">
           @foreach ($categoryItems as $k)
           <div class="card mb-4 p-1 mx-2" style="width: 180px;min-height: 260px">
+            
               <a target="_blank" href="{{ asset('images/uploads/' . $k->fotoPromosi) }}">
                 <img class="card-img-top thumbnail" src="{{ asset('images/uploads/' . $k->fotoPromosi) }}" alt="Gambar Barang">
               </a>
@@ -80,17 +81,6 @@
                     <i class="fa-regular fa-heart"></i> <!-- Default regular heart for guests -->
                 @endif
               </button>
-              {{-- <button class="wishlist-toggle btn" data-product-id="{{ $k->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Wishlist">
-                @if(Auth::check())
-                    @if(Auth::user()->wishlists->contains('fkProductID', $k->id))
-                        <i class="fa-solid fa-heart"></i> <!-- Solid heart if in wishlist -->
-                    @else
-                        <i class="fa-regular fa-heart"></i> <!-- Regular heart if not in wishlist -->
-                    @endif
-                @else
-                    <i class="fa-regular fa-heart"></i> <!-- Default regular heart for guests -->
-                @endif
-            </button> --}}
               </div>
           </div>
           @endforeach
