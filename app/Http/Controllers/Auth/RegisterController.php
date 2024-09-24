@@ -52,6 +52,24 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'phone_number' => ['required', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:15'],
+            'firstName' => ['required', 'string', 'max:255'],
+            'lastName' => ['nullable', 'string', 'max:255'],
+        ],[
+            // Custom messages
+            'name.required' => 'Harap masukkan nama Anda.',
+            'email.required' => 'Alamat email diperlukan.',
+            'email.email' => 'Harap masukkan alamat email yang valid.',
+            'email.unique' => 'Email ini sudah digunakan.',
+            'password.required' => 'password diperlukan.',
+            'password.min' => 'password harus terdiri dari minimal :min karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'phone_number.required' => 'Nomor telepon diperlukan.',
+            'phone_number.regex' => 'Harap masukkan format nomor telepon yang valid.',
+            'phone_number.min' => 'Nomor telepon harus memiliki setidaknya :min digit.',
+            'phone_number.max' => 'Nomor telepon tidak boleh lebih dari :max digit.',
+            'firstName.required' => 'Nama depan diperlukan.',
+            'lastName.string' => 'Nama belakang harus berupa kata. ',
         ]);
     }
 
@@ -68,6 +86,9 @@ class RegisterController extends Controller
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
+                'firstName'=>$data['firstName'],
+                'lastName'=>$data['lastName'],
+                'noHp'=>$data['phone_number'],
             ]);
         } catch (\Exception $e) {
             return $e->getMessage();

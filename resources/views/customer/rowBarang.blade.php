@@ -54,7 +54,7 @@
   @endphp
 
   @if ($categoryItems->isNotEmpty())
-      <div class="col-12 mb-4">
+      <div class="col-12 mt-3">
           <h3>{{ $category->nama_category }}</h3> <!-- Category name -->
       </div>
       <div class="col-sm-12 p-1 d-flex flex-wrap">

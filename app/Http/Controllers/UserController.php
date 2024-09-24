@@ -142,58 +142,59 @@ class UserController extends Controller
         $addressSnap = $address->namaDepan . ' ' . $address->namaBelakang . ', ' . $address->noHP . ', ' . $address->detailAlamat.', '.$address->kodePos.', '.$address->provinsi.', '.$address->kota.', '.$address->kecamatan.', '.$address->kelurahan;
          echo $addressSnap;
         dd($addressSnap);
-         // Start transaction for database integrity
-    //     DB::beginTransaction();
-    //     try {
-    //         // Step 1: Save Htrans (Header Transaction)
-    //         $htrans = new Htrans();
-    //         $htrans->fkUserID = $userID;
-    //         $htrans->totalPayment = $totalPayment;
-    //         $htrans->address = $request->inputAddress;
-    //         $htrans->save(); // Save to get Htrans ID
+        
+        //  Start transaction for database integrity
+        DB::beginTransaction();
+        try {
+            // Step 1: Save Htrans (Header Transaction)
+            $htrans = new Htrans();
+            $htrans->fkUserID = $userID;
+            $htrans->totalPayment = $totalPayment;
+            $htrans->address = $request->inputAddress;
+            $htrans->save(); // Save to get Htrans ID
             
-    //         // Step 2: Save Dtrans (Detail Transactions for each item)
-    //         foreach ($cartItems as $item) {
-    //             $dtrans = new Dtrans();
-    //             $dtrans->fkHtransID = $htrans->id;
-    //             $dtrans->fkBarangID = $item['id'];
-    //             $dtrans->quantity = $item['quantity'];
-    //             $dtrans->price = $item['price'];
-    //             $dtrans->save();
-    //         }
+            // Step 2: Save Dtrans (Detail Transactions for each item)
+            foreach ($cartItems as $item) {
+                $dtrans = new Dtrans();
+                $dtrans->fkHtransID = $htrans->id;
+                $dtrans->fkBarangID = $item['id'];
+                $dtrans->quantity = $item['quantity'];
+                $dtrans->price = $item['price'];
+                $dtrans->save();
+            }
 
-    //         // Step 3: Check if user is in membership table
-    //         $isMember = Membership::where('fkUserID', $userID)->exists();
+            // Step 3: Check if user is in membership table
+            $isMember = Membership::where('fkUserID', $userID)->exists();
 
-    //         if ($isMember) {
-    //             // Step 4: Calculate points
-    //             $pointsEarned = floor($totalPayment / 500);
+            if ($isMember) {
+                // Step 4: Calculate points
+                $pointsEarned = floor($totalPayment / 500);
 
-    //             // Step 5: Save points to the points table
-    //             $point = new Point();
-    //             $point->fkUserID = $userID;
-    //             $point->points = $pointsEarned;
-    //             $point->description = "Points earned from checkout on Htrans ID: $htrans->id";
-    //             $point->save();
-    //         }
+                // Step 5: Save points to the points table
+                $point = new Point();
+                $point->fkUserID = $userID;
+                $point->points = $pointsEarned;
+                $point->description = "Points earned from checkout on Htrans ID: $htrans->id";
+                $point->save();
+            }
 
-    //         // Step 6: Send receipt via email
-    //         $userEmail = Auth::user()->email; // Assuming the User model has an email field
-    //         Mail::to($userEmail)->send(new ReceiptMail($htrans, $cartItems));
+            // Step 6: Send receipt via email
+            $userEmail = Auth::user()->email; // Assuming the User model has an email field
+            Mail::to($userEmail)->send(new ReceiptMail($htrans, $cartItems));
 
-    //         // Commit the transaction
-    //         DB::commit();
+            // Commit the transaction
+            DB::commit();
 
-    //         // Clear cart after successful checkout
-    //         session()->forget('cart');
+            // Clear cart after successful checkout
+            session()->forget('cart');
 
-    //         return back()->with('success', 'Checkout completed successfully! Receipt has been sent to your email.');
+            return back()->with('success', 'Checkout completed successfully! Receipt has been sent to your email.');
 
-    //     } catch (\Exception $e) {
-    //         // Rollback transaction if something goes wrong
-    //         DB::rollBack();
-    //         return back()->with('error', 'There was an issue during checkout. Please try again.');
-    //     }
+        } catch (\Exception $e) {
+            // Rollback transaction if something goes wrong
+            DB::rollBack();
+            return back()->with('error', 'There was an issue during checkout. Please try again.');
+        }
 
     }
 
