@@ -18,7 +18,7 @@ class CartController extends Controller
         if (!$product) {
             return response()->json(['message' => 'Product not found.'], 404);
         }
-        $jumlahKecil = $product->smallQuantity;
+        $jumlahKecil = $product->totalQuantity;
         $jumlahBesar = $product->totalQuantity / $product->isiSatuanBesar;
         // $availablequantity = kalau unit == "small"" di isi jumlah kecil jika tidak jumlah besar
         $availableQuantity = $unit == "small" ? $jumlahKecil : $jumlahBesar;
@@ -38,6 +38,7 @@ class CartController extends Controller
                 // Jika unit berbeda, tambahkan produk baru dengan key unik berdasarkan unit
                 $cart[$productId . '_' . $unit] = [
                     "id"=>$productId. '_' . $unit,
+                    "productID"=>$productId,
                     "name" => $product->namaBarang,
                     "quantity" => $quantity,
                     "unitHidden"=>$unit,
@@ -50,6 +51,7 @@ class CartController extends Controller
             // Jika produk belum ada dalam keranjang, tambahkan sebagai item baru
             $cart[$productId] = [
                 "id"=>$productId .'_' . $unit,
+                "productID"=>$productId,
                 "name" => $product->namaBarang,
                 "quantity" => $quantity,
                 "unitHidden"=>$unit,
@@ -75,7 +77,7 @@ class CartController extends Controller
         $productId = $id;
         $product = Products::where('id',$productId)->first();
         echo($product);
-        $productsmall = $product->smallQuantity;
+        $productsmall = $product->totalQuantity;
         $productbig = $product->totalQuantity / $product->isiSatuanBesar;
 
         $cart = session()->get('cart', []);

@@ -41,7 +41,8 @@ Route::get('/address',[USerController::class,"addressPage"])->middleware('verifi
 Route::post('/address/add',[UserController::class,"addAlamat"])->middleware('verified');
 Route::put('/address/edit', [UserController::class, 'updateAddress'])->middleware('verified');
 Route::get('/membership',[UserController::class,'membershipPage'])->middleware('verified');
-Route::post('/wishlist/toggle', [UserController::class, 'toggleWishlist'])->middleware('auth');
+Route::post('/wishlist/toggle', [UserController::class, 'toggleWishlist'])->middleware('verified');
+Route::get('/transaction',[UserController::class,'transactionPage'])->middleware('verified');
 //user route
 
 Route::middleware(['auth','user-role:user'])->group(function(){

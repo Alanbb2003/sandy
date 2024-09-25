@@ -12,9 +12,11 @@ use App\Models\Pictures;
 use App\Models\Point;
 use App\Models\Products;
 use App\Models\Wishlist;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
@@ -25,7 +27,20 @@ class UserController extends Controller
         $userID = Auth::user()->id;
         $address = Alamat::where('fkUserID',$userID)->get();
 
-        $memberstatus = Membership::where('fkUserID','=',$userID)->get();
+        $currentPoints = 0;
+        $memberstatus = Membership::where('fkUserID','=',$userID)->first();
+        if($memberstatus){
+            $pointRecord = Point::where('tanggalKaldaluarsaPoin', '>', now())->orWhereNull('tanggalKaldaluarsaPoin')->get();
+            foreach ($pointRecord as $point) { 
+                if ($point->jumlahPoin < 0) {
+                    // If jumlahPoin is negative set to 0 
+                    $currentPoints = 0;
+                } else {
+                    // Add points if they're non-negative
+                    $currentPoints += $point->jumlahPoin;
+                }
+            }
+        }
         $cart = session()->get('cart', []);
         $totalAmmount = 0;
 
@@ -33,10 +48,11 @@ class UserController extends Controller
             $totalAmmount += $item['price'] * $item['quantity'];
         }
 
-        return view('customer.checkout', compact('address','totalAmmount','memberstatus'));
+        return view('customer.checkout', compact('address','totalAmmount','memberstatus','currentPoints'));
     }
 
     public function addressPage(){
+        //get the user id
         $userID = Auth::user()->id;
         $address = Alamat::where('fkUserID',$userID)->get();
         // echo $address;
@@ -48,7 +64,13 @@ class UserController extends Controller
         return view('customer.membershipPage');
     }
 
-    
+    public function transactionPage(){
+        $userId = Auth::user()->id; 
+        // Fetch Htrans records for the authenticated user
+        $htransRecords = Htrans::where('fkUserID', $userId)->get();
+
+        return view('customer.transaction',compact('htransRecords'));
+    }
     // function
     public function addAlamat(Request $request){
         $userID = Auth::user()->id;
@@ -89,7 +111,7 @@ class UserController extends Controller
 
     public function updateAddress(Request $request) {
         $address = Alamat::find($request->addressId);
-        
+        //check validation
         $this->validate($request, [
             'editNamaDepan' => 'required',
             'editNamaBelakang' => 'required',
@@ -100,7 +122,7 @@ class UserController extends Controller
             'editKelurahan' => 'required',
             'editKodePos' => 'required',
         ]);
-    
+        // update the address
         $address->namaDepan = $request->editNamaDepan;
         $address->namaBelakang = $request->editNamaBelakang;
         $address->noHP = $request->editNoHp;
@@ -117,7 +139,9 @@ class UserController extends Controller
 
     public function checkoutFunc(Request $request){
         $userID = Auth::user()->id;
+        $pembeli = Auth::user()->firstName." ". Auth::user()->lastName;
         $cartItems = session()->get('cart', []);
+        $today = now();
 
         if (empty($cartItems)) {
             alert()->error('Error!', 'Cart anda kosong');
@@ -128,54 +152,102 @@ class UserController extends Controller
         foreach ($cartItems as $item) {
             $totalPayment += $item['price'] * $item['quantity'];
         }
-
+        $transactionAmount = $totalPayment;
+        
         $this->validate($request, [
             'inputAddress' => 'required',
+        ],[
+            'inputAddress.required' => 'Mohon pilih alamat pengiriman.',
         ]);
 
         $address = Alamat::find($request->inputAddress);
         if (!$address) {
-            alert()->error('Error!', 'invalid address');
-            return redirect()->back();
+            alert()->error('Error!', 'Something went wrong. Please try again.');
+            return back();
         }
-        
+        // make a string to save snapshot of selected address
         $addressSnap = $address->namaDepan . ' ' . $address->namaBelakang . ', ' . $address->noHP . ', ' . $address->detailAlamat.', '.$address->kodePos.', '.$address->provinsi.', '.$address->kota.', '.$address->kecamatan.', '.$address->kelurahan;
-         echo $addressSnap;
-        dd($addressSnap);
         
         //  Start transaction for database integrity
         DB::beginTransaction();
         try {
-            // Step 1: Save Htrans (Header Transaction)
+            $currentPoints = 0;
+            $isMember = Membership::where('fkUserID', $userID)->first();
+            if ($isMember) {
+                // Step 4: Calculate points
+                $pointsEarned = floor($totalPayment / 500); // Example calculation for points
+                $pointRecord = Point::where('tanggalKaldaluarsaPoin', '>', now())->orWhereNull('tanggalKaldaluarsaPoin')->get();
+                foreach ($pointRecord as $point) { // Use a meaningful variable name
+                    if ($point->jumlahPoin < 0) {
+                        // If jumlahPoin is negative, set to 0
+                        $currentPoints = 0;
+                    } else {
+                        // Add points if they're non-negative
+                        $currentPoints += $point->jumlahPoin;
+                    }
+                }
+    
+                // Step 5: Check if redeem points checkbox is ticked
+                if ($request->input('usePoin') && $currentPoints >= 1000) {
+                    $totalPayment -= $currentPoints; // Apply all current points as discount
+    
+                    // Ensure totalPayment does not go below zero
+                    if ($totalPayment < 0) {
+                        $totalPayment = 0; // If points exceed total, set totalPayment to zero
+                    }
+    
+                    // Deduct points from the user's account
+                    Point::create([
+                        'memberID' => $isMember->memberID,
+                        'tanggalPemberianPoin' => now(),
+                        'jumlahPoin' => -$currentPoints, // Use all current points
+                        'tipeTransaksi' => 'Redeem',
+                        'sumberPoin' => 'Redeem Points for purchase',
+                        'tanggalKaldaluarsaPoin' => null, // No expiration for redeemed points
+                        'saldoPoin' => 0, // Balance after redemption
+                    ]);
+                }
+            }
+
             $htrans = new Htrans();
             $htrans->fkUserID = $userID;
-            $htrans->totalPayment = $totalPayment;
-            $htrans->address = $request->inputAddress;
-            $htrans->save(); // Save to get Htrans ID
+            $htrans->fkAddressID = $request->inputAddress;
+            $htrans->namaPembeli = $pembeli;
+            $htrans->addressSnapshot = $addressSnap;
+            $htrans->tanggalPembelian = $today;
+            $htrans->totalPembelian = $totalPayment;
+            $htrans->discount = $currentPoints;
+            $htrans->save(); 
             
-            // Step 2: Save Dtrans (Detail Transactions for each item)
+            //menambah ke dtrans
             foreach ($cartItems as $item) {
                 $dtrans = new Dtrans();
                 $dtrans->fkHtransID = $htrans->id;
-                $dtrans->fkBarangID = $item['id'];
-                $dtrans->quantity = $item['quantity'];
-                $dtrans->price = $item['price'];
+                $dtrans->fkProductID = $item['productID'];
+                $dtrans->totalJumlah = $item['quantity'];
+                $dtrans->satuanBarang = $item['unit'];
+                $dtrans->hargaSatuan = $item['price'];
+                $dtrans->subtotal = $item['quantity'] * $item['price'];
                 $dtrans->save();
             }
 
-            // Step 3: Check if user is in membership table
-            $isMember = Membership::where('fkUserID', $userID)->exists();
-
-            if ($isMember) {
-                // Step 4: Calculate points
-                $pointsEarned = floor($totalPayment / 500);
-
-                // Step 5: Save points to the points table
-                $point = new Point();
-                $point->fkUserID = $userID;
-                $point->points = $pointsEarned;
-                $point->description = "Points earned from checkout on Htrans ID: $htrans->id";
-                $point->save();
+            if($isMember){
+                $tanggalPemberian = Carbon::now(); // Today's date
+                $tanggalKadaluwarsa = $tanggalPemberian->copy()->addYear(1); // Points expire after 1 year
+                $tipeTransaksi = 'Purchase'; // Transaction type
+                $sumberPoin = 'Pembelian dengan jumlah Rp.' .number_format($transactionAmount, 0, ',', '.');
+                $saldoPoin = $pointsEarned; // Assuming current points equal earned points (adjust if needed)
+    
+                // Add points to the database
+                Point::create([
+                    'memberID' => $isMember->memberID,
+                    'tanggalPemberianPoin' => $tanggalPemberian,
+                    'jumlahPoin' => $pointsEarned,
+                    'tipeTransaksi' => $tipeTransaksi,
+                    'sumberPoin' => $sumberPoin,
+                    'tanggalKaldaluarsaPoin' => $tanggalKadaluwarsa,
+                    'saldoPoin' => $saldoPoin,
+                ]);
             }
 
             // Step 6: Send receipt via email
@@ -187,15 +259,19 @@ class UserController extends Controller
 
             // Clear cart after successful checkout
             session()->forget('cart');
-
+            alert()->success('Berhasil!', 'Cart anda kosong');
             return back()->with('success', 'Checkout completed successfully! Receipt has been sent to your email.');
 
         } catch (\Exception $e) {
             // Rollback transaction if something goes wrong
             DB::rollBack();
-            return back()->with('error', 'There was an issue during checkout. Please try again.');
+            Log::error('Checkout error: '.$e->getMessage(), [
+                'stack_trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
+            alert()->error('Error!', 'Something went wrong. Please try again.');
+            return back();
         }
-
     }
 
     public function toggleWishlist(Request $request)

@@ -9,4 +9,14 @@ class Point extends Model
 {
     use HasFactory;
     public $table = "poin";
+
+    protected $fillable = [
+        'memberID',
+        'tanggalPemberianPoin',
+        'jumlahPoin',
+        'tipeTransaksi',
+        'sumberPoin',
+        'tanggalKaldaluarsaPoin',
+        'saldoPoin'
+    ];
 }

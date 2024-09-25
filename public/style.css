@@ -76,3 +76,7 @@ text-decoration: underline;
   color: red;
   cursor: pointer;
 }
+.form-check-input {
+    background-color: #fff; /* White background */
+    border: 2px solid #007bff; /* Blue border */
+}

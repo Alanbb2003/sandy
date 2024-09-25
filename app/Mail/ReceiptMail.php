@@ -49,12 +49,12 @@ class ReceiptMail extends Mailable
      *
      * @return \Illuminate\Mail\Mailables\Content
      */
-    public function content()
-    {
-        return new Content(
-            view: 'view.name',
-        );
-    }
+    // public function content()
+    // {
+    //     return new Content(
+    //         view: 'emails.receipt',
+    //     );
+    // }
 
     /**
      * Get the attachments for the message.

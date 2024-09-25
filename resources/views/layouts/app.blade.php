@@ -16,8 +16,10 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> --}}
-    {{-- <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script> --}}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+   
     <!-- CDN -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.dataTables.css" />
     {{-- <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css" /> --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     {{-- <link href="https://cdn.datatables.net/v/dt/dt-2.0.3/b-3.0.1/b-colvis-3.0.1/b-html5-3.0.1/fc-5.0.0/r-3.0.0/sb-1.7.0/sp-2.3.0/datatables.min.css" rel="stylesheet"> --}}
@@ -257,6 +259,21 @@
             </div>
         </nav>
         
+    <!-- Secondary Navigation Bar -->
+    <nav class="navbar navbar-expand-md navbar-light bg-light" style="padding: 0.25rem 1rem;">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-end w-100">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url('/transaction') }}">Transactions</a>
+                    </li>
+                    <li class="nav-item mx-2">
+                        <a class="nav-link" href="{{ url('/profile') }}">Profile</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
         <main class="py-4">
             @include('sweetalert::alert')
             @yield('content')
@@ -266,7 +283,7 @@
     @yield("script")
  <!-- CDN -->
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
- 
+ <script src="https://cdn.datatables.net/2.1.7/js/dataTables.js"></script>
  {{-- <script src="https://cdn.datatables.net/v/dt/dt-2.0.3/b-3.0.1/b-colvis-3.0.1/b-html5-3.0.1/fc-5.0.0/r-3.0.0/sb-1.7.0/sp-2.3.0/datatables.min.js"></script> --}}
 </body>
 </html>
