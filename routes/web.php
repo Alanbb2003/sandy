@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {return view('welcome');});
 
-Route::get('/', [HomeController::class,"welcome"]);
+Route::get('/', [HomeController::class,"welcome"])->name('home.main');
 Route::get("/product/{slug}",[HomeController::class,'showdetailBarang']);
 
 Auth::routes([

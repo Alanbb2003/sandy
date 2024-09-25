@@ -12,6 +12,7 @@ class Point extends Model
 
     protected $fillable = [
         'memberID',
+        'htransID',
         'tanggalPemberianPoin',
         'jumlahPoin',
         'tipeTransaksi',

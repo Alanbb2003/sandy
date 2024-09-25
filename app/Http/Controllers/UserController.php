@@ -171,44 +171,55 @@ class UserController extends Controller
         //  Start transaction for database integrity
         DB::beginTransaction();
         try {
-            $currentPoints = 0;
-            $isMember = Membership::where('fkUserID', $userID)->first();
-            if ($isMember) {
-                // Step 4: Calculate points
-                $pointsEarned = floor($totalPayment / 500); // Example calculation for points
-                $pointRecord = Point::where('tanggalKaldaluarsaPoin', '>', now())->orWhereNull('tanggalKaldaluarsaPoin')->get();
-                foreach ($pointRecord as $point) { // Use a meaningful variable name
-                    if ($point->jumlahPoin < 0) {
-                        // If jumlahPoin is negative, set to 0
-                        $currentPoints = 0;
-                    } else {
-                        // Add points if they're non-negative
-                        $currentPoints += $point->jumlahPoin;
-                    }
-                }
+            // $currentPoints = 0;
+            // $isMember = Membership::where('fkUserID', $userID)->first();
+            // if ($isMember) {
+            //     // Step 4: Calculate points
+            //     $pointsEarned = floor($totalPayment / 500); // Example calculation for points
+            //     $pointRecord = Point::where('tanggalKaldaluarsaPoin', '>', now())->orWhereNull('tanggalKaldaluarsaPoin')->get();
+            //     foreach ($pointRecord as $point) { // Use a meaningful variable name
+            //         if ($point->jumlahPoin < 0) {
+            //             // If jumlahPoin is negative, set to 0
+            //             $currentPoints = 0;
+            //         } else {
+            //             // Add points if they're non-negative
+            //             $currentPoints += $point->jumlahPoin;
+            //         }
+            //     }
     
-                // Step 5: Check if redeem points checkbox is ticked
-                if ($request->input('usePoin') && $currentPoints >= 1000) {
-                    $totalPayment -= $currentPoints; // Apply all current points as discount
+            //     // Step 5: Check if redeem points checkbox is ticked
+            //     if ($request->input('usePoin') && $currentPoints >= 1000) {
+            //         $totalPayment -= $currentPoints; // Apply all current points as discount
     
-                    // Ensure totalPayment does not go below zero
-                    if ($totalPayment < 0) {
-                        $totalPayment = 0; // If points exceed total, set totalPayment to zero
-                    }
+            //         // Ensure totalPayment does not go below zero
+            //         if ($totalPayment < 0) {
+            //             $totalPayment = 0; // If points exceed total, set totalPayment to zero
+            //         }
     
-                    // Deduct points from the user's account
-                    Point::create([
-                        'memberID' => $isMember->memberID,
-                        'tanggalPemberianPoin' => now(),
-                        'jumlahPoin' => -$currentPoints, // Use all current points
-                        'tipeTransaksi' => 'Redeem',
-                        'sumberPoin' => 'Redeem Points for purchase',
-                        'tanggalKaldaluarsaPoin' => null, // No expiration for redeemed points
-                        'saldoPoin' => 0, // Balance after redemption
-                    ]);
-                }
-            }
+            //         // Deduct points from the user's account
+            //         Point::create([
+            //             'memberID' => $isMember->memberID,
+            //             'tanggalPemberianPoin' => now(),
+            //             'jumlahPoin' => -$currentPoints, // Use all current points
+            //             'tipeTransaksi' => 'Redeem',
+            //             'sumberPoin' => 'Redeem Points for purchase',
+            //             'tanggalKaldaluarsaPoin' => null, // No expiration for redeemed points
+            //             'saldoPoin' => 0, // Balance after redemption
+            //         ]);
+            //     }
+            // }
 
+            // $htrans = new Htrans();
+            // $htrans->fkUserID = $userID;
+            // $htrans->fkAddressID = $request->inputAddress;
+            // $htrans->namaPembeli = $pembeli;
+            // $htrans->addressSnapshot = $addressSnap;
+            // $htrans->tanggalPembelian = $today;
+            // $htrans->totalPembelian = $totalPayment;
+            // $htrans->discount = $currentPoints;
+            // $htrans->save(); 
+
+            // Create htrans first
             $htrans = new Htrans();
             $htrans->fkUserID = $userID;
             $htrans->fkAddressID = $request->inputAddress;
@@ -216,9 +227,45 @@ class UserController extends Controller
             $htrans->addressSnapshot = $addressSnap;
             $htrans->tanggalPembelian = $today;
             $htrans->totalPembelian = $totalPayment;
-            $htrans->discount = $currentPoints;
-            $htrans->save(); 
-            
+            $htrans->discount = 0; // Initialize discount
+            $htrans->save(); // Save the htrans before point redemption
+
+            $currentPoints = 0;
+            $isMember = Membership::where('fkUserID', $userID)->first();
+            if ($isMember) {
+                // Calculate points
+                $pointsEarned = floor($totalPayment / 500); // Example calculation for points
+                $pointRecord = Point::where('tanggalKaldaluarsaPoin', '>', now())->orWhereNull('tanggalKaldaluarsaPoin')->get();
+                foreach ($pointRecord as $point) {
+                    $currentPoints += max(0, $point->jumlahPoin); // Ensure no negative points
+                }
+
+                // Check if redeem points checkbox is ticked
+                if ($request->input('usePoin') && $currentPoints >= 1000) {
+                    $totalPayment -= $currentPoints; // Apply all current points as a discount
+
+                    if ($totalPayment < 0) {
+                        $totalPayment = 0; // Ensure totalPayment doesn't go below zero
+                    }
+
+                    // Deduct points from the user's account
+                    Point::create([
+                        'memberID' => $isMember->memberID,
+                        'htransID' => $htrans->id, // htransID now exists
+                        'tanggalPemberianPoin' => now(),
+                        'jumlahPoin' => -$currentPoints, // Use all current points
+                        'tipeTransaksi' => 'Redeem',
+                        'sumberPoin' => 'Redeem Points for purchase',
+                        'tanggalKaldaluarsaPoin' => null,
+                        'saldoPoin' => 0,
+                    ]);
+
+                    $htrans->discount = $currentPoints; // Apply discount to htrans
+                }
+            }
+
+            $htrans->totalPembelian = $totalPayment;
+            $htrans->save(); // Save the updated totalPembelian and discount
             //menambah ke dtrans
             foreach ($cartItems as $item) {
                 $dtrans = new Dtrans();
@@ -241,6 +288,7 @@ class UserController extends Controller
                 // Add points to the database
                 Point::create([
                     'memberID' => $isMember->memberID,
+                    'htransID'=>$htrans->id,
                     'tanggalPemberianPoin' => $tanggalPemberian,
                     'jumlahPoin' => $pointsEarned,
                     'tipeTransaksi' => $tipeTransaksi,
@@ -259,8 +307,8 @@ class UserController extends Controller
 
             // Clear cart after successful checkout
             session()->forget('cart');
-            alert()->success('Berhasil!', 'Cart anda kosong');
-            return back()->with('success', 'Checkout completed successfully! Receipt has been sent to your email.');
+            alert()->success('Berhasil melakukan pemesanan!', 'harap melakukan pembayaran');
+            return redirect('/');
 
         } catch (\Exception $e) {
             // Rollback transaction if something goes wrong
