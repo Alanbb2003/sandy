@@ -31,7 +31,7 @@ class HomeController extends Controller
         return view('home');
     }
     public function welcome(){
-        $barang = Products::join('category','product.id','=','category.id')
+        $barang = Products::join('category','product.fk_kategori','=','category.id')
         ->select('product.*','category.nama_category as category')
         ->get();
         $category = Category ::all();
@@ -41,7 +41,7 @@ class HomeController extends Controller
     public function showdetailBarang($slugBarang){
         $slug = $slugBarang;
         $product = Products::where('slugBarang', $slug)->firstOrFail();
-        $barang = Products::join('category','product.id','=','category.id')
+        $barang = Products::join('category','product.fk_kategori','=','category.id')
         ->select('product.*','category.nama_category as category')
         ->where('product.slugBarang','=',$slug)
         ->firstOrFail();

@@ -23,7 +23,8 @@ class CartController extends Controller
         // $availablequantity = kalau unit == "small"" di isi jumlah kecil jika tidak jumlah besar
         $availableQuantity = $unit == "small" ? $jumlahKecil : $jumlahBesar;
         if ($availableQuantity < $quantity) {
-            toast("Beberapa Produk sedang kosong, produk ini hanya tersedia $availableQuantity", 'warning');
+            $showquantity = floor($availableQuantity);
+            toast("Beberapa Produk sedang kosong, produk ini hanya tersedia $showquantity", 'warning');
             return back();
         }
 
@@ -91,7 +92,8 @@ class CartController extends Controller
                 }
             }else{
                 if($productbig <= $cart[$productId]['quantity']){
-                    toast("Beberapa Produk sedang kosong, produk ini hanya tersedia $productbig",'warning');
+                    $showquantity = floor($productbig);
+                    toast("Beberapa Produk sedang kosong, produk ini hanya tersedia $showquantity",'warning');
                     return back();
                 }else{
                     $cart[$productId]['quantity'] += 1;

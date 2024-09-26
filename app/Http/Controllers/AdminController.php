@@ -18,7 +18,7 @@ class AdminController extends Controller
     
     public function adminManageStock(){
         // $barang = Products::all();
-        $barang = Products::join('category','product.id','=','category.id')
+        $barang = Products::join('category','product.fk_kategori','=','category.id')
         ->select('product.*','category.nama_category as category')
         ->get();
         $kategori = Category::all();
@@ -49,7 +49,7 @@ class AdminController extends Controller
     public function addBarang(Request $request){
         $input = $request->all();
         $this->validate($request,[
-            'thumbnail'=>'required|image',
+            'thumbnail'=>'required|image|mimes:jpeg,png,jpg,gif,webp',
             'inputNamaBarang'=>'required',
             'inputJumlahKecil'=>'required|numeric|min:0|not_in:0',
             'inputSatuanKecil'=>'required',
@@ -79,6 +79,7 @@ class AdminController extends Controller
         }
         
         try {
+            
         $thumbnailname = $item.time(). '.' . $thumbnail->extension(); 
         $thumbnail->move(public_path('images/uploads'),$thumbnailname);
 

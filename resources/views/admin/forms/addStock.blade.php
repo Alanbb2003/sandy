@@ -199,7 +199,8 @@
 
       <div class="col-md-4">
         <label for="inputDeskripsi" class="form-label">Deskripsi</label>
-        <input type="text" class="form-control  @error('inputDeskripsi') is-invalid @enderror" id="inputDeskripsi" name="inputDeskripsi">
+        {{-- <input type="text" class="form-control  @error('inputDeskripsi') is-invalid @enderror" id="inputDeskripsi" name="inputDeskripsi"> --}}
+        <textarea class="form-control  @error('inputDeskripsi') is-invalid @enderror" id="inputDeskripsi" name="inputDeskripsi" rows="5" cols="40" placeholder="Enter your text here..." required></textarea>
       </div>
       @error('inputDeskripsi')
       <div class="alert alert-danger">{{ $message }}</div>

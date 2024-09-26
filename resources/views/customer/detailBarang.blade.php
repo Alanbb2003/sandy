@@ -1,8 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+<a href="/" class="mx-5"><i class="fa-solid fa-circle-arrow-left fa-xl"></i></a>
 <div class="container mt-4">
+    
     <div class="row">
+        
         <div class="col">
             {{-- <div class="col"> --}}
                 <div class="row">
@@ -37,7 +40,8 @@
             </div>
             <div class="row mt-3">
                 <h5>Deskripsi:</h5>
-                <p>{{ $barang->deskripsi }}</p>
+                
+                <p>{!! nl2br(e($barang->deskripsi)) !!}</p>
             </div>
             
             <h5>Price:</h5>

@@ -71,6 +71,13 @@ class UserController extends Controller
 
         return view('customer.transaction',compact('htransRecords'));
     }
+
+    public function wishlistPage(){
+        $userID = Auth::user()->id;
+        $Wishlist = 1;
+        return view('customer.wishlist');
+    }
+
     // function
     public function addAlamat(Request $request){
         $userID = Auth::user()->id;
@@ -170,54 +177,7 @@ class UserController extends Controller
         
         //  Start transaction for database integrity
         DB::beginTransaction();
-        try {
-            // $currentPoints = 0;
-            // $isMember = Membership::where('fkUserID', $userID)->first();
-            // if ($isMember) {
-            //     // Step 4: Calculate points
-            //     $pointsEarned = floor($totalPayment / 500); // Example calculation for points
-            //     $pointRecord = Point::where('tanggalKaldaluarsaPoin', '>', now())->orWhereNull('tanggalKaldaluarsaPoin')->get();
-            //     foreach ($pointRecord as $point) { // Use a meaningful variable name
-            //         if ($point->jumlahPoin < 0) {
-            //             // If jumlahPoin is negative, set to 0
-            //             $currentPoints = 0;
-            //         } else {
-            //             // Add points if they're non-negative
-            //             $currentPoints += $point->jumlahPoin;
-            //         }
-            //     }
-    
-            //     // Step 5: Check if redeem points checkbox is ticked
-            //     if ($request->input('usePoin') && $currentPoints >= 1000) {
-            //         $totalPayment -= $currentPoints; // Apply all current points as discount
-    
-            //         // Ensure totalPayment does not go below zero
-            //         if ($totalPayment < 0) {
-            //             $totalPayment = 0; // If points exceed total, set totalPayment to zero
-            //         }
-    
-            //         // Deduct points from the user's account
-            //         Point::create([
-            //             'memberID' => $isMember->memberID,
-            //             'tanggalPemberianPoin' => now(),
-            //             'jumlahPoin' => -$currentPoints, // Use all current points
-            //             'tipeTransaksi' => 'Redeem',
-            //             'sumberPoin' => 'Redeem Points for purchase',
-            //             'tanggalKaldaluarsaPoin' => null, // No expiration for redeemed points
-            //             'saldoPoin' => 0, // Balance after redemption
-            //         ]);
-            //     }
-            // }
-
-            // $htrans = new Htrans();
-            // $htrans->fkUserID = $userID;
-            // $htrans->fkAddressID = $request->inputAddress;
-            // $htrans->namaPembeli = $pembeli;
-            // $htrans->addressSnapshot = $addressSnap;
-            // $htrans->tanggalPembelian = $today;
-            // $htrans->totalPembelian = $totalPayment;
-            // $htrans->discount = $currentPoints;
-            // $htrans->save(); 
+        try {          
 
             // Create htrans first
             $htrans = new Htrans();
