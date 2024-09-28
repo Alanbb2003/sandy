@@ -135,7 +135,9 @@
                         <img class="card-img-top thumbnail" src="{{asset('images/uploads/'.$k->fotoPromosi)}}" alt="Gambar Barang">
                       </a>
                     </td>
-                    <td>{{$k->namaBarang}}</td> 
+                    <td>
+                      <a href="{{ url('/product/' . $k->slugBarang ) }}" class="nodecor">{{$k->namaBarang}}</a>
+                    </td> 
                     <td>{{$k->category}}</td>
                     <td>{{$k->totalQuantity}} {{$k-> satuanTerkecil}} 
                       @if($k->satuanBesar)

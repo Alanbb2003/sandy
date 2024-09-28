@@ -1,7 +1,14 @@
-@extends('layouts.app')
+{{-- @extends('layouts.app') --}}
+@extends(Auth::guest() ? 'layouts.app' : (Auth::user()->role == 'user' ? 'layouts.app' : 'layouts.appAdmin'))
 
 @section('content')
+@if (Auth::check() && Auth::user()->role == 'admin')
+<a href="/dashboard/barang" class="mx-5"><i class="fa-solid fa-circle-arrow-left fa-xl"></i></a>
+@elseif (Auth::guest())
 <a href="/" class="mx-5"><i class="fa-solid fa-circle-arrow-left fa-xl"></i></a>
+@else
+<a href="/" class="mx-5"><i class="fa-solid fa-circle-arrow-left fa-xl"></i></a>
+@endif
 <div class="container mt-4">
     
     <div class="row">
@@ -25,7 +32,20 @@
                     <h3>{{ $barang->namaBarang }}</h3>
                 </div>
                 <div class="col">
-                    <button class="wishlist-toggle btn" data-product-id="{{ $barang->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Wishlist">
+                    @if (Auth::check() && Auth::user()->role == 'user')
+                        <button class="wishlist-toggle btn" data-product-id="{{ $barang->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Wishlist">
+                            @if(Auth::user()->wishlists->contains('fkProductID', $barang->id))
+                                <i class="fa-solid fa-heart"></i> <!-- Solid heart if in wishlist -->
+                            @else
+                                <i class="fa-regular fa-heart"></i> <!-- Regular heart if not in wishlist -->
+                            @endif
+                        </button>
+                    @elseif (Auth::guest())
+                        <button class="wishlist-toggle btn" data-product-id="{{ $barang->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Wishlist">
+                            <i class="fa-regular fa-heart"></i> <!-- Default regular heart for guests -->
+                        </button>
+                    @endif
+                    {{-- <button class="wishlist-toggle btn" data-product-id="{{ $barang->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Wishlist">
                         @if(Auth::check())
                             @if(Auth::user()->wishlists->contains('fkProductID', $barang->id))
                                 <i class="fa-solid fa-heart"></i> <!-- Solid heart if in wishlist -->
@@ -35,7 +55,7 @@
                         @else
                             <i class="fa-regular fa-heart"></i> <!-- Default regular heart for guests -->
                         @endif
-                    </button>
+                    </button> --}}
                 </div>
             </div>
             <div class="row mt-3">
@@ -50,10 +70,8 @@
             <p>Rp.{{ $barang->hargaBesar }} per  1 {{$barang->satuanBesar}}</p>
             @endif
             
-            
-            
-
             <div>
+                @if (Auth::check() && Auth::user()->role == 'user')
                 <form action="{{url('/cart/add') }}" method="POST">
                     @csrf
                     <input type="hidden" id="IDbarang" name="IDbarang" value="{{$barang->id}}">
@@ -73,22 +91,46 @@
                         <button type="submit" class="btn btn-primary">Tambah ke keranjang</button>
                     </div>
                 </form>
-                {{-- <label for="quantity_{{ $barang->id }}">Quantity:</label>
-                <input type="number" id="quantity_{{ $barang->id }}" name="quantity" min="1" value="1" class="form-control">
-                
-                <label for="unit_{{ $barang->id }}">Unit:</label>
-                <select id="unit_{{ $barang->id }}" name="unit" class="form-control">
-                    <option value="small">{{ $barang->satuanTerkecil }}</option>
-                    @if($barang->satuanBesar)
-                    <option value="big">{{ $barang->satuanBesar }}</option>
-                    @endif
-                </select>
+                @elseif (Auth::guest())
+                <form action="{{url('/cart/add') }}" method="POST">
+                    @csrf
+                    <input type="hidden" id="IDbarang" name="IDbarang" value="{{$barang->id}}">
 
-                <label for="total">Total:</label>
-                <input type="number" id="total" name="total"  class="form-control">
-                 --}}
+                    <label for="quantity_{{ $barang->id }}">Quantity:</label>
+                    <input type="number" id="quantity_{{ $barang->id }}" name="quantity" min="1" value="1" class="form-control">
+                    
+                    <label for="unit_{{ $barang->id }}">Unit:</label>
+                    <select id="unit_{{ $barang->id }}" name="unit" class="form-control">
+                        <option value="small">{{ $barang->satuanTerkecil }}</option>
+                        @if($barang->satuanBesar)
+                        <option value="big">{{ $barang->satuanBesar }}</option>
+                        @endif
+                    </select>
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-primary">Tambah ke keranjang</button>
+                    </div>
+                </form>
+                @endif
+                {{-- <form action="{{url('/cart/add') }}" method="POST">
+                    @csrf
+                    <input type="hidden" id="IDbarang" name="IDbarang" value="{{$barang->id}}">
+
+                    <label for="quantity_{{ $barang->id }}">Quantity:</label>
+                    <input type="number" id="quantity_{{ $barang->id }}" name="quantity" min="1" value="1" class="form-control">
+                    
+                    <label for="unit_{{ $barang->id }}">Unit:</label>
+                    <select id="unit_{{ $barang->id }}" name="unit" class="form-control">
+                        <option value="small">{{ $barang->satuanTerkecil }}</option>
+                        @if($barang->satuanBesar)
+                        <option value="big">{{ $barang->satuanBesar }}</option>
+                        @endif
+                    </select>
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-primary">Tambah ke keranjang</button>
+                    </div>
+                </form> --}}
             </div>
-            <div class="container">
+            {{-- <div class="container">
                 <h2>Your Cart</h2>
                 <table class="table">
                     <thead>
@@ -120,7 +162,7 @@
                         @endif
                     </tbody>
                 </table>
-            </div>
+            </div> --}}
             
 
             {{-- <button class="btn btn-primary add-to-cart" data-barang-id="{{ $barang->id }}">Add to Cart</button> --}}

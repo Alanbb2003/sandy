@@ -212,7 +212,11 @@
                             </i>
                             @if(session('cart'))
                             @php
-                                $items_in_cart = count(Session('cart'));
+                                $cartItems = session()->get('cart', []);
+                                $items_in_cart = 0;
+                                foreach ($cartItems as $item) {
+                                    $items_in_cart += $item['quantity'];
+                                }
                             @endphp
                                 <span class="position-absolute top-0 start-100 translate-middle badge bg-danger">
                                 {{$items_in_cart}}
@@ -264,6 +268,9 @@
         <div class="container-fluid">
             <div class="d-flex justify-content-end w-100">
                 <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url('/wishlist') }}">Wishlist</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url('/transaction') }}">Transactions</a>
                     </li>

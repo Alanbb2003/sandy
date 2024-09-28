@@ -74,8 +74,10 @@ class UserController extends Controller
 
     public function wishlistPage(){
         $userID = Auth::user()->id;
-        $Wishlist = 1;
-        return view('customer.wishlist');
+        $WishlistItems =  Wishlist::where('fkUserID', $userID)
+        ->with('product') // Load related product data
+        ->get();
+        return view('customer.wishlist',compact('WishlistItems'));
     }
 
     // function
@@ -220,12 +222,13 @@ class UserController extends Controller
                         'saldoPoin' => 0,
                     ]);
 
-                    $htrans->discount = $currentPoints; // Apply discount to htrans
+                    $htrans->discount = $currentPoints;
                 }
             }
 
             $htrans->totalPembelian = $totalPayment;
-            $htrans->save(); // Save the updated totalPembelian and discount
+            $htrans->save(); 
+            
             //menambah ke dtrans
             foreach ($cartItems as $item) {
                 $dtrans = new Dtrans();
@@ -236,6 +239,19 @@ class UserController extends Controller
                 $dtrans->hargaSatuan = $item['price'];
                 $dtrans->subtotal = $item['quantity'] * $item['price'];
                 $dtrans->save();
+
+                // Fetch the product from the database
+                $product = Products::find($item['productID']);
+                
+                if ($product) {
+                    if($item['unitHidden'] == 'small'){
+                        $product->totalQuantity -= $item['quantity'];
+                    }else{
+                        $reducebig = $item['quantity'] * $product->isiSatuanBesar;
+                        $product->totalQuantity -= $reducebig;
+                    }
+                    $product->save();
+                }
             }
 
             if($isMember){
