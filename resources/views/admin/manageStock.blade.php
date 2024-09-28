@@ -152,7 +152,7 @@
                     </td>
                     <td style="width: 100px;">
                       <div class="container d-flex-inline flex-row"></div>
-                      <a href="#" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
+                      <a href="{{url('/dashboard/barang/edit/'.$k->id)}}" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
                       <a href="#" data-method="DELETE" data-confirm="Yakin hapus barang ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
                     </td>
                   </tr>

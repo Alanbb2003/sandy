@@ -62,7 +62,7 @@
           <div class="card mb-4 p-1 mx-2" style="width: 180px;min-height: 260px">
             
               <a target="_blank" href="{{ asset('images/uploads/' . $k->fotoPromosi) }}">
-                <img class="card-img-top thumbnail" src="{{ asset('images/uploads/' . $k->fotoPromosi) }}" alt="Gambar Barang">
+                <img class="card-img-top thumbnail" src="{{ asset('images/uploads/' . $k->fotoPromosi) }}" alt="Gambar Barang" loading="lazy">
               </a>
               <div class="card-body">
                 <h5 class="card-title">{{ $k->namaBarang }}</h5>

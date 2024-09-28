@@ -60,11 +60,15 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
     Route::prefix('/dashboard',)->group(function(){
         Route::get("/",[AdminController::class,'adminHome'])->name('homeAdmin');
         Route::get('/barang',[AdminController::class,'adminManageStock']);
+        //add new barang
         Route::get('/barang/new',[AdminController::class,'adminBarangNew']);
         Route::get('/barang/new/get-categories',[AdminController::class,'getCategories']);
         Route::post('/barang/new',[AdminController::class,'addBarang']);    
         Route::post('/barang/new/kategori',[AdminController::class,"addKategori"]);
         Route::post('/barang/new/kategori/update-category', [AdminController::class, 'updateKategori']);
+        //edit barang
+        Route::get('/barang/edit/{id}', [AdminController::class, 'showeditBarang'])->name('dashboard.barang.edit');
+        Route::delete('/barang/delete-image/{id}', [AdminController::class, 'deleteImage'])->name('dashboard.barang.deleteImage');
         // Route::post('/barang/kategori',[AdminController::class,"addKategori"]);
     });
 });

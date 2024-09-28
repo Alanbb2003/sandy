@@ -44,8 +44,39 @@ class AdminController extends Controller
         return view('admin.manageMembership');
     }
 
+    public function showeditBarang($id)
+    {
+        // Fetch the product by ID
+        $product = Products::findOrFail($id);
+
+        // Fetch all categories
+        $kategori = Category::all();
+
+        $pictures = Pictures::where('productID', $id)->get();
+        // Return the edit view with product and categories data
+        return view('admin.forms.editStock', compact('product', 'kategori','pictures'));
+    }
+
 
     //function
+    public function deleteImage($id)
+    {
+       // Find the image by ID in the picture table
+        $picture = Pictures::findOrFail($id);
+
+        // Delete the image file from 'images/uploads/' directory
+        $filePath = public_path('images/uploads/' . $picture->fileName);
+        if (file_exists($filePath)) {
+            unlink($filePath);  // Delete the file
+        }
+
+        // Delete the image record from the database
+        $picture->delete();
+
+        // Redirect back with success message
+        return back()->with('success', 'Image deleted successfully!');
+    }
+
     public function addBarang(Request $request){
         $input = $request->all();
         $this->validate($request,[
@@ -171,13 +202,96 @@ class AdminController extends Controller
     //         return $e->getMessage();
     //     }
     // }
-
-    public function editBarang(Request $request,$id){
-        $barang = Products::where('id','=',$id)->first();
-        $this->validate($request,[
-            'inputNamaBarang'=>'required',
-            'inputjumlahkecil'=>'required'
+    public function updateBarang(Request $request, $id)
+    {
+        // Validate the request data
+        $request->validate([
+            // ... validation rules ...
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
+        $request->validate([
+            'inputNamaBarang' => 'required|string|max:255',
+            'inputKategori' => 'required|integer',
+            'inputDeskripsi' => 'required|string',
+            'inputJumlahKecil' => 'required|numeric|min:0',
+            'inputSatuanKecil' => 'required|string',
+            'inputJumlahBesar' => 'nullable|numeric|min:0',
+            'inputSatuanBesar' => 'nullable|string',
+            'inputHargaKecil' => 'required|numeric|min:0',
+            'inputHargaBesar' => 'nullable|numeric|min:0',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+        ]);
+    
+        // Find the product by ID
+        $product = Products::findOrFail($id);
+    
+        // Update product details
+        $product->namaBarang = $request->input('inputNamaBarang');
+        $product->category_id = $request->input('inputKategori');
+        $product->deskripsi = $request->input('inputDeskripsi');
+        $product->jumlahKecil = $request->input('inputJumlahKecil');
+        $product->satuanTerkecil = $request->input('inputSatuanKecil');
+        $product->jumlahBesar = $request->input('inputJumlahBesar');
+        $product->satuanTerbesar = $request->input('inputSatuanBesar');
+        $product->hargaKecil = $request->input('inputHargaKecil');
+        $product->hargaBesar = $request->input('inputHargaBesar');
+    
+        $arr = explode(' ',trim($request->inputNamaBarang));
+        $item = "";
+        if(sizeof($arr) >= 2){
+            $first_character = mb_substr($arr[0], 0, 2);
+            $second_character = mb_substr($arr[1], 0, 2);
+            $item = $first_character.$second_character;
+        }else{
+            $first_character = mb_substr($request->inputNamaBarang, 0, 2);
+            $item = $first_character;
+        }
+        // Check if thumbnail was uploaded
+        if ($request->hasFile('thumbnail')) {
+            // Check if the product already has a thumbnail
+            if ($product->fotoPromosi) {
+                // Get the full path of the old thumbnail
+                $oldThumbnailPath = public_path('images/uploads/' . basename($product->fotoPromosi));
+                
+                // Delete the old thumbnail if it exists
+                if (file_exists($oldThumbnailPath)) {
+                    unlink($oldThumbnailPath);
+                }
+            }
+        
+            // Handle file upload for new thumbnail
+            $thumbnail = $request->file('thumbnail');
+            $thumbnailName = $item . time() . '.' . $thumbnail->extension();
+            $thumbnail->move(public_path('images/uploads'), $thumbnailName);
+            
+            // Save the new thumbnail path to the product
+            $thumbnailPath = $request->file('thumbnail')->store('public/products/thumbnails');
+            $product->fotoPromosi = $thumbnailName;
+        }
+    
+        // Save the updated product
+        $product->save();
+
+        // Check if new images were uploaded for the product
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $fileName = time() . rand(1, 99) . '.' . $image->extension();  
+                // Store the image in the 'images/uploads/' directory
+                $imagePath = $image->storeAs('images/uploads', $fileName, 'public');
+    
+                // Store image details in the picture table
+                Pictures::create([
+                    'productID' => $product->id,
+                    'fileName' => $fileName,
+                    'filePath' => asset('images/uploads/' . $fileName),  // If needed, store the full path
+                ]);
+            }
+        }
+    
+        // Save and redirect
+        return redirect()->route('dashboard.barang.index')
+                         ->with('success', 'Product updated successfully!');
     }
 
     public function addJumlahBarang(Request $request,$id){
