@@ -110,9 +110,15 @@ class AdminController extends Controller
         }
         
         try {
-            
-        $thumbnailname = $item.time(). '.' . $thumbnail->extension(); 
-        $thumbnail->move(public_path('images/uploads'),$thumbnailname);
+
+        if ($request->hasFile('thumbnail')) {
+            $thumbnail = $request->file('thumbnail');
+            $thumbnailname = $item . time() . '.webp'; // Save as WEBP format
+            $thumbnailPath = public_path('images/uploads/' . $thumbnailname);
+            $this->convertToWebP($thumbnail, $thumbnailPath);
+        }
+        // $thumbnailname = $item.time(). '.' . $thumbnail->extension(); 
+        // $thumbnail->move(public_path('images/uploads'),$thumbnailname);
 
         $productbaru = new Products();
         $productbaru->fotoPromosi = $thumbnailname;
@@ -129,15 +135,32 @@ class AdminController extends Controller
         $productbaru->Status = 1;
         $productbaru->save();
 
+        // if ($files) {
+        //     for ($i=0; $i < count($files); $i++) { 
+        //         $fileName = time() . rand(1, 99) . '.' . $files[$i]->extension();  
+        //         $filePath = 'images/uploads';
+        //         $files[$i]->move(public_path($filePath), $fileName);
+        //         // $file->storeAs('photos', $fileName);
+
+        //         $uploadedFiles[] = ['name' => $fileName,'path' => $filePath];
+
+        //         $upload = new Pictures();
+        //         $upload->productID = $barang;
+        //         $upload->fileName = $fileName;
+        //         $upload->filePath = $filePath;
+        //         $upload->save();
+        //     }
+        // }
+        $files = $request->file('images');
         if ($files) {
-            for ($i=0; $i < count($files); $i++) { 
-                $fileName = time() . rand(1, 99) . '.' . $files[$i]->extension();  
+            foreach ($files as $file) {
+                $fileName = time() . rand(1, 99) . '.webp';  // Save as WEBP format
                 $filePath = 'images/uploads';
-                $files[$i]->move(public_path($filePath), $fileName);
-                // $file->storeAs('photos', $fileName);
+                $webpPath = public_path($filePath . '/' . $fileName);
+                
+                $this->convertToWebP($file, $webpPath);
 
-                $uploadedFiles[] = ['name' => $fileName,'path' => $filePath];
-
+                // Save image details to the database
                 $upload = new Pictures();
                 $upload->productID = $barang;
                 $upload->fileName = $fileName;
@@ -145,7 +168,6 @@ class AdminController extends Controller
                 $upload->save();
             }
         }
-
         alert()->success('Success!','Berhasil menambahkan produk');
         return back();
         } catch (\Exception $e) {
@@ -228,12 +250,13 @@ class AdminController extends Controller
     
         // Update product details
         $product->namaBarang = $request->input('inputNamaBarang');
-        $product->category_id = $request->input('inputKategori');
+        $product->slugBarang = Str::slug($request->input('inputNamaBarang'));
+        $product->fk_kategori = $request->input('inputKategori');
         $product->deskripsi = $request->input('inputDeskripsi');
-        $product->jumlahKecil = $request->input('inputJumlahKecil');
+        $product->totalQuantity = $request->input('inputJumlahKecil');
         $product->satuanTerkecil = $request->input('inputSatuanKecil');
-        $product->jumlahBesar = $request->input('inputJumlahBesar');
-        $product->satuanTerbesar = $request->input('inputSatuanBesar');
+        $product->isiSatuanBesar = $request->input('inputJumlahBesar');
+        $product->satuanBesar = $request->input('inputSatuanBesar');
         $product->hargaKecil = $request->input('inputHargaKecil');
         $product->hargaBesar = $request->input('inputHargaBesar');
     
@@ -248,6 +271,28 @@ class AdminController extends Controller
             $item = $first_character;
         }
         // Check if thumbnail was uploaded
+        
+        // if ($request->hasFile('thumbnail')) {
+        //     // Check if the product already has a thumbnail
+        //     if ($product->fotoPromosi) {
+        //         // Get the full path of the old thumbnail
+        //         $oldThumbnailPath = public_path('images/uploads/' . basename($product->fotoPromosi));
+                
+        //         // Delete the old thumbnail if it exists
+        //         if (file_exists($oldThumbnailPath)) {
+        //             unlink($oldThumbnailPath);
+        //         }
+        //     }
+        
+        //     // Handle file upload for new thumbnail
+        //     $thumbnail = $request->file('thumbnail');
+        //     $thumbnailName = $item . time() . '.' . $thumbnail->extension();
+        //     $thumbnail->move(public_path('images/uploads'), $thumbnailName);
+            
+        //     // Save the new thumbnail path to the product
+        //     $thumbnailPath = $request->file('thumbnail')->store('public/products/thumbnails');
+        //     $product->fotoPromosi = $thumbnailName;
+        // }
         if ($request->hasFile('thumbnail')) {
             // Check if the product already has a thumbnail
             if ($product->fotoPromosi) {
@@ -262,36 +307,56 @@ class AdminController extends Controller
         
             // Handle file upload for new thumbnail
             $thumbnail = $request->file('thumbnail');
-            $thumbnailName = $item . time() . '.' . $thumbnail->extension();
-            $thumbnail->move(public_path('images/uploads'), $thumbnailName);
-            
-            // Save the new thumbnail path to the product
-            $thumbnailPath = $request->file('thumbnail')->store('public/products/thumbnails');
+            $thumbnailName = $item . time() . '.webp';  // Save as WebP format
+            $thumbnailPath = public_path('images/uploads/' . $thumbnailName);
+        
+            // Convert the new thumbnail to WebP
+            $this->convertToWebP($thumbnail, $thumbnailPath);
+        
+            // Save the new thumbnail name to the product
             $product->fotoPromosi = $thumbnailName;
         }
-    
         // Save the updated product
         $product->save();
 
         // Check if new images were uploaded for the product
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $fileName = time() . rand(1, 99) . '.' . $image->extension();  
-                // Store the image in the 'images/uploads/' directory
-                $imagePath = $image->storeAs('images/uploads', $fileName, 'public');
-    
-                // Store image details in the picture table
+                // Create a unique file name for each image
+                $fileName = time() . rand(1, 99) . '.webp';  // Saving as WebP format
+        
+                // Define the file path for saving the WebP image
+                $imagePath = public_path('images/uploads/' . $fileName);
+        
+                // Convert the image to WebP format and save
+                $this->convertToWebP($image, $imagePath);
+        
+                // Store the image details in the Pictures table
                 Pictures::create([
                     'productID' => $product->id,
-                    'fileName' => $fileName,
+                    'fileName' => $fileName,  // Store the WebP file name
                     'filePath' => asset('images/uploads/' . $fileName),  // If needed, store the full path
                 ]);
             }
         }
+        // if ($request->hasFile('images')) {
+        //     foreach ($request->file('images') as $image) {
+        //         $fileName = time() . rand(1, 99) . '.' . $image->extension();  
+        //         // Store the image in the 'images/uploads/' directory
+        //         $imagePath = $image->storeAs('images/uploads', $fileName, 'public');
+    
+        //         // Store image details in the picture table
+        //         Pictures::create([
+        //             'productID' => $product->id,
+        //             'fileName' => $fileName,
+        //             'filePath' => asset('images/uploads/' . $fileName),  // If needed, store the full path
+        //         ]);
+        //     }
+        // }
     
         // Save and redirect
-        return redirect()->route('dashboard.barang.index')
-                         ->with('success', 'Product updated successfully!');
+        alert()->success('Success!','Berhasil menambahkan kategori');
+        return redirect()->back();    
     }
 
     public function addJumlahBarang(Request $request,$id){
@@ -306,5 +371,41 @@ class AdminController extends Controller
             $isiBesar = $barang->isiSatuanBesar;
             $tambahBesar = $request->inputJumlah * $isiBesar;
         }
+    }
+        /**
+     * Convert an image to WebP format using GD library.
+     *
+     * @param \Illuminate\Http\UploadedFile $file
+     * @param string $outputWebPPath Path where the WebP image will be saved
+     * @return void
+     */
+    private function convertToWebP($file, $outputWebPPath)
+    {
+        $extension = $file->extension();
+        switch ($extension) {
+            case 'jpeg':
+            case 'jpg':
+                $image = imagecreatefromjpeg($file->getPathname());
+                break;
+            case 'png':
+                $image = imagecreatefrompng($file->getPathname());
+                break;
+            case 'gif':
+                $image = imagecreatefromgif($file->getPathname());
+                break;
+            case 'webp':
+                // If the file is already a WebP image, move it directly without conversion
+                $file->move(dirname($outputWebPPath), basename($outputWebPPath));
+                return;
+            default:
+                alert()->error('Error!', 'Unsupported image format');
+                return back();
+        }
+
+        // Convert to WebP and save
+        imagewebp($image, $outputWebPPath, 75); // 80 is the quality setting for WEBP (0-100)
+
+        // Free memory
+        imagedestroy($image);
     }
 }

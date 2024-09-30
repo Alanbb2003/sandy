@@ -106,6 +106,7 @@
                     <div class="row">{{$a->detailAlamat}}, {{$a->provinsi}}, {{$a->kota}}, {{$a->kecamatan}}, {{$a->kelurahan}}</div>
 
                     <button class="btn btn-info" onclick="editAddress({{ json_encode($a) }})">Edit</button>
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" onclick="setDeleteId({{ $a->id }})">Delete</button>
                 </div>
                 @endforeach
             @endif
@@ -184,7 +185,32 @@
       </div>
     </div>
   </div>
-@endsection
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this address?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <!-- Form to delete the address -->
+                <form id="deleteAddressForm" method="POST" action="{{ url('/address/delete') }}">
+                    @csrf
+                    @method('DELETE')
+                    <input type="hidden" id="addressIdToDelete" name="addressId">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+  @endsection
 
 @section('script')
 <script>
@@ -265,7 +291,10 @@ selectKecamatan.addEventListener('change',(e)=>{
 
     var modal = new bootstrap.Modal(document.getElementById('editAddressModal'));
     modal.show();
-}
+    }
+    function setDeleteId(id) {
+        document.getElementById('addressIdToDelete').value = id;
+    }
 </script>
 <script>
     // Fetch Provinces

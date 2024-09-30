@@ -196,6 +196,7 @@
                     <ul class="navbar-nav me-auto">
                         <a class="nav-link" href="/dashboard">Home</a>
                         <a class="nav-link" href="{{ url('/dashboard/barang') }}">Barang</a>
+                        <a class="nav-link" href="#">Pesanan</a>
                         <a class="nav-link" href="#">Pelanggan</a>
                         <a class="nav-link" href="#">Membership</a>
                     </ul>

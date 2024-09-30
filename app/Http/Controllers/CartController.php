@@ -19,7 +19,10 @@ class CartController extends Controller
             return response()->json(['message' => 'Product not found.'], 404);
         }
         $jumlahKecil = $product->totalQuantity;
-        $jumlahBesar = $product->totalQuantity / $product->isiSatuanBesar;
+        //check if isiSatuanBesar is null
+        if($product->isiSatuanBesar != null){
+            $jumlahBesar = $product->totalQuantity / $product->isiSatuanBesar;
+        }   
         // $availablequantity = kalau unit == "small"" di isi jumlah kecil jika tidak jumlah besar
         $availableQuantity = $unit == "small" ? $jumlahKecil : $jumlahBesar;
         if ($availableQuantity < $quantity) {
@@ -72,15 +75,24 @@ class CartController extends Controller
     public function view()
     {
         $cart = session()->get('cart', []);
-        return view('customer.cart', compact('cart'));
+        $totalAmmount = 0;
+
+        foreach ($cart as $item) {
+            $totalAmmount += $item['price'] * $item['quantity'];
+        }
+        return view('customer.cart', compact('cart','totalAmmount'));
     }
     public function addOne($id){
         $productId = $id;
         $product = Products::where('id',$productId)->first();
         echo($product);
         $productsmall = $product->totalQuantity;
-        $productbig = $product->totalQuantity / $product->isiSatuanBesar;
-
+        //check if isiSatuanBesar is null
+        if($product->isiSatuanBesar != null){
+            $productbig = $product->totalQuantity / $product->isiSatuanBesar;
+        } 
+        
+        //get cart session
         $cart = session()->get('cart', []);
         if (isset($cart[$productId])) {
             if($cart[$productId]['unitHidden'] == "small"){

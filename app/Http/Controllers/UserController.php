@@ -80,12 +80,15 @@ class UserController extends Controller
         return view('customer.wishlist',compact('WishlistItems'));
     }
 
+    public function profilePage(){
+
+        return view('customer.profile',);
+    }
+
     // function
     public function addAlamat(Request $request){
         $userID = Auth::user()->id;
-        // dd($request->all());
 
-        // Validate the request
         $this->validate($request, [
             'InputnamaDepan' => 'required',
             'InputnamaBelakang' => 'required',
@@ -120,7 +123,7 @@ class UserController extends Controller
 
     public function updateAddress(Request $request) {
         $address = Alamat::find($request->addressId);
-        //check validation
+
         $this->validate($request, [
             'editNamaDepan' => 'required',
             'editNamaBelakang' => 'required',
@@ -146,6 +149,29 @@ class UserController extends Controller
         return redirect()->back();
     }
 
+    public function deleteAddress(Request $request)
+    {
+        $addressId = $request->input('addressId');
+
+        // Check if the address exists
+        $address = Alamat::find($addressId);
+
+        if (!$address) {
+            alert()->success('error!', 'Alamat tidak ditemukan');
+            return redirect()->back();
+        }
+
+        try {
+ 
+            $address->delete();
+
+            alert()->success('Success!', 'Berhasil menghapus alamat');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            alert()->success('error!', 'Gagal menghapus alamat');
+            return redirect()->back();
+        }
+    }
     public function checkoutFunc(Request $request){
         $userID = Auth::user()->id;
         $pembeli = Auth::user()->firstName." ". Auth::user()->lastName;
@@ -184,7 +210,6 @@ class UserController extends Controller
             // Create htrans first
             $htrans = new Htrans();
             $htrans->fkUserID = $userID;
-            $htrans->fkAddressID = $request->inputAddress;
             $htrans->namaPembeli = $pembeli;
             $htrans->addressSnapshot = $addressSnap;
             $htrans->tanggalPembelian = $today;
@@ -298,8 +323,7 @@ class UserController extends Controller
         }
     }
 
-    public function toggleWishlist(Request $request)
-    {
+    public function toggleWishlist(Request $request){
         $user = Auth::user();
         $productId = $request->input('product_id');
     

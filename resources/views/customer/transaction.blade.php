@@ -24,7 +24,7 @@
                 <td>{{$k->addressSnapshot}}</td>
                 <td>{{$k->tanggalPembelian}}</td> 
                 <td>Rp. {{ number_format($k->totalPembelian, 2, ",", ".") }}</td>
-                @if ($k->status == 1)
+                {{-- @if ($k->status == 1)
                     <td>
                         Menunggu pembayaran
                     </td>
@@ -32,10 +32,31 @@
                     <td>
                         Mengirim barang
                     </td>
-                @endif
+                @endif --}}
+                @switch($k->status)
+                    @case(1)
+                        <td>Menunggu pembayaran.</td>
+                        @break
+
+                    @case(2)
+                        <td>The order is being processed.</td>
+                        @break
+
+                    @case(3)
+                        <td>The order has been completed.</td>
+                        @break
+
+                    @case(4)
+                        <td>Pesanan dibatalkan.</td>
+                        @break
+                    @default
+                        <td>Unknown order status.</td>
+                @endswitch
                 <td>
                     <a href="" class="btn btn-info my-1">Detail</a>
+                    @if ($k->status == 1)
                     <button class="btn btn-info">Upload bukti</button>
+                    @endif
                 </td>
                 </tr>
                 @endforeach
@@ -54,7 +75,8 @@
 <script>
   $(document).ready(function(){
         $('#tabelTransaksi').dataTable({
-          responsive: true
+          responsive: true,
+          order: [[3, 'desc']]
         } );
     });
 </script>

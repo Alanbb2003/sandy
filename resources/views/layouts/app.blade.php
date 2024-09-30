@@ -220,7 +220,7 @@
                             @endphp
                                 <span class="position-absolute top-0 start-100 translate-middle badge bg-danger">
                                 {{$items_in_cart}}
-                                <span class="visually-hidden">unread messages</span>
+                                <span class="visually-hidden">items in cart</span>
                                 </span>   
                             @endif
                         </a>
@@ -238,7 +238,7 @@
                                 </li>
                             @endif
                         @else
-                        <a href="{{ url('/cart') }}" class="btn mt-2 mx-1 position-relative">
+                        <a href="{{ url('/wishlist') }}" class="btn mt-2 mx-1 position-relative">
                             <i class="fa-solid fa-heart"></i>
                         </a>
                             <li class="nav-item mt-2 mx-1 position-relative">

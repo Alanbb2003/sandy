@@ -35,25 +35,44 @@ Route::prefix('/cart')->group(function() {
     Route::get('/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 });
 
-Route::get('/checkout',[UserController::class,"checkoutPage"])->middleware('verified');
-Route::post('/checkout',[UserController::class,"checkoutFunc"])->middleware('verified');
-Route::get('/address',[USerController::class,"addressPage"])->middleware('verified');
-Route::post('/address/add',[UserController::class,"addAlamat"])->middleware('verified');
-Route::put('/address/edit', [UserController::class, 'updateAddress'])->middleware('verified');
-Route::get('/membership',[UserController::class,'membershipPage'])->middleware('verified');
-Route::get('/wishlist', [UserController::class, 'wishlistPage'])->middleware('verified');
-Route::post('/wishlist/toggle', [UserController::class, 'toggleWishlist'])->middleware('verified');
-Route::get('/transaction',[UserController::class,'transactionPage'])->middleware('verified');
+// Route::middleware(['auth','user-role:user'])->group(function(){
+//     Route::get('/checkout',[UserController::class,"checkoutPage"])->middleware('verified');
+//     Route::post('/checkout',[UserController::class,"checkoutFunc"])->middleware('verified');
+//     Route::get('/address',[UserController::class,"addressPage"])->middleware('verified');
+//     Route::post('/address/add',[UserController::class,"addAlamat"])->middleware('verified');
+//     Route::put('/address/edit', [UserController::class, 'updateAddress'])->middleware('verified');
+//     Route::get('/membership',[UserController::class,'membershipPage'])->middleware('verified');
+//     Route::get('/wishlist', [UserController::class, 'wishlistPage'])->middleware('verified');
+//     Route::post('/wishlist/toggle', [UserController::class, 'toggleWishlist'])->middleware('verified');
+//     Route::get('/transaction',[UserController::class,'transactionPage'])->middleware('verified');
+// });
+
+Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
+    Route::get('/checkout', [UserController::class, 'checkoutPage'])->name('checkout.page');
+    Route::post('/checkout', [UserController::class, 'checkoutFunc'])->name('checkout.func');
+    
+    Route::get('/address', [UserController::class, 'addressPage'])->name('address.page');
+    Route::post('/address/add', [UserController::class, 'addAlamat'])->name('address.add');
+    Route::put('/address/edit', [UserController::class, 'updateAddress'])->name('address.edit');
+    Route::delete('/address/delete', [UserController::class, 'deleteAddress'])->name('address.delete');
+
+    Route::get('/membership', [UserController::class, 'membershipPage'])->name('membership.page');
+    
+    Route::get('/wishlist', [UserController::class, 'wishlistPage'])->name('wishlist.page');
+    Route::post('/wishlist/toggle', [UserController::class, 'toggleWishlist'])->name('wishlist.toggle');
+    
+    Route::get('/transaction', [UserController::class, 'transactionPage'])->name('transaction.page');
+});
 //user route
 
-Route::middleware(['auth','user-role:user'])->group(function(){
-    Route::prefix('/home',)->group(function(){
-        Route::get('/', [HomeController::class,"welcome"])->name('home')->middleware('verified');
+
+    // Route::prefix('/home',)->group(function(){
+        // Route::get('/', [HomeController::class,"welcome"])->name('home')->middleware('verified');
         // Route::get('/checkout',[HomeController::class,"checkoutPage"])->middleware('verified');
         // Route::get('/address',[HomeController::class,"addressPage"]);
         // Route::post('/address/add',[UserController::class,"addAlamat"])->middleware('verified');
-    });
-});
+    // });
+
 
 //admin route
 Route::middleware(['auth','user-role:admin'])->group(function(){
@@ -68,6 +87,7 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::post('/barang/new/kategori/update-category', [AdminController::class, 'updateKategori']);
         //edit barang
         Route::get('/barang/edit/{id}', [AdminController::class, 'showeditBarang'])->name('dashboard.barang.edit');
+        Route::put('/barang/edit/{id}', [AdminController::class, 'updateBarang']);
         Route::delete('/barang/delete-image/{id}', [AdminController::class, 'deleteImage'])->name('dashboard.barang.deleteImage');
         // Route::post('/barang/kategori',[AdminController::class,"addKategori"]);
     });

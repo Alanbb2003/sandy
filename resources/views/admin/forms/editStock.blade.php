@@ -53,129 +53,136 @@
 </div>
 
 <!-- ISI Data barang -->
-    <form class="row g-3" action="{{ url('/dashboard/barang/edit', $product->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT') <!-- Since this is an edit, use PUT method -->
-        
-        <!-- Product Thumbnail Image -->
-        <div class="mb-3 d-flex">
-            <img id="frame" src="{{ asset('images/uploads/'.$product->fotoPromosi)}}" width="100px" height="100px" class="img-thumbnail mt-1" />
-            <div class="container-fluid">
-                <label for="thumbnail" class="form-label">Foto produk promosi</label>
-                <input class="form-control" type="file" id="thumbnail" name="thumbnail">
-                @error('thumbnail')
-                <div class="alert alert-danger">{{ $message }}</div>
-                @enderror
+
+<div class="col my-1 mx-2">
+  <div class="my-2">
+    <label for="formFile" class="form-label">Gambar yang ada</label>
+    <div id="existingImages">
+        @foreach ($pictures as $picture)
+            <div class="img-thumbnail d-inline-block position-relative" style="width: 100px; height: 100px;">
+                <img src="{{ asset('images/uploads/'.$picture->fileName) }}" alt="{{ $picture->fileName }}" style="width: 100%; height: 100%; object-fit: cover;">
+                
+                <!-- Separate form to delete each image -->
+                <form action="{{ url('/dashboard/barang/delete-image', $picture->id) }}" method="POST" class="position-absolute top-0 end-0">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm">X</button>
+                </form>
             </div>
-        </div>
-
-        <!-- Additional Images -->
-        <!-- Display Existing Product Images -->
-        <div class="mb-3">
-            <label for="formFile" class="form-label">Gambar yang ada</label>
-            <div id="existingImages">
-                @foreach ($pictures as $picture)
-                    <div class="img-thumbnail d-inline-block position-relative" style="width: 100px; height: 100px;">
-                        <img src="{{ asset('images/uploads/'.$picture->fileName) }}" alt="{{ $picture->fileName }}" style="width: 100%; height: 100%; object-fit: cover;">
-                        <a href="{{ route('dashboard.barang.deleteImage', $picture->id) }}" class="btn btn-danger btn-sm position-absolute top-0 end-0">X</a>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- Upload New Images -->
-        <div class="mb-3">
-            <label for="formFile" class="form-label">Upload Gambar Baru</label>
-            <input class="form-control" type="file" id="images" name="images[]" multiple>
-            <div id="frames"></div>
-        </div>
-
-        <!-- Product Name -->
-        <div class="col-md-4">
-            <label for="inputNamaBarang" class="form-label">Nama Barang</label>
-            <input type="text" class="form-control @error('inputNamaBarang') is-invalid @enderror" id="inputNamaBarang" name="inputNamaBarang" value="{{ $product->namaBarang }}">
-            @error('inputNamaBarang')
-            <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <!-- Product Category -->
-        <div class="col-md-3">
-            <label for="inputKategori" class="form-label">Kategori</label>
-            <select class="form-select" id="inputKategori" name="inputKategori">
-                @foreach ($kategori as $k)
-                    <option value="{{ $k->id }}" {{ $k->id == $product->fk_kategori ? 'selected' : '' }}>{{ $k->nama_category }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <!-- Product Description -->
-        <div class="col-md-4">
-            <label for="inputDeskripsi" class="form-label">Deskripsi</label>
-            <textarea class="form-control @error('inputDeskripsi') is-invalid @enderror" id="inputDeskripsi" name="inputDeskripsi" rows="5">{{ $product->deskripsi }}</textarea>
-            @error('inputDeskripsi')
-            <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <!-- Quantity Fields -->
-        <div class="col-md-2">
-            <label for="inputJumlahKecil" class="form-label">Jumlah terkecil</label>
-            <input type="number" min="0" class="form-control @error('inputJumlahKecil') is-invalid @enderror" id="inputJumlahKecil" name="inputJumlahKecil" value="{{ $product->totalQuantity }}">
-            @error('inputJumlahKecil')
-            <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="col-md-2">
-            <label for="inputSatuanKecil" class="form-label">Satuan terkecil</label>
-            <input type="text" class="form-control @error('inputSatuanKecil') is-invalid @enderror" id="inputSatuanKecil" name="inputSatuanKecil" value="{{ $product->satuanTerkecil }}">
-            @error('inputSatuanKecil')
-            <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="col-md-3">
-            <label for="inputJumlahBesar" class="form-label">Jumlah terkecil dalam satuan besar</label>
-            <input type="number" min="0" class="form-control @error('inputJumlahBesar') is-invalid @enderror" id="inputJumlahBesar" name="inputJumlahBesar" value="{{ $product->isiSatuanBesar }}">
-            @error('inputJumlahBesar')
-            <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="col-md-2">
-            <label for="inputSatuanBesar" class="form-label">Satuan terbesar</label>
-            <input type="text" class="form-control @error('inputSatuanBesar') is-invalid @enderror" id="inputSatuanBesar" name="inputSatuanBesar" value="{{ $product->satuanBesar }}">
-            @error('inputSatuanBesar')
-            <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <!-- Pricing Fields -->
-        <div class="d-flex flex-row">
-            <div class="col-md-2 me-3">
-                <label for="inputHargaKecil" class="form-label">Harga jumlah terkecil</label>
-                Rp.<input type="number" min="0" class="form-control @error('inputHargaKecil') is-invalid @enderror" id="inputHargaKecil" name="inputHargaKecil" value="{{ $product->hargaKecil }}">
-                @error('inputHargaKecil')
-                <div class="alert alert-danger">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="col-md-2">
-                <label for="inputHargaBesar" class="form-label">Harga jumlah terbesar</label>
-                Rp.<input type="number" min="0" class="form-control @error('inputHargaBesar') is-invalid @enderror" id="inputHargaBesar" name="inputHargaBesar" value="{{ $product->hargaBesar }}">
-                @error('inputHargaBesar')
-                <div class="alert alert-danger">{{ $message }}</div>
-                @enderror
-            </div>
-        </div>
-
-        <!-- Submit Button -->
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Update</button>
-        </div>
-    </form>
+        @endforeach
+    </div>
   </div>
+    <form class="row g-3" action="{{ url('/dashboard/barang/edit', $product->id) }}" method="POST" enctype="multipart/form-data">
+      @csrf
+      @method('PUT') <!-- Since this is an edit, use PUT method -->
+      
+      <!-- Product Thumbnail Image -->
+      <div class="mb-3 d-flex">
+          <img id="frame" src="{{ asset('images/uploads/'.$product->fotoPromosi)}}" width="100px" height="100px" class="img-thumbnail mt-1" />
+          <div class="container-fluid">
+              <label for="thumbnail" class="form-label">Foto produk promosi</label>
+              <input class="form-control" type="file" id="thumbnail" name="thumbnail">
+              @error('thumbnail')
+              <div class="alert alert-danger">{{ $message }}</div>
+              @enderror
+          </div>
+      </div>
+
+      <!-- Upload New Images -->
+      <div class="mb-3">
+          <label for="formFile" class="form-label">Upload Gambar Baru</label>
+          <input class="form-control" type="file" id="images" name="images[]" multiple>
+          <div id="frames"></div>
+      </div>
+
+      <!-- Product Name -->
+      <div class="col-md-4">
+          <label for="inputNamaBarang" class="form-label">Nama Barang</label>
+          <input type="text" class="form-control @error('inputNamaBarang') is-invalid @enderror" id="inputNamaBarang" name="inputNamaBarang" value="{{ $product->namaBarang }}">
+          @error('inputNamaBarang')
+          <div class="alert alert-danger">{{ $message }}</div>
+          @enderror
+      </div>
+
+      <!-- Product Category -->
+      <div class="col-md-3">
+          <label for="inputKategori" class="form-label">Kategori</label>
+          <select class="form-select" id="inputKategori" name="inputKategori">
+              @foreach ($kategori as $k)
+                  <option value="{{ $k->id }}" {{ $k->id == $product->fk_kategori ? 'selected' : '' }}>{{ $k->nama_category }}</option>
+              @endforeach
+          </select>
+      </div>
+
+      <!-- Product Description -->
+      <div class="col-md-4">
+          <label for="inputDeskripsi" class="form-label">Deskripsi</label>
+          <textarea class="form-control @error('inputDeskripsi') is-invalid @enderror" id="inputDeskripsi" name="inputDeskripsi" rows="5">{{ $product->deskripsi }}</textarea>
+          @error('inputDeskripsi')
+          <div class="alert alert-danger">{{ $message }}</div>
+          @enderror
+      </div>
+
+      <!-- Quantity Fields -->
+      <div class="col-md-2">
+          <label for="inputJumlahKecil" class="form-label">Jumlah terkecil</label>
+          <input type="number" min="0" class="form-control @error('inputJumlahKecil') is-invalid @enderror" id="inputJumlahKecil" name="inputJumlahKecil" value="{{ $product->totalQuantity }}">
+          @error('inputJumlahKecil')
+          <div class="alert alert-danger">{{ $message }}</div>
+          @enderror
+      </div>
+
+      <div class="col-md-2">
+          <label for="inputSatuanKecil" class="form-label">Satuan terkecil</label>
+          <input type="text" class="form-control @error('inputSatuanKecil') is-invalid @enderror" id="inputSatuanKecil" name="inputSatuanKecil" value="{{ $product->satuanTerkecil }}">
+          @error('inputSatuanKecil')
+          <div class="alert alert-danger">{{ $message }}</div>
+          @enderror
+      </div>
+
+      <div class="col-md-3">
+          <label for="inputJumlahBesar" class="form-label">Jumlah terkecil dalam satuan besar</label>
+          <input type="number" min="0" class="form-control @error('inputJumlahBesar') is-invalid @enderror" id="inputJumlahBesar" name="inputJumlahBesar" value="{{ $product->isiSatuanBesar }}">
+          @error('inputJumlahBesar')
+          <div class="alert alert-danger">{{ $message }}</div>
+          @enderror
+      </div>
+
+      <div class="col-md-2">
+          <label for="inputSatuanBesar" class="form-label">Satuan terbesar</label>
+          <input type="text" class="form-control @error('inputSatuanBesar') is-invalid @enderror" id="inputSatuanBesar" name="inputSatuanBesar" value="{{ $product->satuanBesar }}">
+          @error('inputSatuanBesar')
+          <div class="alert alert-danger">{{ $message }}</div>
+          @enderror
+      </div>
+
+      <!-- Pricing Fields -->
+      <div class="d-flex flex-row">
+          <div class="col-md-2 me-3">
+              <label for="inputHargaKecil" class="form-label">Harga jumlah terkecil</label>
+              Rp.<input type="number" min="0" class="form-control @error('inputHargaKecil') is-invalid @enderror" id="inputHargaKecil" name="inputHargaKecil" value="{{ $product->hargaKecil }}">
+              @error('inputHargaKecil')
+              <div class="alert alert-danger">{{ $message }}</div>
+              @enderror
+          </div>
+
+          <div class="col-md-2">
+              <label for="inputHargaBesar" class="form-label">Harga jumlah terbesar</label>
+              Rp.<input type="number" min="0" class="form-control @error('inputHargaBesar') is-invalid @enderror" id="inputHargaBesar" name="inputHargaBesar" value="{{ $product->hargaBesar }}">
+              @error('inputHargaBesar')
+              <div class="alert alert-danger">{{ $message }}</div>
+              @enderror
+          </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="col-12">
+          <button type="submit" class="btn btn-primary">Update</button>
+      </div>
+  </form>
+</div>
+    
+</div>
 
 <!-- Edit Category Modal -->
 <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">

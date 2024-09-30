@@ -37,7 +37,9 @@
             @endif
         </tbody>
     </table>
-    <div class="col">
+    <h3>Total:</h3>
+    <h3 id="totalAmountDisplay"> Rp.{{ number_format($totalAmmount, 2, ",", ".") }} </h3>
+    {{-- <div class="col">
         <div class="row">
             @if(session('cart'))
            
@@ -64,7 +66,7 @@
             @endforeach
         @endif
         </div>
-    </div>
+    </div> --}}
     <div class="mt-1">
         <a href="{{url('/checkout' )}}" class="btn btn-primary nodecor">Checkout</a>
     </div>

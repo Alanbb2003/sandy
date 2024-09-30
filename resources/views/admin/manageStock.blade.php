@@ -111,56 +111,60 @@
 
 <div class="row justify-content-center">
     <div class="col-md-11">
-        <div class="card">
-            <div class="card-header"> <b>Manage Barang</b> </div>
-            <div class="card-body">
-                <table class="display responsive nowrap" id="tableBarang" style="width:100%">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Thumbnail</th>
-                      <th data-priority="1">Nama Barang</th>
-                      <th>kategori</th>
-                      <th data-priority="3">Jumlah</th>
-                      <th>Harga</th>
-                      <th data-priority="2">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  @foreach ($barang as $k)
-                  <tr>
-                    <td>{{$k->id}}</td>
-                    <td>
-                      <a target="_blank" href="{{asset('images/uploads/'.$k->fotoPromosi)}}">
-                        <img class="card-img-top thumbnail" src="{{asset('images/uploads/'.$k->fotoPromosi)}}" alt="Gambar Barang">
-                      </a>
-                    </td>
-                    <td>
-                      <a href="{{ url('/product/' . $k->slugBarang ) }}" class="nodecor">{{$k->namaBarang}}</a>
-                    </td> 
-                    <td>{{$k->category}}</td>
-                    <td>{{$k->totalQuantity}} {{$k-> satuanTerkecil}} 
-                      @if($k->satuanBesar)
-                       / {{$k->totalQuantity/$k->isiSatuanBesar}} {{$k->satuanBesar}}
-                      @endif
-                     
-                    </td> 
-                    <td> Rp.{{ number_format($k->hargaKecil, 0, ',', '.') }}
-                      @if($k->satuanBesar)
-                       / {{ number_format($k->hargaBesar, 0, ',', '.') }}
-                      @endif
-                    </td>
-                    <td style="width: 100px;">
-                      <div class="container d-flex-inline flex-row"></div>
-                      <a href="{{url('/dashboard/barang/edit/'.$k->id)}}" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
-                      <a href="#" data-method="DELETE" data-confirm="Yakin hapus barang ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
-                    </td>
-                  </tr>
-                  @endforeach
-                  </tbody>
-                </table>
-            </div>
-        </div>
+      <div class="card-header"> <b>Manage Barang</b> </div>
+      <div class="card-body">
+          <table class="display responsive nowrap" id="tableBarang" style="width:100%">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Thumbnail</th>
+                <th data-priority="1">Nama Barang</th>
+                <th>kategori</th>
+                <th data-priority="3">Jumlah</th>
+                <th>Harga</th>
+                <th data-priority="2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            @foreach ($barang as $k)
+            <tr>
+              <td>{{$k->id}}</td>
+              <td>
+                <a target="_blank" href="{{asset('images/uploads/'.$k->fotoPromosi)}}">
+                  <img class="card-img-top thumbnail" src="{{asset('images/uploads/'.$k->fotoPromosi)}}" alt="Gambar Barang">
+                </a>
+              </td>
+              <td>
+                <a href="{{ url('/product/' . $k->slugBarang ) }}" class="nodecor">{{$k->namaBarang}}</a>
+              </td> 
+              <td>{{$k->category}}</td>
+              <td>{{$k->totalQuantity}} {{$k-> satuanTerkecil}} 
+                @if($k->satuanBesar)
+                  / {{$k->totalQuantity/$k->isiSatuanBesar}} {{$k->satuanBesar}}
+                @endif
+                
+              </td> 
+              <td> Rp.{{ number_format($k->hargaKecil, 0, ',', '.') }}
+                @if($k->satuanBesar)
+                  / {{ number_format($k->hargaBesar, 0, ',', '.') }}
+                @endif
+              </td>
+              <td>
+                <div class="col mb-1">
+                  <div class="row px-2">
+                    <a href="#" class="btn btn-primary mb-1">Tambah Jumlah</a>
+                  </div>
+                  <div class="row px-2">
+                    <a href="{{url('/dashboard/barang/edit/'.$k->id)}}" class="btn btn-primary mb-1"><i class="fa-regular fa-pen-to-square"></i></a>
+                    <a href="{{url('/dashboard/barang/delete/'.$k->id)}}" data-method="DELETE" data-confirm="Yakin hapus barang ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            @endforeach
+            </tbody>
+          </table>
+      </div>
     </div>
 </div>
 @endsection
