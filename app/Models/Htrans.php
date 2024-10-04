@@ -9,4 +9,13 @@ class Htrans extends Model
 {
     use HasFactory;
     public $table = "htrans";
+
+    public function items()
+    {
+        return $this->hasMany(Dtrans::class, 'fkHtransID', 'id');
+    }
+    public function dtrans()
+    {
+        return $this->hasMany(Dtrans::class, 'fkHtransID', 'id');
+    }
 }

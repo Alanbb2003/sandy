@@ -11,6 +11,7 @@ use App\Models\Membership;
 use App\Models\Pictures;
 use App\Models\Point;
 use App\Models\Products;
+use App\Models\retur;
 use App\Models\Wishlist;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -85,6 +86,32 @@ class UserController extends Controller
         return view('customer.profile',);
     }
 
+    public function showReturnHistory()
+    {
+        $returns = retur::where('fkUserID', auth()->id())->get();
+        $transactions = Htrans::with(['dtrans.product'])->where('fkUserID', auth()->id())
+        ->where('tanggalPembelian', '>=', now()->subWeeks(2))
+        ->get();
+
+        return view('customer.retur', compact('returns', 'transactions'));
+    }
+    public function getTransactionItems($id){
+        // Fetch the transaction along with the related dtrans items and product names
+        $transaction = Htrans::with('dtrans.product') // Eager load the product relationship
+        ->find($id);
+
+        // Check if the transaction exists
+        if (!$transaction) {
+            return response()->json([], 404); // Return 404 if not found
+        }
+
+        // Return the dtrans items along with the discount
+        return response()->json([
+            'dtrans' => $transaction->dtrans,
+            'discount' => $transaction->discount, // Adjust this if the discount field has a different name
+        ]);
+    }
+
     // function
     public function addAlamat(Request $request){
         $userID = Auth::user()->id;
@@ -149,8 +176,7 @@ class UserController extends Controller
         return redirect()->back();
     }
 
-    public function deleteAddress(Request $request)
-    {
+    public function deleteAddress(Request $request){
         $addressId = $request->input('addressId');
 
         // Check if the address exists
@@ -266,17 +292,17 @@ class UserController extends Controller
                 $dtrans->save();
 
                 // Fetch the product from the database
-                $product = Products::find($item['productID']);
+                // $product = Products::find($item['productID']);
                 
-                if ($product) {
-                    if($item['unitHidden'] == 'small'){
-                        $product->totalQuantity -= $item['quantity'];
-                    }else{
-                        $reducebig = $item['quantity'] * $product->isiSatuanBesar;
-                        $product->totalQuantity -= $reducebig;
-                    }
-                    $product->save();
-                }
+                // if ($product) {
+                //     if($item['unitHidden'] == 'small'){
+                //         $product->totalQuantity -= $item['quantity'];
+                //     }else{
+                //         $reducebig = $item['quantity'] * $product->isiSatuanBesar;
+                //         $product->totalQuantity -= $reducebig;
+                //     }
+                //     $product->save();
+                // }
             }
 
             if($isMember){
@@ -314,10 +340,57 @@ class UserController extends Controller
         } catch (\Exception $e) {
             // Rollback transaction if something goes wrong
             DB::rollBack();
-            Log::error('Checkout error: '.$e->getMessage(), [
-                'stack_trace' => $e->getTraceAsString(),
-                'request_data' => $request->all(),
+            // Log::error('Checkout error: '.$e->getMessage(), [
+            //     'stack_trace' => $e->getTraceAsString(),
+            //     'request_data' => $request->all(),
+            // ]);
+            alert()->error('Error!', 'Something went wrong. Please try again.');
+            return back();
+        }
+    }
+    
+    public function addRetur(Request $request){
+
+         // Validate incoming request data
+         $request->validate([
+            'salesHeaderID' => 'required|integer',
+            'userID' => 'required|integer',
+            'fotoBarang' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'alasanRetur' => 'required|string|max:500',
+            'selectedItemsData' => 'required|string',
+        ]);
+        
+        // Debug the request data
+        // dd($request->all());
+
+        // Parse selected item data from the hidden input
+        $selectedItem = json_decode($request->selectedItemsData, true);
+
+        // $file = $request->file('fotoBarang');
+        // $webpPath = 'uploads/' . uniqid() . '.webp'; // Define the path for the WebP image
+        // $this->convertToWebP($file, public_path($webpPath));
+
+        $thumbnail = $request->file('thumbnail');
+        $thumbnailName =uniqid() . '.webp';  // Save as WebP format
+        $thumbnailPath = public_path('images/userUpload/' . $thumbnailName);
+        $this->convertToWebP($thumbnail, $thumbnailPath);
+        // Create a new retur record for the selected item
+        try{
+            Retur::create([
+                'fkHeaderID' => $request->salesHeaderID,
+                'fkUserID' => $request->userID,
+                'fkDtransID' => $selectedItem['id'],
+                'fotoBarang' => $thumbnailName  , // Store photo
+                'tanggalRetur' => now(),
+                'alasanRetur' => $request->alasanRetur,
+                'jumlahBarangRetur' => $selectedItem['quantity'],
+                'satuanBarangRetur' => $selectedItem['unit'],
+                'hargaPerBarang' => $selectedItem['price'],
+                'subtotal' => $selectedItem['quantity'] * $selectedItem['price'],
+                'status' => 1, // Set status as pending
             ]);
+            return redirect()->back()->with('success', 'Return request submitted successfully!');
+        } catch (\Exception $e) {
             alert()->error('Error!', 'Something went wrong. Please try again.');
             return back();
         }
@@ -345,4 +418,43 @@ class UserController extends Controller
             return response()->json(['in_wishlist' => true]);
         }
     }
+
+
+ /**
+     * Convert an image to WebP format using GD library.
+     *
+     * @param \Illuminate\Http\UploadedFile $file
+     * @param string $outputWebPPath Path where the WebP image will be saved
+     * @return void
+     */
+    private function convertToWebP($file, $outputWebPPath)
+    {
+        $extension = $file->extension();
+        switch ($extension) {
+            case 'jpeg':
+            case 'jpg':
+                $image = imagecreatefromjpeg($file->getPathname());
+                break;
+            case 'png':
+                $image = imagecreatefrompng($file->getPathname());
+                break;
+            case 'gif':
+                $image = imagecreatefromgif($file->getPathname());
+                break;
+            case 'webp':
+                // If the file is already a WebP image, move it directly without conversion
+                $file->move(dirname($outputWebPPath), basename($outputWebPPath));
+                return;
+            default:
+                alert()->error('Error!', 'Unsupported image format');
+                return back();
+        }
+
+        // Convert to WebP and save
+        imagewebp($image, $outputWebPPath, 75); // 80 is the quality setting for WEBP (0-100)
+
+        // Free memory
+        imagedestroy($image);
+    }
+
 }

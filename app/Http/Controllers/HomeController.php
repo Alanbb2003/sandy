@@ -30,14 +30,73 @@ class HomeController extends Controller
     {
         return view('home');
     }
-    public function welcome(){
-        $barang = Products::join('category','product.fk_kategori','=','category.id')
-        ->select('product.*','category.nama_category as category')
-        ->get();
-        $category = Category ::all();
-        return view('welcome',compact('barang','category'));
-    }
+    // public function welcome(){
+    //     $barang = Products::join('category','product.fk_kategori','=','category.id')
+    //     ->select('product.*','category.nama_category as category')
+    //     ->get();
+    //     $category = Category ::all();
+    //     return view('welcome',compact('barang','category'));
+    // }
+    public function welcome(Request $request) {
+        // Start the query
+        $query = Products::join('category', 'product.fk_kategori', '=', 'category.id')
+            ->select('product.*', 'category.nama_category as category');
     
+        // Filter by category
+        if ($request->has('searchCategory') && $request->searchCategory != '') {
+            $query->where('product.fk_kategori', $request->searchCategory);
+        }
+    
+        // Filter by product name
+        if ($request->has('searchName') && $request->searchName != '') {
+            $query->where('product.namaBarang', 'LIKE', '%' . $request->searchName . '%');
+        }
+    
+        // Filter by price range
+        if ($request->has('minPrice') && $request->minPrice != '') {
+            $query->where('product.hargaKecil', '>=', $request->minPrice);
+        }
+    
+        if ($request->has('maxPrice') && $request->maxPrice != '') {
+            $query->where('product.hargaKecil', '<=', $request->maxPrice);
+        }
+    
+        // Get filtered products
+        $barang = $query->get();
+    
+        // Get all categories
+        $category = Category::all();
+    
+        return view('welcome', compact('barang', 'category'));
+    }
+    public function searchProducts(Request $request) {
+        $query = Products::query();
+    
+        // Filter by category
+        if ($request->has('searchCategory') && $request->searchCategory != '') {
+            $query->where('category_id', $request->searchCategory);
+        }
+    
+        // Filter by product name
+        if ($request->has('searchName') && $request->searchName != '') {
+            $query->where('name', 'LIKE', '%' . $request->searchName . '%');
+        }
+    
+        // Filter by price range
+        if ($request->has('minPrice') && $request->minPrice != '') {
+            $query->where('price', '>=', $request->minPrice);
+        }
+    
+        if ($request->has('maxPrice') && $request->maxPrice != '') {
+            $query->where('price', '<=', $request->maxPrice);
+        }
+    
+        // Get the filtered products
+        $products = $query->get();
+    
+        // Pass the filtered products and categories back to the view
+        return view('product.index', compact('products', 'category'));
+    }
     public function showdetailBarang($slugBarang){
         $slug = $slugBarang;
         $product = Products::where('slugBarang', $slug)->firstOrFail();

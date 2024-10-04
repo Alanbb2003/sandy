@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Htrans;
 use App\Models\Pictures;
 use App\Models\Products;
 use Illuminate\Http\Request;
@@ -44,8 +45,14 @@ class AdminController extends Controller
         return view('admin.manageMembership');
     }
 
-    public function showeditBarang($id)
-    {
+    public function adminTransaksi(){
+        // Retrieve all transactions with their related details and products
+        $transaksi = Htrans::with(['dtrans', 'dtrans.product'])->get();
+        // dd($transaksi);
+        return view('admin.manageTransaksi', compact('transaksi'));
+    }
+
+    public function showeditBarang($id){
         // Fetch the product by ID
         $product = Products::findOrFail($id);
 
@@ -59,8 +66,7 @@ class AdminController extends Controller
 
 
     //function
-    public function deleteImage($id)
-    {
+    public function deleteImage($id){
        // Find the image by ID in the picture table
         $picture = Pictures::findOrFail($id);
 
@@ -192,8 +198,7 @@ class AdminController extends Controller
         }
     }
 
-    public function updateKategori(Request $request)
-    {
+    public function updateKategori(Request $request){
         try {
             $category = Category::find($request->input('categoryId'));
             if (!$category) {
@@ -211,21 +216,7 @@ class AdminController extends Controller
         }
     }
 
-    // public function editKategori(Request $request,$id){
-    //     $input = $request->all();
-
-    //     try {
-    //         $Kat = Category::where('ID','=',$id)->first();
-    //         $Kat->nama_category = strtoupper($input["inputkategori"]);
-    //         $Kat->save();
-    //         alert()->success('Success!','Berhasil mengubah kategori');
-    //         return back();
-    //     } catch (\Exception $e) {
-    //         return $e->getMessage();
-    //     }
-    // }
-    public function updateBarang(Request $request, $id)
-    {
+    public function updateBarang(Request $request, $id){
         // Validate the request data
         $request->validate([
             // ... validation rules ...
@@ -271,28 +262,6 @@ class AdminController extends Controller
             $item = $first_character;
         }
         // Check if thumbnail was uploaded
-        
-        // if ($request->hasFile('thumbnail')) {
-        //     // Check if the product already has a thumbnail
-        //     if ($product->fotoPromosi) {
-        //         // Get the full path of the old thumbnail
-        //         $oldThumbnailPath = public_path('images/uploads/' . basename($product->fotoPromosi));
-                
-        //         // Delete the old thumbnail if it exists
-        //         if (file_exists($oldThumbnailPath)) {
-        //             unlink($oldThumbnailPath);
-        //         }
-        //     }
-        
-        //     // Handle file upload for new thumbnail
-        //     $thumbnail = $request->file('thumbnail');
-        //     $thumbnailName = $item . time() . '.' . $thumbnail->extension();
-        //     $thumbnail->move(public_path('images/uploads'), $thumbnailName);
-            
-        //     // Save the new thumbnail path to the product
-        //     $thumbnailPath = $request->file('thumbnail')->store('public/products/thumbnails');
-        //     $product->fotoPromosi = $thumbnailName;
-        // }
         if ($request->hasFile('thumbnail')) {
             // Check if the product already has a thumbnail
             if ($product->fotoPromosi) {
@@ -339,26 +308,15 @@ class AdminController extends Controller
                 ]);
             }
         }
-        // if ($request->hasFile('images')) {
-        //     foreach ($request->file('images') as $image) {
-        //         $fileName = time() . rand(1, 99) . '.' . $image->extension();  
-        //         // Store the image in the 'images/uploads/' directory
-        //         $imagePath = $image->storeAs('images/uploads', $fileName, 'public');
-    
-        //         // Store image details in the picture table
-        //         Pictures::create([
-        //             'productID' => $product->id,
-        //             'fileName' => $fileName,
-        //             'filePath' => asset('images/uploads/' . $fileName),  // If needed, store the full path
-        //         ]);
-        //     }
-        // }
     
         // Save and redirect
         alert()->success('Success!','Berhasil menambahkan kategori');
         return redirect()->back();    
     }
 
+    public function acceptTransaction($id){
+        
+    }
     public function addJumlahBarang(Request $request,$id){
         $barang = Products::where('ID','='<$id)->first();
         $this->validate($request,[
@@ -372,6 +330,11 @@ class AdminController extends Controller
             $tambahBesar = $request->inputJumlah * $isiBesar;
         }
     }
+
+
+
+
+
         /**
      * Convert an image to WebP format using GD library.
      *

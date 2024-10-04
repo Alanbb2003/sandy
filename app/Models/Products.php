@@ -15,4 +15,7 @@ class Products extends Model
     {
         return $this->hasMany(Wishlist::class, 'fkProductID');
     }
+    public function dtrans() {
+        return $this->hasMany(Dtrans::class, 'fkProductID', 'id');
+    }
 }

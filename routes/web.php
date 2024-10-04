@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class,"welcome"])->name('home.main');
 Route::get("/product/{slug}",[HomeController::class,'showdetailBarang']);
-
+// Route::get('/product/search', [HomeController::class, 'searchProducts'])->name('product.search');
 Auth::routes([
     'verify'=>true
 ]);
@@ -62,6 +62,10 @@ Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
     Route::post('/wishlist/toggle', [UserController::class, 'toggleWishlist'])->name('wishlist.toggle');
     
     Route::get('/transaction', [UserController::class, 'transactionPage'])->name('transaction.page');
+
+    Route::get('/retur', [UserController::class, 'showReturnHistory'])->name('retur.page');
+    Route::post('/retur/add', [UserController::class, 'addRetur'])->name('retur.store');
+    Route::get('/get-transaction-items/{id}', [UserController::class, 'getTransactionItems']);
 });
 //user route
 
@@ -90,6 +94,8 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::put('/barang/edit/{id}', [AdminController::class, 'updateBarang']);
         Route::delete('/barang/delete-image/{id}', [AdminController::class, 'deleteImage'])->name('dashboard.barang.deleteImage');
         // Route::post('/barang/kategori',[AdminController::class,"addKategori"]);
+
+        Route::get('/transaksi',[AdminController::class,"adminTransaksi"])->name('admin.transaksi');
     });
 });
 

@@ -184,11 +184,11 @@
                    
                    
                 </div>
-                <div>
+                <div style="max-height: 300px; overflow-y: auto; overflow-x: hidden;">
                     @if(session('cart'))
                         @foreach(session('cart') as $id => $details)
                         <div class="row">
-                            <div class="col">
+                            <div class="col-2 me-4">
                                 <img src="{{ asset('images/uploads/' . $details['image']) }}" width="50" height="50" class="thumbnailSmall" />
                             </div>
                             

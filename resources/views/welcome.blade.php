@@ -2,18 +2,36 @@
 
 @section('content')
 <div class="container">
-    <div>
-      <form action="">
-        <h3>search form disini</h3>
-        <select name="searchCategory" id="categorySearch">
-              @foreach ($category as $a)
-              <option value="{{ $a->id }}">
-                  {{$a->nama_category}}
-              </option>
-              @endforeach
-      </select>
-      </form>
-    </div>
+  <div>
+    <form action="{{ url()->current() }}" method="GET">
+        <h3>Search Products</h3>
+        
+        <!-- Category Filter -->
+        <label for="categorySearch">Category:</label>
+        <select name="searchCategory" id="categorySearch" class="form-select">
+            <option value="">All Categories</option>
+            @foreach ($category as $a)
+                <option value="{{ $a->id }}" {{ request()->searchCategory == $a->id ? 'selected' : '' }}>
+                    {{$a->nama_category}}
+                </option>
+            @endforeach
+        </select>
+
+        <!-- Name Filter -->
+        <label for="searchName">Product Name:</label>
+        <input type="text" name="searchName" id="searchName" class="form-control" value="{{ request()->searchName }}" placeholder="Enter product name">
+
+        <!-- Price Filter -->
+        <label for="minPrice">Min Price:</label>
+        <input type="number" name="minPrice" id="minPrice" class="form-control" value="{{ request()->minPrice }}" placeholder="Min price">
+        
+        <label for="maxPrice">Max Price:</label>
+        <input type="number" name="maxPrice" id="maxPrice" class="form-control" value="{{ request()->maxPrice }}" placeholder="Max price">
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary mt-3">Filter</button>
+    </form>
+  </div>
     
     @include('customer.rowBarang')
 
@@ -35,17 +53,7 @@
             <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">About</a></li>
           </ul>
         </div>
-    
-        <div class="col mb-3">
-          <h5>Section</h5>
-          <ul class="nav flex-column">
-            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Home</a></li>
-            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Features</a></li>
-            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Pricing</a></li>
-            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">FAQs</a></li>
-            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">About</a></li>
-          </ul>
-        </div>
+
       </footer>
 </div>
 
