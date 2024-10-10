@@ -49,9 +49,11 @@
               <td>
                 <div class="row px-2">
                   <a href="#" class="btn btn-primary mb-1">
+                    <i class="fa-sharp-duotone fa-solid fa-check"></i>
                     <i class="fa-regular fa-pen-to-square"></i>
                   </a>
-                  <a href="#" data-method="DELETE" class="btn btn-danger btn-xs pull-right delete">
+                  <a href="#" class="btn btn-danger btn-xs pull-right delete">
+                    <i class="fa-sharp-duotone fa-solid fa-xmark"></i>
                     <i class="fa-regular fa-trash-can"></i>
                   </a>
                 </div>

@@ -12,6 +12,7 @@
                 <th>tanggal pembelian</th>
                 <th>Total</th>
                 <th>Status</th>
+                <th>Bukti Pembayaran</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -24,15 +25,6 @@
                 <td>{{$k->addressSnapshot}}</td>
                 <td>{{$k->tanggalPembelian}}</td> 
                 <td>Rp. {{ number_format($k->totalPembelian, 2, ",", ".") }}</td>
-                {{-- @if ($k->status == 1)
-                    <td>
-                        Menunggu pembayaran
-                    </td>
-                @elseif ($k->status == 2)
-                    <td>
-                        Mengirim barang
-                    </td>
-                @endif --}}
                 @switch($k->status)
                     @case(1)
                         <td>Menunggu pembayaran.</td>
@@ -53,9 +45,16 @@
                         <td>Unknown order status.</td>
                 @endswitch
                 <td>
+                    @if ($k->buktiPembayaran == null)
+                        <button class="btn btn-info">Upload bukti</button>
+                    @else
+                        <img src="{{ asset('storage/' . $htrans->buktiPembayaran) }}" alt="Bukti" style="width: 100px;">
+                    @endif
+                </td>
+                <td>
                     <a href="" class="btn btn-info my-1">Detail</a>
                     @if ($k->status == 1)
-                    <button class="btn btn-info">Upload bukti</button>
+                    <button class="btn btn-danger" onclick="confirmCancel({{ $k->id }})">Batalkan Pemesanan</button>
                     @endif
                 </td>
                 </tr>
@@ -73,11 +72,18 @@
 
 @section('script')
 <script>
-  $(document).ready(function(){
+    $(document).ready(function(){
         $('#tabelTransaksi').dataTable({
           responsive: true,
           order: [[3, 'desc']]
         } );
     });
+    
+    function confirmCancel(orderId) {
+        if (confirm("Are you sure you want to cancel this order?")) {
+            // If the user confirms, send a cancellation request
+            window.location.href = "/cancel-order/" + orderId;
+        }
+    }
 </script>
 @endsection

@@ -12,6 +12,7 @@ use App\Models\Pictures;
 use App\Models\Point;
 use App\Models\Products;
 use App\Models\retur;
+use App\Models\User;
 use App\Models\Wishlist;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -82,13 +83,15 @@ class UserController extends Controller
     }
 
     public function profilePage(){
-
-        return view('customer.profile',);
+        $userID = Auth::user()->id;
+        $user = User::find($userID);
+        return view('customer.profile',compact('user'));
     }
 
     public function showReturnHistory()
     {
-        $returns = retur::where('fkUserID', auth()->id())->get();
+        // $returns = retur::where('fkUserID', auth()->id())->get();
+        $returns = retur::with(['dtrans.product'])->where('fkUserID', auth()->id())->get();
         $transactions = Htrans::with(['dtrans.product'])->where('fkUserID', auth()->id())
         ->where('tanggalPembelian', '>=', now()->subWeeks(2))
         ->get();
@@ -369,8 +372,8 @@ class UserController extends Controller
         // $file = $request->file('fotoBarang');
         // $webpPath = 'uploads/' . uniqid() . '.webp'; // Define the path for the WebP image
         // $this->convertToWebP($file, public_path($webpPath));
-
-        $thumbnail = $request->file('thumbnail');
+    
+        $thumbnail = $request->file('fotoBarang');
         $thumbnailName =uniqid() . '.webp';  // Save as WebP format
         $thumbnailPath = public_path('images/userUpload/' . $thumbnailName);
         $this->convertToWebP($thumbnail, $thumbnailPath);
@@ -395,7 +398,29 @@ class UserController extends Controller
             return back();
         }
     }
-
+    public function cancelOrder($id) {
+        // Find the Htrans order
+        $order = Htrans::find($id);
+    
+        if (!$order) {
+            return redirect()->back()->with('error', 'Order not found.');
+        }
+    
+        // Check if user is a member by looking in the membership table
+        $membership = Membership::where('user_id', $order->userID)->first();
+    
+        if ($membership) {
+            // If user is a member, find the last points earned/used for this transaction
+            $$deletedPoints = Point::where('htransID', $id)->delete();
+        }
+    
+        // Set the order status to 'canceled'
+        $order->status = 4; // 4 for "Pesanan dibatalkan"
+        $order->save();
+    
+        return redirect()->back()->with('success', 'Order has been canceled.');
+    }
+    
     public function toggleWishlist(Request $request){
         $user = Auth::user();
         $productId = $request->input('product_id');

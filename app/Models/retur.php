@@ -23,4 +23,9 @@ class retur extends Model
         'subtotal',
         'status'
     ];
+
+    public function dtrans()
+    {
+        return $this->belongsTo(Dtrans::class, 'fkDtransID', 'id'); // dtransID is the foreign key in retur
+    }
 }

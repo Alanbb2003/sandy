@@ -66,6 +66,9 @@ Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
     Route::get('/retur', [UserController::class, 'showReturnHistory'])->name('retur.page');
     Route::post('/retur/add', [UserController::class, 'addRetur'])->name('retur.store');
     Route::get('/get-transaction-items/{id}', [UserController::class, 'getTransactionItems']);
+
+    Route::get('/profile',[UserController::class,'profilePage']);
+    Route::put('/profile/password/update', [HomeController::class, 'updatePassword'])->name('password.update');
 });
 //user route
 

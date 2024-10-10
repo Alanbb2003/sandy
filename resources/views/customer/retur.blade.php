@@ -8,7 +8,8 @@
             <tr>
                 <th>Return ID</th>
                 <th>Transaction ID</th>
-                <th>Product ID</th>
+                <th>Nama Barang</th>
+                <th>Jumlah Barang</th>
                 <th>Return Date</th>
                 <th>Reason</th>
                 <th>Status</th>
@@ -17,12 +18,25 @@
         <tbody>
             @foreach ($returns as $retur)
                 <tr>
-                    <td>{{ $retur->returID }}</td>
-                    <td>{{ $retur->salesHeaderID }}</td>
-                    <td>{{ $retur->barangID }}</td>
+                    <td>{{ $retur->id}}</td>
+                    <td>{{ $retur->fkHeaderID }}</td>
+                    <td>{{ $retur->dtrans->product->namaBarang ?? 'Product Not Found' }}</td>
+                    <td>{{ $retur->jumlahBarangRetur }} {{$retur->satuanBarangRetur}}</td>
                     <td>{{ $retur->tanggalRetur }}</td>
                     <td>{{ $retur->alasanRetur }}</td>
-                    <td>{{ $retur->status }}</td>
+                    @switch($retur->status)
+                    @case(1)
+                        <td>Menunggu Konfirmasi.</td>
+                        @break
+                    @case(2)
+                        <td>Diterima</td>
+                        @break
+                    @case(3)
+                        <td>Ditolak</td>
+                        @break
+                    @default
+                        <td>Unknown retur status.</td>
+                @endswitch
                 </tr>
             @endforeach
         </tbody>

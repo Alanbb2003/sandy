@@ -6,8 +6,10 @@ use App\Models\Alamat;
 use App\Models\Category;
 use App\Models\Pictures;
 use App\Models\Products;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class HomeController extends Controller
 {
@@ -109,62 +111,33 @@ class HomeController extends Controller
 
         return view('customer.detailBarang',compact('barang','pic'));
     }
-    // admin
-    // public function adminHome(){
-    //     return view('admin.homeAdmin',["msg"=>"I am admin role"]);
-    // }
-    // public function adminManageStock(){
-    //     // $barang = Products::all();
-    //     $barang = Products::join('category','product.id','=','category.id')
-    //     ->select('product.*','category.nama_category as category')
-    //     ->get();
-    //     $kategori = Category::all();
-    //     return view('admin.manageStock',compact('barang','kategori'));
-    // }
-    // public function adminBarangNew(){
-    //     $kategori = Category::all();
-    //     return view('admin.forms.addStock',compact('kategori'));
-    // }
-    // public function getCategories(){
-    //     try {
-    //         $categories = Category::all();
-    //         return response()->json($categories);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['error' => 'Failed to fetch categories. Please try again.'], 500);
-    //     }
-    // }
-    // public function adminMembership(){
 
-    //     return view('admin.manageMembership');
-    // }
+    public function updatePassword(Request $request){
+    // Validate input fields
+    $request->validate([
+        'passwordLama' => 'required',
+        'password' => 'required|string|min:8|confirmed', // Ensure password confirmation
+    ]);
+    $userID = Auth::user()->id;
+    $user = User::find($userID); // Replace with actual ID source
 
-
-    //user/pelanggan
-    
-
-    public function returnBarang(){
-        $category  = Category::all();
-
-
+    if (!$user) {
+        return redirect()->back()->with('error', 'User not found.');
     }
-    
-    public function checkoutPage(){
-        $userID = Auth::user()->id;
-        $address = Alamat::where('fkUserID',$userID)->get();
 
-        
-        return view('customer.checkout', compact('address'));
+    // Optional: Verify the old password (remove this if you don't want to validate it)
+    if ($request->has('passwordLama') && !Hash::check($request->passwordLama, $user->password)) {
+        return back()->withErrors(['passwordLama' => 'Current password is incorrect.']);
     }
-    public function addressPage(){
-        $userID = Auth::user()->id;
-        $address = Alamat::where('fkUserID',$userID)->get();
-        // echo $address;
-        return view('customer.adressInput',compact('address'));
-    }
-    public function membershipPage(){
-        return view('customer.membershipPage');
-    }
-    public function searchBarang(){
-        
-    }
+
+    // Update the password
+    $user->password = Hash::make($request->password);
+    $user->save(); // Save changes to the database
+
+    // Optionally, you can log the user out after password change
+    Auth::logout();
+
+    // Redirect back or show success message
+    return redirect()->route('login')->with('success', 'Password successfully changed.');
+}
 }

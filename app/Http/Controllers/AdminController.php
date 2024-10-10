@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NewProductNotification;
 use App\Models\Category;
 use App\Models\Htrans;
+use App\Models\Membership;
 use App\Models\Pictures;
 use App\Models\Products;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use RealRashid\SweetAlert\Facades\Alert;
 class AdminController extends Controller
@@ -174,6 +177,17 @@ class AdminController extends Controller
                 $upload->save();
             }
         }
+
+         // Retrieve all active members
+         $members = Membership::where('statusMembership', 1)->with('user')->get();
+
+         // Send email to each member
+         foreach ($members as $member) {
+             if ($member->user && $member->user->email) {
+                 Mail::to($member->user->email)->send(new NewProductNotification($productbaru));
+             }
+         }
+         
         alert()->success('Success!','Berhasil menambahkan produk');
         return back();
         } catch (\Exception $e) {
