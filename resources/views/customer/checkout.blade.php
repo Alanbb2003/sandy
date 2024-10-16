@@ -164,6 +164,10 @@
                             <label class="form-check-label" for="usePoin">Gunakan Poin</label>
                         </div>
                     </div>
+                    @if ($memberstatus)
+                        <strong>Poin yang didapat dari transaksi ini:</strong>
+                        <p>{{ $pointsEarned }}</p>
+                    @endif
                 </div>
 
                 <div class="col-12">

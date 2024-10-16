@@ -63,6 +63,25 @@ class HomeController extends Controller
             $query->where('product.hargaKecil', '<=', $request->maxPrice);
         }
     
+        if ($request->has('sort')) {
+            switch ($request->sort) {
+                case 'newest':
+                    $query->orderBy('product.created_at', 'desc');
+                    break;
+                case 'price_high_to_low':
+                    $query->orderBy('product.hargaKecil', 'desc');
+                    break;
+                case 'price_low_to_high':
+                    $query->orderBy('product.hargaKecil', 'asc');
+                    break;
+                default:
+                    $query->orderBy('product.created_at', 'desc'); // Default to newest
+                    break;
+            }
+        } else {
+            // Default sorting: newest
+            $query->orderBy('product.created_at', 'asc');
+        }
         // Get filtered products
         $barang = $query->get();
     
@@ -71,6 +90,7 @@ class HomeController extends Controller
     
         return view('welcome', compact('barang', 'category'));
     }
+    
     public function searchProducts(Request $request) {
         $query = Products::query();
     

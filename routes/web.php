@@ -47,6 +47,7 @@ Route::prefix('/cart')->group(function() {
 //     Route::get('/transaction',[UserController::class,'transactionPage'])->middleware('verified');
 // });
 
+//user route
 Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
     Route::get('/checkout', [UserController::class, 'checkoutPage'])->name('checkout.page');
     Route::post('/checkout', [UserController::class, 'checkoutFunc'])->name('checkout.func');
@@ -62,6 +63,8 @@ Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
     Route::post('/wishlist/toggle', [UserController::class, 'toggleWishlist'])->name('wishlist.toggle');
     
     Route::get('/transaction', [UserController::class, 'transactionPage'])->name('transaction.page');
+    Route::post('/transaction/upload',[UserController::class,'uploadBuktiPembayaran'])->name('uploadBuktiPembayaran');
+    Route::post('/transaction/cancel',[UserController::class,'cancelOrder'])->name('cancelOrder');
 
     Route::get('/retur', [UserController::class, 'showReturnHistory'])->name('retur.page');
     Route::post('/retur/add', [UserController::class, 'addRetur'])->name('retur.store');
@@ -70,15 +73,6 @@ Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
     Route::get('/profile',[UserController::class,'profilePage']);
     Route::put('/profile/password/update', [HomeController::class, 'updatePassword'])->name('password.update');
 });
-//user route
-
-
-    // Route::prefix('/home',)->group(function(){
-        // Route::get('/', [HomeController::class,"welcome"])->name('home')->middleware('verified');
-        // Route::get('/checkout',[HomeController::class,"checkoutPage"])->middleware('verified');
-        // Route::get('/address',[HomeController::class,"addressPage"]);
-        // Route::post('/address/add',[UserController::class,"addAlamat"])->middleware('verified');
-    // });
 
 
 //admin route
@@ -96,9 +90,10 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::get('/barang/edit/{id}', [AdminController::class, 'showeditBarang'])->name('dashboard.barang.edit');
         Route::put('/barang/edit/{id}', [AdminController::class, 'updateBarang']);
         Route::delete('/barang/delete-image/{id}', [AdminController::class, 'deleteImage'])->name('dashboard.barang.deleteImage');
-        // Route::post('/barang/kategori',[AdminController::class,"addKategori"]);
+        Route::get('/barang/toggle-status/{id}', [AdminController::class, 'toggleStatus'])->name('barang.toggleStatus');
 
         Route::get('/transaksi',[AdminController::class,"adminTransaksi"])->name('admin.transaksi');
+        Route::post('/transaksi/accept',[AdminController::class,"acceptTransaction"])->name('admin.acceptTransaction');
     });
 });
 

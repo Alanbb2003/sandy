@@ -18,3 +18,5 @@ yarn-error.log
 /.vscode
 /public/images/uploads
 /public/images/userUpload
+storage/app/*
+!storage/app/public

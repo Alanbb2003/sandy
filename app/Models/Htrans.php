@@ -18,4 +18,8 @@ class Htrans extends Model
     {
         return $this->hasMany(Dtrans::class, 'fkHtransID', 'id');
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'fkUserID');
+    }
 }

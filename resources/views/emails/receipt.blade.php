@@ -2,7 +2,7 @@
 
 <p>Pesanan Anda akan diproses. Berikut adalah detailnya:</p>
 
-<p><strong>ID Transaksi:</strong> {{ $htrans->id }}</p>
+<p><strong>ID Transaksi:</strong> {{ $htrans->kodeTrans }}</p>
 <p><strong>Alamat:</strong> {{ $htrans->addressSnapshot }}</p>
 
 <h3>Item:</h3>

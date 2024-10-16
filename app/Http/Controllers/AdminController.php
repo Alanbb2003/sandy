@@ -7,7 +7,11 @@ use App\Models\Category;
 use App\Models\Htrans;
 use App\Models\Membership;
 use App\Models\Pictures;
+use App\Models\Point;
 use App\Models\Products;
+use App\Models\retur;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -50,8 +54,12 @@ class AdminController extends Controller
 
     public function adminTransaksi(){
         // Retrieve all transactions with their related details and products
-        $transaksi = Htrans::with(['dtrans', 'dtrans.product'])->get();
-        // dd($transaksi);
+        // $transaksi = Htrans::with(['dtrans', 'dtrans.product'])->get();
+        // // dd($transaksi);
+        // return view('admin.manageTransaksi', compact('transaksi'));
+
+        $transaksi = Htrans::with(['dtrans.product', 'user'])->get();
+    
         return view('admin.manageTransaksi', compact('transaksi'));
     }
 
@@ -230,6 +238,22 @@ class AdminController extends Controller
         }
     }
 
+    public function toggleStatus($id){
+        // Find the product by ID
+        $barang = Products::find($id);
+    
+        if (!$barang) {
+            return redirect()->back()->with('error', 'Product not found.');
+        }
+    
+        // Toggle the status: if 1 (enabled), change to 2 (disabled) and vice versa
+        $barang->Status = $barang->Status == 1 ? 2 : 1;
+        $barang->save();
+    
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Product status updated successfully.');
+    }
+
     public function updateBarang(Request $request, $id){
         // Validate the request data
         $request->validate([
@@ -328,9 +352,63 @@ class AdminController extends Controller
         return redirect()->back();    
     }
 
-    public function acceptTransaction($id){
+    public function acceptTransaction(Request $request) {
+        $transactionId = $request->input('transaction_id'); // Get transaction ID from form
+        $transaksi = Htrans::with(['dtrans.product', 'user'])->where('id', $transactionId)->firstOrFail();
         
+        // Calculate total transaction amount and points earned
+        $transactionAmount = $transaksi->totalPembelian + $transaksi->discount;
+        $pointsEarned = floor($transactionAmount / 500);
+        
+        $userID = $transaksi->fkUserID;
+        $isMember = Membership::where('fkUserID', $userID)->first();
+        
+        // If the user is a member, add points
+        if ($isMember) {
+            $tanggalPemberian = Carbon::now();
+            $tanggalKadaluwarsa = $tanggalPemberian->copy()->addYear(1);
+            $tipeTransaksi = 'Purchase';
+            $sumberPoin = 'Pembelian dengan jumlah Rp.' . number_format($transactionAmount, 0, ',', '.');
+            $saldoPoin = $pointsEarned;
+    
+            // Add points to the database
+            Point::create([
+                'memberID' => $isMember->memberID,
+                'htransID' => $transaksi->id,
+                'tanggalPemberian' => $tanggalPemberian,
+                'jumlahPoin' => $pointsEarned,
+                'tipeTransaksi' => $tipeTransaksi,
+                'sumberPoin' => $sumberPoin,
+                'tanggalKadaluwarsa' => $tanggalKadaluwarsa,
+                'saldoPoin' => $saldoPoin,
+            ]);
+        }
+    
+        // Reduce stock for each product in the transaction
+        foreach ($transaksi->dtrans as $item) {
+            $product = Products::find($item->fkProductID);
+            // dd($product);
+            if ($product) {
+                if ($item->satuanBarang == $product->satuanTerkecil) {
+                    $product->totalQuantity =$product->totalQuantity - $item->totalJumlah;
+                    dd($product->totalQuantity );
+                } else {
+                    $reduceBig = $item->totalJumlah * $product->isiSatuanBesar;
+                    $product->totalQuantity -= $reduceBig;
+                    dd();
+                }
+                $product->save();
+            }
+        }
+    
+        // Update the transaction status to 3 (completed)
+        $transaksi->status = 3;
+        $transaksi->save();
+    
+        alert()->success('Success!', 'Transaksi diterima, stok produk dikurangi, dan poin telah diberikan');
+        return redirect()->back();
     }
+
     public function addJumlahBarang(Request $request,$id){
         $barang = Products::where('ID','='<$id)->first();
         $this->validate($request,[

@@ -9,102 +9,8 @@
         <a href="{{url("/dashboard/barang/new")}}" class="btn btn-primary" type="button">
           Input barang baru
         </a>
-        {{-- <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#insertBarang" aria-expanded="false" aria-controls="insertBarang">
-          Input barang baru
-        </button> --}}
       </div>
-      {{-- <div class="collapse p-2 my-2" id="insertBarang" style="background-color:rgb(233, 237, 242)">
-        <form class="row g-3" action="{{url('/dashboard/barang') }}" method="POST">
-          @csrf
-          <div class="col-md-4">
-            <label for="inputNamaBarang" class="form-label">Nama Barang</label>
-            <input type="text" class="form-control  @error('inputNamaBarang') is-invalid @enderror" id="inputNamaBarang" name="inputNamaBarang">
-          </div>
-          @error('inputNamaBarang')
-          <div class="alert alert-danger">{{ $message }}</div>
-          @enderror
-    
-          <div class="col-md-3">
-            <label for="" class="form-label">Kategori</label>
-            <select class="form-select" id="inputKaryawan" name="inputKaryawan" placeholder="select Karyawan..." >
-              <option value="">Select None...</option>
-              @foreach ($kategori as $k)
-                <option value="{{$k->id}}">{{$k->nama_category}}</option>
-              @endforeach
-            </select>
-          </div>
-          
-          <div class="col-md-2">
-              <label for="inputJumlah" class="form-label">jumlah</label>
-              <input type="number" min="0" class="form-control  @error('inputJumlah') is-invalid @enderror" id="inputJumlah" name="inputJumlah">
-          </div>
-            @error('inputJumlah')
-            <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
-
-          <div class="col-md-2">
-            <label for="inputJumlah" class="form-label">Satuan</label>
-            <input type="text" class="form-control  @error('inputSatuan') is-invalid @enderror" id="inputSatuan" name="inputSatuan">
-          </div>
-            @error('inputSatuan')
-            <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
-
-          <div class="mb-3">
-            <label for="formFile" class="form-label">Default file input example</label>
-            <input class="form-control" type="file" id="formFile">
-          </div>
-          <div class="col-12">
-            <button type="submit" class="btn btn-primary">Insert</button>
-          </div>
-        </form>
-      </div> --}}
     </div>
-    {{-- <div class="col">
-      <div class="my-3 card">
-          <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#insertKategori" aria-expanded="false" aria-controls="insertKategori">
-            Kategori
-          </button>
-      </div>
-      <div class="collapse p-2 my-2" id="insertKategori" style="background-color:rgb(233, 237, 242)">
-        <form class="row g-3 mb-2" action="{{url('/dashboard/barang/kategori') }}" method="POST">
-          @csrf
-          <div class="col-md-5 form-floating">
-            <input type="text" class="form-control  @error('inputkategori') is-invalid @enderror" id="inputkategori" name="inputkategori" placeholder="nama kategori">
-            <label for="inputNamaKategori">Nama kategori</label>
-          </div>
-          @error('inputkategori')
-          <div class="alert alert-danger">{{ $message }}</div>
-          @enderror
-          <div class="col-md-3 mt-4">
-            <button type="submit" class="btn btn-primary">Insert</button>
-          </div>
-        </form>
-
-        <table class="display responsive nowrap" id="tableKategori" style="width:100%">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>kategori</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-          @foreach ($kategori as $k)
-          <tr>
-            <td>{{$k->id}}</td>
-            <td>{{$k->nama_category}}</td>
-            <td style="width: 100px;">
-              <div class="container d-flex-inline flex-row"></div>
-              <a href="#" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
-              <a href="#" data-method="DELETE" data-confirm="Yakin hapus kategori ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
-            </td>
-          </tr>
-          @endforeach
-          </tbody>
-        </table>
-      </div>
-    </div> --}}
   </div>
   
 </div>
@@ -151,12 +57,31 @@
               </td>
               <td>
                 <div class="col mb-1">
-                  <div class="row px-2">
-                    <a href="#" class="btn btn-primary mb-1">Tambah Jumlah</a>
+                  <!-- Button for Tambah Jumlah -->
+                  <div class="row px-2 mb-2">
+                    <button type="button" class="btn btn-primary w-100" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#tambahJumlahModal" 
+                            data-id="{{ $k->id }}" 
+                            data-satuan-kecil="{{ $k->satuanTerkecil }}" 
+                            data-satuan-besar="{{ $k->satuanBesar }}">
+                      Tambah Jumlah
+                    </button>
                   </div>
+                
+                  <!-- Button for Edit -->
+                  <div class="row px-2 mb-2">
+                    <a href="{{ url('/dashboard/barang/edit/'.$k->id) }}" class="btn btn-primary w-100">
+                      <i class="fa-regular fa-pen-to-square"></i> Edit
+                    </a>
+                  </div>
+                
+                  <!-- Button for Enable/Disable -->
                   <div class="row px-2">
-                    <a href="{{url('/dashboard/barang/edit/'.$k->id)}}" class="btn btn-primary mb-1"><i class="fa-regular fa-pen-to-square"></i></a>
-                    <a href="{{url('/dashboard/barang/delete/'.$k->id)}}" data-method="DELETE" data-confirm="Yakin hapus barang ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
+                    <a href="/dashboard/barang/toggle-status/{{$k->id}}" 
+                      class="btn {{ $k->Status == 1 ? 'btn-danger' : 'btn-success' }}">
+                      {{ $k->Status == 1 ? 'Disable' : 'Enable' }}
+                   </a>
                   </div>
                 </div>
               </td>
@@ -166,6 +91,43 @@
           </table>
       </div>
     </div>
+
+    
+        <!-- Modal for Tambah Jumlah -->
+        <div class="modal fade" id="tambahJumlahModal" tabindex="-1" aria-labelledby="tambahJumlahModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="tambahJumlahModalLabel">Tambah Jumlah Barang</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <form action="" method="POST">
+                @csrf
+                <div class="modal-body">
+                  <input type="hidden" id="barangId" name="barangId">
+                  
+                  <!-- Satuan Selection -->
+                  <div class="mb-3">
+                    <label for="satuan" class="form-label">Pilih Satuan</label>
+                    <select class="form-select" id="satuan" name="satuan">
+                      <!-- Options will be populated by JavaScript -->
+                    </select>
+                  </div>
+        
+                  <!-- Amount Input -->
+                  <div class="mb-3">
+                    <label for="amount" class="form-label">Jumlah</label>
+                    <input type="number" class="form-control" id="amount" name="amount" placeholder="Masukkan jumlah" required>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                  <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
 </div>
 @endsection
 
@@ -179,6 +141,42 @@
         $('#tableKategori').dataTable(
           
         );
+    });
+
+    var tambahJumlahModal = document.getElementById('tambahJumlahModal');
+  
+    // When the modal is shown, fill in the barangId and available satuans
+    tambahJumlahModal.addEventListener('show.bs.modal', function (event) {
+      // Button that triggered the modal
+      var button = event.relatedTarget;
+      // Extract info from data-* attributes
+      var barangId = button.getAttribute('data-id');
+      var satuanKecil = button.getAttribute('data-satuan-kecil');
+      var satuanBesar = button.getAttribute('data-satuan-besar');
+      
+      // Update the modal's hidden input field with the barangId
+      var modalBarangIdInput = tambahJumlahModal.querySelector('#barangId');
+      modalBarangIdInput.value = barangId;
+      
+      // Populate the satuan dropdown
+      var satuanSelect = tambahJumlahModal.querySelector('#satuan');
+      satuanSelect.innerHTML = '';  // Clear previous options
+      
+      // Add Satuan Kecil if available
+      if (satuanKecil) {
+        var optionKecil = document.createElement('option');
+        optionKecil.value = 'kecil';
+        optionKecil.text = satuanKecil + ' (Satuan Kecil)';
+        satuanSelect.appendChild(optionKecil);
+      }
+      
+      // Add Satuan Besar if available
+      if (satuanBesar) {
+        var optionBesar = document.createElement('option');
+        optionBesar.value = 'besar';
+        optionBesar.text = satuanBesar + ' (Satuan Besar)';
+        satuanSelect.appendChild(optionBesar);
+      }
     });
     // let table = new DataTable('#tableBarang');
 </script>

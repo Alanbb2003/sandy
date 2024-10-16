@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -49,8 +50,8 @@ class UserController extends Controller
         foreach ($cart as $item) {
             $totalAmmount += $item['price'] * $item['quantity'];
         }
-
-        return view('customer.checkout', compact('address','totalAmmount','memberstatus','currentPoints'));
+        $pointsEarned = floor($totalAmmount / 500);
+        return view('customer.checkout', compact('address','totalAmmount','memberstatus','currentPoints','pointsEarned'));
     }
 
     public function addressPage(){
@@ -62,15 +63,53 @@ class UserController extends Controller
     }
 
     public function membershipPage(){
+        $userId = auth()->user()->id;
+    
+        // Check if user is a member
+        $membership = Membership::where('fkUserID', $userId)->first();
+        $totalPoints = 0;
+        if ($membership) {
+            
+            $memberstatus = Membership::where('fkUserID','=', $userId)->first();
+            if($memberstatus){
+                $pointRecord = Point::where('memberID', $membership->memberID)
+                    ->where(function ($query) {
+                        $query->where('tanggalKaldaluarsaPoin', '>', now())
+                            ->orWhereNull('tanggalKaldaluarsaPoin');
+                    })
+                    ->get();
+                foreach ($pointRecord as $point) { 
+                    if ($point->jumlahPoin < 0) {
+                        // If jumlahPoin is negative set to 0 
+                        $totalPoints = 0;
+                    } else {
+                        // Add points if they're non-negative
+                        $totalPoints += $point->jumlahPoin;
+                    }
+                }
+            }
 
-        return view('customer.membershipPage');
+            $pointHistory = Point::where('memberID', $membership->memberID)->get();
+            
+            return view('customer.membership.membershipPage', compact('totalPoints', 'pointHistory'));
+        } else {
+            // User is not a member, show membership details and form
+            return view('customer.membership.notMember');
+        }
     }
 
     public function transactionPage(){
         $userId = Auth::user()->id; 
-        // Fetch Htrans records for the authenticated user
-        $htransRecords = Htrans::where('fkUserID', $userId)->get();
+        
+        $htransRecords = Htrans::with('dtrans.product')
+        ->where('fkUserID', $userId) // Ensure the transaction belongs to the current user
+        ->get();
 
+        // dd($htransRecords);
+        // Check if the transaction exists and belongs to the current user
+        if (!$htransRecords) {
+            return response()->json(['error' => 'Transaction not found or unauthorized'], 404);
+        }
         return view('customer.transaction',compact('htransRecords'));
     }
 
@@ -98,6 +137,7 @@ class UserController extends Controller
 
         return view('customer.retur', compact('returns', 'transactions'));
     }
+
     public function getTransactionItems($id){
         // Fetch the transaction along with the related dtrans items and product names
         $transaction = Htrans::with('dtrans.product') // Eager load the product relationship
@@ -201,6 +241,7 @@ class UserController extends Controller
             return redirect()->back();
         }
     }
+
     public function checkoutFunc(Request $request){
         $userID = Auth::user()->id;
         $pembeli = Auth::user()->firstName." ". Auth::user()->lastName;
@@ -236,8 +277,20 @@ class UserController extends Controller
         DB::beginTransaction();
         try {          
 
+            $latestTransaction = Htrans::orderBy('id', 'desc')->first(); // Get the last transaction
+
+            if ($latestTransaction) {
+                // Extract the numeric part from the last kodeTrans (e.g., "TR00001" -> 1)
+                $lastKode = intval(substr($latestTransaction->kodeTrans, 2)); 
+                // Increment the number and pad it with leading zeros to a length of 5
+                $newKode = 'TR' . str_pad($lastKode + 1, 5, '0', STR_PAD_LEFT); 
+            } else {
+                // If there are no previous transactions, start with TR00001
+                $newKode = 'TR00001';
+            }
             // Create htrans first
             $htrans = new Htrans();
+            $htrans->kodeTrans = $newKode;
             $htrans->fkUserID = $userID;
             $htrans->namaPembeli = $pembeli;
             $htrans->addressSnapshot = $addressSnap;
@@ -251,17 +304,24 @@ class UserController extends Controller
             if ($isMember) {
                 // Calculate points
                 $pointsEarned = floor($totalPayment / 500); // Example calculation for points
-                $pointRecord = Point::where('tanggalKaldaluarsaPoin', '>', now())->orWhereNull('tanggalKaldaluarsaPoin')->get();
+                $pointRecord = Point::where('memberID', $isMember->memberID)
+                ->where(function ($query) {
+                    $query->where('tanggalKaldaluarsaPoin', '>', now())
+                        ->orWhereNull('tanggalKaldaluarsaPoin');
+                })
+                ->get();
                 foreach ($pointRecord as $point) {
-                    $currentPoints += max(0, $point->jumlahPoin); // Ensure no negative points
+                    $currentPoints += $point->jumlahPoin; // Ensure no negative points
                 }
-
+                // dd($currentPoints);
                 // Check if redeem points checkbox is ticked
                 if ($request->input('usePoin') && $currentPoints >= 1000) {
+                    $pay = $totalPayment;
                     $totalPayment -= $currentPoints; // Apply all current points as a discount
 
                     if ($totalPayment < 0) {
                         $totalPayment = 0; // Ensure totalPayment doesn't go below zero
+                        $currentPoints = $pay;
                     }
 
                     // Deduct points from the user's account
@@ -308,25 +368,25 @@ class UserController extends Controller
                 // }
             }
 
-            if($isMember){
-                $tanggalPemberian = Carbon::now(); // Today's date
-                $tanggalKadaluwarsa = $tanggalPemberian->copy()->addYear(1); // Points expire after 1 year
-                $tipeTransaksi = 'Purchase'; // Transaction type
-                $sumberPoin = 'Pembelian dengan jumlah Rp.' .number_format($transactionAmount, 0, ',', '.');
-                $saldoPoin = $pointsEarned; // Assuming current points equal earned points (adjust if needed)
+            // if($isMember){
+            //     $tanggalPemberian = Carbon::now(); // Today's date
+            //     $tanggalKadaluwarsa = $tanggalPemberian->copy()->addYear(1); // Points expire after 1 year
+            //     $tipeTransaksi = 'Purchase'; // Transaction type
+            //     $sumberPoin = 'Pembelian dengan jumlah Rp.' .number_format($transactionAmount, 0, ',', '.');
+            //     $saldoPoin = $pointsEarned; // Assuming current points equal earned points (adjust if needed)
     
-                // Add points to the database
-                Point::create([
-                    'memberID' => $isMember->memberID,
-                    'htransID'=>$htrans->id,
-                    'tanggalPemberianPoin' => $tanggalPemberian,
-                    'jumlahPoin' => $pointsEarned,
-                    'tipeTransaksi' => $tipeTransaksi,
-                    'sumberPoin' => $sumberPoin,
-                    'tanggalKaldaluarsaPoin' => $tanggalKadaluwarsa,
-                    'saldoPoin' => $saldoPoin,
-                ]);
-            }
+            //     // Add points to the database
+            //     Point::create([
+            //         'memberID' => $isMember->memberID,
+            //         'htransID'=>$htrans->id,
+            //         'tanggalPemberianPoin' => $tanggalPemberian,
+            //         'jumlahPoin' => $pointsEarned,
+            //         'tipeTransaksi' => $tipeTransaksi,
+            //         'sumberPoin' => $sumberPoin,
+            //         'tanggalKaldaluarsaPoin' => $tanggalKadaluwarsa,
+            //         'saldoPoin' => $saldoPoin,
+            //     ]);
+            // }
 
             // Step 6: Send receipt via email
             $userEmail = Auth::user()->email; // Assuming the User model has an email field
@@ -352,6 +412,40 @@ class UserController extends Controller
         }
     }
     
+    public function uploadBuktiPembayaran(Request $request){
+        // Validate the uploaded file
+        $request->validate([
+            'buktiPembayaran' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // Max 2MB, only images
+            'transaction_id' => 'required|exists:htrans,id',
+        ]);
+
+        $transaction = Htrans::where('id', $request->transaction_id)
+                            ->where('fkUserID', auth()->id())
+                            ->firstOrFail();
+
+        // Define the path where you want to store the image
+        $webpDirectory = storage_path('app/public/bukti'); // Using public storage
+        $webpPath = 'bukti/' . uniqid() . '.webp'; // Path relative to storage/app/public
+        $outputWebPPath = storage_path('app/public/' . $webpPath);
+
+        // Check if the directory exists, if not create it
+        if (!File::exists($webpDirectory)) {
+            File::makeDirectory($webpDirectory, 0755, true);
+        }
+
+        // Convert the uploaded image to WebP format
+        $this->convertToWebP($request->file('buktiPembayaran'), $outputWebPPath);
+
+        // Save the WebP file path to the transaction's 'buktiPembayaran' column
+        $transaction->buktiPembayaran = $webpPath;
+        $transaction->status=2;
+        $transaction->save();
+
+        // Return a success response (or redirect)
+    return redirect()->back()->with('success', 'Bukti pembayaran berhasil diupload');
+    }
+
+
     public function addRetur(Request $request){
 
          // Validate incoming request data
@@ -398,6 +492,7 @@ class UserController extends Controller
             return back();
         }
     }
+
     public function cancelOrder($id) {
         // Find the Htrans order
         $order = Htrans::find($id);

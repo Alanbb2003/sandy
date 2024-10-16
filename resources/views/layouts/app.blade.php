@@ -263,27 +263,27 @@
             </div>
         </nav>
         
-    <!-- Secondary Navigation Bar -->
-    <nav class="navbar navbar-expand-md navbar-light bg-light" style="padding: 0.25rem 1rem;">
-        <div class="container-fluid">
-            <div class="d-flex justify-content-end w-100">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/wishlist') }}">Wishlist</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/transaction') }}">Transactions</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/retur') }}">Retur</a>
-                    </li>
-                    <li class="nav-item mx-2">
-                        <a class="nav-link" href="{{ url('/profile') }}">Profile</a>
-                    </li>
-                </ul>
+        <!-- Secondary Navigation Bar -->
+        <nav class="navbar navbar-expand-md navbar-light bg-light" style="padding: 0.25rem 1rem;">
+            <div class="container">
+                <div class="d-flex justify-content-end w-100">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url('/wishlist') }}">Wishlist</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url('/transaction') }}">Transactions</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url('/retur') }}">Retur</a>
+                        </li>
+                        <li class="nav-item mx-2">
+                            <a class="nav-link" href="{{ url('/profile') }}">Profile</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
         <main class="py-4">
             @include('sweetalert::alert')
             @yield('content')
