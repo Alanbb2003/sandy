@@ -9,32 +9,28 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ReceiptMail extends Mailable
+class OrderAcceptedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $htrans;
-    // public $cartItems;
-    public $dtransItems; // Use dtrans items with product details
-    // $cartItems masukan di () 
-    public function __construct($htrans, $dtransItems)
+    public $user;
+    public $transaction;
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
+    public function __construct($user, $transaction)
     {
-        $this->htrans = $htrans;
-        // $this->cartItems = $cartItems;
-        $this->dtransItems = $dtransItems;
+        $this->user = $user;
+        $this->transaction = $transaction;
     }
     
     public function build()
     {
-        return $this->view('emails.receipt')
-                    ->subject('Your Order Receipt')
-                    ->with([
-                        'htrans' => $this->htrans,
-                        'dtransItems' => $this->dtransItems,
-                        // 'cartItems' => $this->cartItems,
-                    ]);
+        return $this->subject('Pesanan Anda Sudah Diterima!')
+                    ->view('emails.orderAccepted');
     }
-    
     /**
      * Get the message envelope.
      *
@@ -43,7 +39,7 @@ class ReceiptMail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Receipt Mail',
+            subject: 'Pesanan Anda Sudah Diterima!',
         );
     }
 
@@ -55,7 +51,7 @@ class ReceiptMail extends Mailable
     // public function content()
     // {
     //     return new Content(
-    //         view: 'emails.receipt',
+    //         view: 'view.name',
     //     );
     // }
 

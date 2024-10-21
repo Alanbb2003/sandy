@@ -46,7 +46,7 @@
               <td>{{$k->category}}</td>
               <td>{{$k->totalQuantity}} {{$k-> satuanTerkecil}} 
                 @if($k->satuanBesar)
-                  / {{$k->totalQuantity/$k->isiSatuanBesar}} {{$k->satuanBesar}}
+                    / {{ round($k->totalQuantity / $k->isiSatuanBesar) }} {{$k->satuanBesar}}
                 @endif
                 
               </td> 
@@ -64,7 +64,8 @@
                             data-bs-target="#tambahJumlahModal" 
                             data-id="{{ $k->id }}" 
                             data-satuan-kecil="{{ $k->satuanTerkecil }}" 
-                            data-satuan-besar="{{ $k->satuanBesar }}">
+                            data-satuan-besar="{{ $k->satuanBesar }}"
+                            data-isibesar="{{$k->isiSatuanBesar}}">
                       Tambah Jumlah
                     </button>
                   </div>
@@ -101,7 +102,7 @@
                 <h5 class="modal-title" id="tambahJumlahModalLabel">Tambah Jumlah Barang</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <form action="" method="POST">
+              <form action="{{ route('admin.TambahJumlah') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                   <input type="hidden" id="barangId" name="barangId">
@@ -145,15 +146,13 @@
 
     var tambahJumlahModal = document.getElementById('tambahJumlahModal');
   
-    // When the modal is shown, fill in the barangId and available satuans
     tambahJumlahModal.addEventListener('show.bs.modal', function (event) {
-      // Button that triggered the modal
       var button = event.relatedTarget;
-      // Extract info from data-* attributes
+
       var barangId = button.getAttribute('data-id');
       var satuanKecil = button.getAttribute('data-satuan-kecil');
       var satuanBesar = button.getAttribute('data-satuan-besar');
-      
+      var isiSatuan = button.getAttribute('data-isiBesar')
       // Update the modal's hidden input field with the barangId
       var modalBarangIdInput = tambahJumlahModal.querySelector('#barangId');
       modalBarangIdInput.value = barangId;
@@ -174,7 +173,7 @@
       if (satuanBesar) {
         var optionBesar = document.createElement('option');
         optionBesar.value = 'besar';
-        optionBesar.text = satuanBesar + ' (Satuan Besar)';
+        optionBesar.text = satuanBesar + ' ( isi ' + isiSatuan + ' '+satuanKecil+' )'  ;
         satuanSelect.appendChild(optionBesar);
       }
     });

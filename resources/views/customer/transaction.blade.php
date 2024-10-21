@@ -23,57 +23,70 @@
                 <td>{{$k->kodeTrans}}</td>
                 <td>{{$k->namaPembeli}}</td> 
                 <td>{{$k->addressSnapshot}}</td>
-                <td>{{$k->tanggalPembelian}}</td> 
+                <td>{{ \Carbon\Carbon::parse($k->tanggalPembelian)->format('d-m-Y H:i:s') }}</td> 
                 <td>Rp. {{ number_format($k->totalPembelian, 2, ",", ".") }}</td>
                 @switch($k->status)
                     @case(1)
                         <td>Menunggu pembayaran.</td>
                         @break
                     @case(2)
-                        <td>The order is being processed.</td>
+                        <td>Pesanan sedang diproses.</td>
                         @break
                     @case(3)
                         <td>The order has been completed.</td>
                         @break
                     @case(4)
-                        <td>Pesanan dibatalkan.</td>
+                        <td>Pesanan dibatalkan Pembeli.</td>
+                        @break
+                    @case(5)
+                        <td>Pesanan dibatalkan Penjual.</td>
                         @break
                     @default
                         <td>Unknown order status.</td>
                 @endswitch
                 <td>
-                    @if ($k->buktiPembayaran == null)
-                    <form method="POST" action="{{ route('uploadBuktiPembayaran') }}" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="transaction_id" value="{{ $k->id }}">
-            
-                            <div class="card" style="width: 18rem;">
-                                <div class="card-body">
-                                    <h5 class="card-title">Upload Bukti Pembayaran</h5>
-                                    <p class="card-text">Silakan unggah bukti pembayaran Anda.</p>
-                
-                                    <div class="input-group mb-3">
-                                        <input type="file" class="form-control" id="buktiPembayaran" name="buktiPembayaran" accept="image/*" required>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-success w-100">Upload</button>
-                                </div>
-                            </div>
-                        </form>
+                    @if ($k->status == 4)
+                    <div class="text-center">
+                        <p>Pesanan dibatalkan oleh pembeli.</p>
+                    </div>
+                    @elseif ($k->status == 5)
+                    <div class="text-center">
+                        <p>Pesanan dibatalkan oleh penjual.</p>
+                    </div>
                     @else
-                        <!-- Show uploaded image and provide the image URL -->
-                        <div class="text-center">
-                            <img src="{{ asset('storage/' . $k->buktiPembayaran) }}" alt="Bukti Pembayaran" class="img-fluid rounded mb-2" style="width: 100px;">
-                            <p>
-                                <a href="{{ asset('storage/' . $k->buktiPembayaran) }}" target="_blank" class="btn btn-link">Lihat Bukti Pembayaran</a>
-                            </p>
-                        </div>
+                        @if ($k->buktiPembayaran == null)
+                            <form method="POST" action="{{ route('uploadBuktiPembayaran') }}" enctype="multipart/form-data">
+                                @csrf
+                                <input type="hidden" name="transaction_id" value="{{ $k->id }}">
+                    
+                                <div class="card" style="width: 18rem;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Upload Bukti Pembayaran</h5>
+                                        <p class="card-text">Silakan unggah bukti pembayaran Anda.</p>
+                    
+                                        <div class="input-group mb-3">
+                                            <input type="file" class="form-control" id="buktiPembayaran" name="buktiPembayaran" accept="image/*" required>
+                                        </div>
+                    
+                                        <button type="submit" class="btn btn-success w-100">Upload</button>
+                                    </div>
+                                </div>
+                            </form>
+                        @else
+                            <!-- Show uploaded image and provide the image URL -->
+                            <div class="text-center">
+                                <img src="{{ asset('storage/' . $k->buktiPembayaran) }}" alt="Bukti Pembayaran" class="img-fluid rounded mb-2" style="width: 100px;">
+                                <p>
+                                    <a href="{{ asset('storage/' . $k->buktiPembayaran) }}" target="_blank" class="btn btn-link">Lihat Bukti Pembayaran</a>
+                                </p>
+                            </div>
+                        @endif
                     @endif
                 </td>
                 <td>
                     <button type="button" class="btn btn-info btn-sm my-1" style="width: 120px"
                             data-id="{{ $k->id }}"
-                            data-tanggal="{{ $k->tanggalPembelian }}"
+                            data-tanggal="{{ \Carbon\Carbon::parse($k->tanggalPembelian)->format('d-m-Y H:i:s') }}"
                             data-diskon="Rp{{ number_format($k->discount, 2, ',', '.') }}"
                             data-total="Rp{{ number_format($k->totalPembelian, 2, ',', '.') }}"
                             data-transaksi='@json($k->dtrans)'
@@ -158,9 +171,9 @@
 <script>
     $(document).ready(function(){
         $('#tabelTransaksi').dataTable({
-          responsive: true,
-          order: [[3, 'desc']]
-        } );
+            responsive: true,
+            order: [[0, 'desc']] // Order by the 4th column (Tanggal Pembelian)
+        });
 
         $('#transactionDetailModal').on('show.bs.modal', function (event) {
           var button = $(event.relatedTarget); 

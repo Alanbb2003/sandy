@@ -28,7 +28,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/email/verify';
 
     /**
      * Create a new controller instance.
@@ -89,6 +89,8 @@ class RegisterController extends Controller
                 'firstName'=>$data['firstName'],
                 'lastName'=>$data['lastName'],
                 'noHp'=>$data['phone_number'],
+                'tanggalLahir'=>null,
+                'role'=>0
             ]);
         } catch (\Exception $e) {
             return $e->getMessage();

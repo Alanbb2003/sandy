@@ -58,6 +58,7 @@ Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
     Route::delete('/address/delete', [UserController::class, 'deleteAddress'])->name('address.delete');
 
     Route::get('/membership', [UserController::class, 'membershipPage'])->name('membership.page');
+    Route::post('/membership/add',[UserController::class,'AddToMembership'])->name('membership.add');
     
     Route::get('/wishlist', [UserController::class, 'wishlistPage'])->name('wishlist.page');
     Route::post('/wishlist/toggle', [UserController::class, 'toggleWishlist'])->name('wishlist.toggle');
@@ -71,7 +72,7 @@ Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
     Route::get('/get-transaction-items/{id}', [UserController::class, 'getTransactionItems']);
 
     Route::get('/profile',[UserController::class,'profilePage']);
-    Route::put('/profile/password/update', [HomeController::class, 'updatePassword'])->name('password.update');
+    Route::put('/profile/password/update', [HomeController::class, 'updatePassword'])->name('password.user.update');
 });
 
 
@@ -91,9 +92,16 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::put('/barang/edit/{id}', [AdminController::class, 'updateBarang']);
         Route::delete('/barang/delete-image/{id}', [AdminController::class, 'deleteImage'])->name('dashboard.barang.deleteImage');
         Route::get('/barang/toggle-status/{id}', [AdminController::class, 'toggleStatus'])->name('barang.toggleStatus');
+        Route::post('/barang/Tambah',[AdminController::class,'addJumlahBarang'])->name('admin.TambahJumlah');
 
         Route::get('/transaksi',[AdminController::class,"adminTransaksi"])->name('admin.transaksi');
         Route::post('/transaksi/accept',[AdminController::class,"acceptTransaction"])->name('admin.acceptTransaction');
+        Route::post('/transaksi/cancel', [AdminController::class, 'cancelTransaction'])->name('admin.cancelOrder');
+
+        route::get('/pelanggan',[AdminController::class,"adminPelanggan"])->name('admin.Pelanggan');
+
+
+        route::get('/retur',[AdminController::class,"adminRetur"])->name('admin.retur');
     });
 });
 

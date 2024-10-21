@@ -11,6 +11,13 @@ class Membership extends Model
     public $table = "membership";
     protected $primaryKey = "memberID";
 
+    protected $fillable = [
+        'fkUserID',
+        'tanggalDaftar',
+        'tanggalAkhir',
+        'statusMembership',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'fkUserID', 'id');

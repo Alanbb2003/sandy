@@ -17,7 +17,7 @@ class Point extends Model
         'jumlahPoin',
         'tipeTransaksi',
         'sumberPoin',
-        'tanggalKaldaluarsaPoin',
+        'tanggalKadaluwarsaPoin',
         'saldoPoin'
     ];
 }

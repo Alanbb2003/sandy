@@ -197,7 +197,8 @@
                         <a class="nav-link" href="/dashboard">Home</a>
                         <a class="nav-link" href="{{ url('/dashboard/barang') }}">Barang</a>
                         <a class="nav-link" href="{{url('/dashboard/transaksi')}}">Pesanan</a>
-                        <a class="nav-link" href="#">Pelanggan</a>
+                        <a class="nav-link" href="{{url('/dashboard/retur')}}">Retur</a>
+                        <a class="nav-link" href="{{url('/dashboard/pelanggan')}}">Pelanggan</a>
                         <a class="nav-link" href="#">Membership</a>
                     </ul>
         

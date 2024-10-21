@@ -171,7 +171,7 @@
                 </div>
 
                 <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Tambah</button>
+                    <button type="submit" class="btn btn-primary">Buat Pesanan</button>
                 </div>
             </form>
         </div>

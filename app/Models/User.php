@@ -24,7 +24,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'firstName',
         'lastName',
-        'noHp',
+        'role',
+        'tanggalLahir',
+        'noHp',  
     ];
 
     /**
@@ -58,6 +60,6 @@ class User extends Authenticatable implements MustVerifyEmail
     
     public function htrans()
     {
-        return $this->hasMany(Htrans::class, 'userID', 'id');
+        return $this->hasMany(Htrans::class, 'fkUserID', 'id');
     }
 }

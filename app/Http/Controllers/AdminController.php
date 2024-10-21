@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\NewProductNotification;
+use App\Mail\OrderAcceptedMail;
 use App\Models\Category;
 use App\Models\Htrans;
 use App\Models\Membership;
@@ -13,6 +14,8 @@ use App\Models\retur;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -53,13 +56,11 @@ class AdminController extends Controller
     }
 
     public function adminTransaksi(){
-        // Retrieve all transactions with their related details and products
-        // $transaksi = Htrans::with(['dtrans', 'dtrans.product'])->get();
-        // // dd($transaksi);
-        // return view('admin.manageTransaksi', compact('transaksi'));
-
-        $transaksi = Htrans::with(['dtrans.product', 'user'])->get();
-    
+        // Retrieve all transactions sorted by newest ID with their related details and products
+        $transaksi = Htrans::with(['dtrans.product', 'user'])
+                    ->orderBy('id', 'desc') // Order by newest ID
+                    ->get();
+        
         return view('admin.manageTransaksi', compact('transaksi'));
     }
 
@@ -73,6 +74,36 @@ class AdminController extends Controller
         $pictures = Pictures::where('productID', $id)->get();
         // Return the edit view with product and categories data
         return view('admin.forms.editStock', compact('product', 'kategori','pictures'));
+    }
+
+    public function adminPelanggan(){
+        // $customers = DB::table('users')
+        // ->leftJoin('htrans', 'users.id', '=', 'htrans.fkUserID')
+        // ->select('users.id', 'users.name','users.firstName','users.lastName','users.noHP','users.tanggalLahir','users.email', DB::raw('COUNT(htrans.id) as total_completed_transactions'))
+        // ->where('htrans.status', 3)
+        // ->groupBy('users.id','users.name','users.firstName','users.lastName','users.noHP','users.tanggalLahir','users.email')
+        // ->get();
+
+
+
+        $customers = User::where('role','!=',1)->get()->map(function ($user) {
+            $user->total_completed_transactions = $user->htrans()
+                ->where('status', 3) // Completed transactions
+                ->count();
+    
+            $user->total_transaction_amount = $user->htrans()
+                ->where('status', 3) // Completed transactions
+                ->sum('totalPembelian');
+    
+            return $user;
+        });;
+        
+        return view('admin.managePelanggan',compact('customers'));
+    }
+
+    public function adminRetur(){
+
+        return view('admin.manageRetur');
     }
 
 
@@ -103,18 +134,11 @@ class AdminController extends Controller
             'inputSatuanKecil'=>'required',
             'inputHargaKecil'=>'required|numeric|min:0|not_in:0'
         ]);
-        $barang = Products::select("ID")->orderBy("ID","DESC")->first();
-        // echo $barang;
+
         
         $files = $request->file('images');
         $thumbnail = $request->file('thumbnail');
-        $uploadedFiles = [];
-        if($barang == null){
-            $barang = 1;
-        }else{
-            $barang = $barang->ID + 1;
-        }
-        // echo $barang;
+
         $arr = explode(' ',trim($request->inputNamaBarang));
         $item = "";
         if(sizeof($arr) >= 2){
@@ -125,17 +149,15 @@ class AdminController extends Controller
             $first_character = mb_substr($request->inputNamaBarang, 0, 2);
             $item = $first_character;
         }
-        
+        DB::beginTransaction();
         try {
 
         if ($request->hasFile('thumbnail')) {
             $thumbnail = $request->file('thumbnail');
-            $thumbnailname = $item . time() . '.webp'; // Save as WEBP format
+            $thumbnailname = $item . time() . '.webp';
             $thumbnailPath = public_path('images/uploads/' . $thumbnailname);
             $this->convertToWebP($thumbnail, $thumbnailPath);
         }
-        // $thumbnailname = $item.time(). '.' . $thumbnail->extension(); 
-        // $thumbnail->move(public_path('images/uploads'),$thumbnailname);
 
         $productbaru = new Products();
         $productbaru->fotoPromosi = $thumbnailname;
@@ -152,26 +174,10 @@ class AdminController extends Controller
         $productbaru->Status = 1;
         $productbaru->save();
 
-        // if ($files) {
-        //     for ($i=0; $i < count($files); $i++) { 
-        //         $fileName = time() . rand(1, 99) . '.' . $files[$i]->extension();  
-        //         $filePath = 'images/uploads';
-        //         $files[$i]->move(public_path($filePath), $fileName);
-        //         // $file->storeAs('photos', $fileName);
-
-        //         $uploadedFiles[] = ['name' => $fileName,'path' => $filePath];
-
-        //         $upload = new Pictures();
-        //         $upload->productID = $barang;
-        //         $upload->fileName = $fileName;
-        //         $upload->filePath = $filePath;
-        //         $upload->save();
-        //     }
-        // }
         $files = $request->file('images');
         if ($files) {
             foreach ($files as $file) {
-                $fileName = time() . rand(1, 99) . '.webp';  // Save as WEBP format
+                $fileName = time() . rand(1, 99) . '.webp'; 
                 $filePath = 'images/uploads';
                 $webpPath = public_path($filePath . '/' . $fileName);
                 
@@ -179,27 +185,27 @@ class AdminController extends Controller
 
                 // Save image details to the database
                 $upload = new Pictures();
-                $upload->productID = $barang;
+                $upload->productID = $productbaru->id;
                 $upload->fileName = $fileName;
                 $upload->filePath = $filePath;
                 $upload->save();
             }
         }
+         $members = Membership::with('user')->get();
 
-         // Retrieve all active members
-         $members = Membership::where('statusMembership', 1)->with('user')->get();
-
-         // Send email to each member
          foreach ($members as $member) {
              if ($member->user && $member->user->email) {
                  Mail::to($member->user->email)->send(new NewProductNotification($productbaru));
              }
          }
-         
+         DB::commit();
         alert()->success('Success!','Berhasil menambahkan produk');
         return back();
         } catch (\Exception $e) {
-            return $e->getMessage();
+            DB::rollBack();
+            Log::error('Error adding product: ' . $e->getMessage());
+            alert()->error('Error!', 'Something went wrong. Please try again.');
+            return back();
         }
     }
    
@@ -250,16 +256,11 @@ class AdminController extends Controller
         $barang->Status = $barang->Status == 1 ? 2 : 1;
         $barang->save();
     
-        // Redirect back with a success message
+        toast("Berhasil mengubah status produk",'success');
         return redirect()->back()->with('success', 'Product status updated successfully.');
     }
 
     public function updateBarang(Request $request, $id){
-        // Validate the request data
-        $request->validate([
-            // ... validation rules ...
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
         $request->validate([
             'inputNamaBarang' => 'required|string|max:255',
             'inputKategori' => 'required|integer',
@@ -276,7 +277,8 @@ class AdminController extends Controller
     
         // Find the product by ID
         $product = Products::findOrFail($id);
-    
+        DB::beginTransaction();
+        try {
         // Update product details
         $product->namaBarang = $request->input('inputNamaBarang');
         $product->slugBarang = Str::slug($request->input('inputNamaBarang'));
@@ -346,10 +348,15 @@ class AdminController extends Controller
                 ]);
             }
         }
-    
-        // Save and redirect
-        alert()->success('Success!','Berhasil menambahkan kategori');
-        return redirect()->back();    
+        DB::commit();
+        alert()->success('Success!','Berhasil mengubah barang');
+        return redirect('/dashboard/barang');  
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error adding product: ' . $e->getMessage());
+            alert()->error('Error!', 'Something went wrong. Please try again.');
+            return back();
+        }
     }
 
     public function acceptTransaction(Request $request) {
@@ -362,7 +369,9 @@ class AdminController extends Controller
         
         $userID = $transaksi->fkUserID;
         $isMember = Membership::where('fkUserID', $userID)->first();
-        
+
+        DB::beginTransaction();
+        try {   
         // If the user is a member, add points
         if ($isMember) {
             $tanggalPemberian = Carbon::now();
@@ -370,16 +379,16 @@ class AdminController extends Controller
             $tipeTransaksi = 'Purchase';
             $sumberPoin = 'Pembelian dengan jumlah Rp.' . number_format($transactionAmount, 0, ',', '.');
             $saldoPoin = $pointsEarned;
-    
+        
             // Add points to the database
             Point::create([
                 'memberID' => $isMember->memberID,
                 'htransID' => $transaksi->id,
-                'tanggalPemberian' => $tanggalPemberian,
+                'tanggalPemberianPoin' => $tanggalPemberian,
                 'jumlahPoin' => $pointsEarned,
                 'tipeTransaksi' => $tipeTransaksi,
                 'sumberPoin' => $sumberPoin,
-                'tanggalKadaluwarsa' => $tanggalKadaluwarsa,
+                'tanggalKadaluwarsaPoin' => $tanggalKadaluwarsa, // Fixed typo here
                 'saldoPoin' => $saldoPoin,
             ]);
         }
@@ -390,36 +399,79 @@ class AdminController extends Controller
             // dd($product);
             if ($product) {
                 if ($item->satuanBarang == $product->satuanTerkecil) {
-                    $product->totalQuantity =$product->totalQuantity - $item->totalJumlah;
-                    dd($product->totalQuantity );
+                    $product->totalQuantity -= $item->totalJumlah;
+                    
                 } else {
                     $reduceBig = $item->totalJumlah * $product->isiSatuanBesar;
                     $product->totalQuantity -= $reduceBig;
-                    dd();
+                    
                 }
                 $product->save();
             }
         }
     
-        // Update the transaction status to 3 (completed)
-        $transaksi->status = 3;
-        $transaksi->save();
+            // Update the transaction status to 3 (completed)
+            $transaksi->status = 3;
+            $transaksi->save();
+        
+                // Send email notification to the user
+            Mail::to($transaksi->user->email)->send(new OrderAcceptedMail($transaksi->user, $transaksi));
+
+            DB::commit();
+            alert()->success('Success!', 'Transaksi diterima, stok produk dikurangi, dan poin telah diberikan');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            // Rollback transaction if something goes wrong
+            DB::rollBack();
+            Log::error('Error adding product: ' . $e->getMessage());
+            alert()->error('Error!', 'Gagal konfirmasi transaksi');
+            return back()->withErrors(['error' => 'Failed to add product']);
+        }
+    }
+
+    public function cancelTransaction(Request $request) {
+        $id = $request->input('transaction_idcancel');
+        $order = Htrans::find($id);
+        if (!$order) {
+            return redirect()->back()->with('error', 'Order not found.');
+        }
     
-        alert()->success('Success!', 'Transaksi diterima, stok produk dikurangi, dan poin telah diberikan');
+        $membership = Membership::where('fkUserID', $order->fkUserID)->first();
+        if ($membership) {
+            Point::where('htransID', $id)->delete();
+        }
+    
+        $order->status = 5; 
+        $order->save();
+        alert()->success('Success!', 'Transaksi Ditolak');
         return redirect()->back();
     }
 
-    public function addJumlahBarang(Request $request,$id){
-        $barang = Products::where('ID','='<$id)->first();
-        $this->validate($request,[
-            'inputJumlah'=>'required',
+    public function addJumlahBarang(Request $request){
+        $barang = Products::where('ID','=',$request->barangId)->first();
+        
+        $this->validate($request, [
+            'amount' => 'required|numeric',
         ]);
-        if ($request->satuan == 1) {
-            # code.
-            $jumlah = $barang->jumlahTerkecil;
+
+        if ($request->satuan == 'kecil') {
+            $jumlah = $request->amount;
         }else{
             $isiBesar = $barang->isiSatuanBesar;
-            $tambahBesar = $request->inputJumlah * $isiBesar;
+            $jumlah = $request->amount * $isiBesar;
+        }
+        DB::beginTransaction();
+        try {
+            $barang->totalQuantity += $jumlah;
+            $barang->save();
+            DB::commit();
+            toast("Berhasil menambah jumlah produk",'success');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error adding product: ' . $e->getMessage());
+            toast("Gagal menambah jumlah produk",'error');
+            return back()->withErrors(['error' => 'Failed to add product']);
         }
     }
 
@@ -449,7 +501,6 @@ class AdminController extends Controller
                 $image = imagecreatefromgif($file->getPathname());
                 break;
             case 'webp':
-                // If the file is already a WebP image, move it directly without conversion
                 $file->move(dirname($outputWebPPath), basename($outputWebPPath));
                 return;
             default:
@@ -458,7 +509,7 @@ class AdminController extends Controller
         }
 
         // Convert to WebP and save
-        imagewebp($image, $outputWebPPath, 75); // 80 is the quality setting for WEBP (0-100)
+        imagewebp($image, $outputWebPPath, 75); 
 
         // Free memory
         imagedestroy($image);

@@ -21,18 +21,19 @@
             <tbody>
             @foreach ($transaksi as $htrans)
             <tr>
-              <td>{{ $htrans->id }}</td>
+              <td>{{ $htrans->kodeTrans }}</td>
     
               <!-- Display the user's first and last name -->
               <td>{{ $htrans->user->firstName }} {{ $htrans->user->lastName }}</td>
           
-              <td>{{ $htrans->tanggalPembelian }}</td> 
+              <td>{{ \Carbon\Carbon::parse($htrans->tanggalPembelian)->format('d-m-Y H:i:s') }}</td> 
 
               <td>
                 <button type="button" class="btn btn-info" 
                     data-id="{{ $htrans->id }}"
                     data-nama="{{ $htrans->user->firstName }} {{ $htrans->user->lastName }}"
-                    data-tanggal="{{ $htrans->tanggalPembelian }}"
+                    data-tanggal="{{ \Carbon\Carbon::parse($htrans->tanggalPembelian)->format('d-m-Y H:i:s') }}"
+                    data-diskon="Rp{{ number_format($htrans->discount, 2, ',', '.') }}"
                     data-total="Rp{{ number_format($htrans->totalPembelian, 2, ',', '.') }}"
                     data-transaksi='@json($htrans->dtrans)'
                     data-bs-toggle="modal" data-bs-target="#detailModal">
@@ -65,28 +66,60 @@
                       <td>The order has been completed.</td>
                       @break
                   @case(4)
-                      <td>Pesanan dibatalkan.</td>
+                      <td>Pesanan dibatalkan Pembeli.</td>
+                      @break
+                  @case(5)
+                      <td>Pesanan dibatalkan Penjual.</td>
                       @break
                   @default
                       <td>Unknown order status.</td>
               @endswitch
               <td>
+                  @if ($htrans->status == 2)
                   <a href="#" class="btn btn-info btn-sm my-1" style="width: 120px" 
-                     data-bs-toggle="modal" 
-                     data-bs-target="#acceptTransactionModal" 
-                     data-id="{{ $htrans->id }}">
-                    <i class="fa fa-check"></i>
+                      data-bs-toggle="modal" 
+                      data-bs-target="#acceptTransactionModal" 
+                      data-id="{{ $htrans->id }}">
+                    <i class="fa fa-check"></i> Terima
                   </a>
+                  @endif
 
-                    @if ($htrans->status == 1)
-                    <a href="#" class="btn btn-danger btn-sm" style="width: 120px">
-                      <i class="fa fa-xmark"></i>
-                    </a>
-                    @endif
+                  @if ($htrans->status == 1)
+                  <a href="#" class="btn btn-danger btn-sm my-1" style="width: 120px" 
+                      data-bs-toggle="modal" 
+                      data-bs-target="#cancelOrderModal" 
+                      data-id="{{ $htrans->id }}" 
+                      data-kode="{{$htrans->kodeTrans}}">
+                      <i class="fa fa-xmark"></i> Batal
+                  </a>
+                  @endif
               </td>
             @endforeach
             </tbody>
           </table>
+      </div>
+    </div>
+
+    <!-- Modal for Confirming Order Cancellation -->
+    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cancelOrderModalLabel">Konfirmasi Pembatalan Pesanan</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Apakah Anda yakin ingin membatalkan pesanan dengan Kode <strong id="showKode"></strong>?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            <form action="{{ route('admin.cancelOrder') }}" method="POST">
+              @csrf
+              <input type="hidden" name="transaction_idcancel" id="transactionIdcancel">
+              <button type="submit" class="btn btn-danger">Ya, Batalkan Pesanan</button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -125,6 +158,7 @@
                 <div class="modal-body">
                     <h5>Nama Pembeli: <span id="modalNamaPembeli"></span></h5>
                     <p>Tanggal Pembelian: <span id="modalTanggalPembelian"></span></p>
+                    <strong>Diskon: <span id="modalDiskon"></span></strong>
                     <h6>Transaction Details:</h6>
     
                     <!-- Table to display transaction details -->
@@ -158,7 +192,8 @@
 <script>
     $(document).ready(function(){
         $('#tabelTransaksi').dataTable({
-          responsive: true
+          responsive: true,
+          order: [[0, 'desc']]
         });
 
         $('#detailModal').on('show.bs.modal', function (event) {
@@ -170,13 +205,14 @@
           var tanggalPembelian = button.data('tanggal');
           var totalTransaksi = button.data('total');
           var transaksiDetails = button.data('transaksi');
-          
+          var diskon = button.data('diskon');
+
           // Set modal title and fields
           var modal = $(this);
           modal.find('#modalNamaPembeli').text(namaPembeli);
           modal.find('#modalTanggalPembelian').text(tanggalPembelian);
           modal.find('#modalTotalTransaksi').text(totalTransaksi);
-          
+          modal.find('#modalDiskon').text(diskon);
           // Clear existing table content
           modal.find('#modalTransaksiDetails').empty();
           
@@ -214,6 +250,21 @@
             inputTransactionId.value = transactionId;
           });
         });
-    
+    document.addEventListener('DOMContentLoaded', function () {
+      var cancelModal = document.getElementById('cancelOrderModal');
+
+      cancelModal.addEventListener('show.bs.modal', function (event) {
+        // Button that triggered the modal
+        var button = event.relatedTarget;
+
+        // Extract info from data-* attributes
+        var transactionId = button.getAttribute('data-id');
+        var kodeTrans = button.getAttribute('data-kode');
+        // Update the form's hidden input value with the transaction ID
+        var inputTransactionId = document.getElementById('transactionIdcancel');
+        inputTransactionId.value = transactionId;
+        document.getElementById('showKode').textContent = kodeTrans;
+      });
+    });
 </script>
 @endsection
