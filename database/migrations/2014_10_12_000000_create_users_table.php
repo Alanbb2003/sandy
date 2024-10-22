@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('firstName');
+            $table->string('lastName');
             //0 = customer 1 = admin
             $table->tinyInteger('role')->default(0);
             $table->date('tanggalLahir')->nullable();
