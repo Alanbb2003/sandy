@@ -71,17 +71,17 @@
             <div class="col-sm-12 p-1 d-flex flex-wrap">
                 @foreach ($categoryItems as $k)
                 <div class="card mb-4 p-1 mx-2 d-flex flex-column" style="width: 180px; min-height: 320px;"> <!-- Set a minimum consistent height -->
-                    <a target="_blank" href="{{ asset('images/uploads/' . $k->fotoPromosi) }}">
+                    <a target="_blank" href="{{ url('/product/' . $k->slugBarang ) }}">
                       <img class="card-img-top thumbnail" src="{{ asset('images/uploads/' . $k->fotoPromosi) }}" alt="Gambar Barang" loading="lazy">
                     </a>
                     <div class="card-body d-flex flex-column justify-content-between"> <!-- Flexbox to space out the content -->
                       <div>
-                        <h5 class="card-title">{{ $k->namaBarang }}</h5>
+                       <a href="{{ url('/product/' . $k->slugBarang ) }}" class="nodecor"><h5 class="card-title">{{ $k->namaBarang }}</h5></a> 
                         <p class="card-text">Rp.{{ number_format($k->hargaKecil, 0, ',', '.') }}</p>
                       </div>
     
                       <div class="mt-auto d-flex justify-content-between align-items-center"> <!-- Align buttons next to each other -->
-                        <a href="{{ url('/product/' . $k->slugBarang ) }}" class="btn btn-primary me-2 w-75">Detail</a> <!-- 75% width for "Detail" button -->
+                        <a href="{{ url('/product/' . $k->slugBarang ) }}" class="btn btn-primary me-2 w-75">Detail</a> 
                         
                         <button class="wishlist-toggle btn btn-outline-secondary w-25" data-product-id="{{ $k->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Wishlist">
                           @if(Auth::check())

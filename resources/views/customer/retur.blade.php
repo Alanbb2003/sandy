@@ -19,24 +19,26 @@
             @foreach ($returns as $retur)
                 <tr>
                     <td>{{ $retur->id}}</td>
-                    <td>{{ $retur->fkHeaderID }}</td>
+                    <td>{{ $retur->htrans->kodeTrans ?? 'Transaction Not Found' }}</td>
                     <td>{{ $retur->dtrans->product->namaBarang ?? 'Product Not Found' }}</td>
                     <td>{{ $retur->jumlahBarangRetur }} {{$retur->satuanBarangRetur}}</td>
                     <td>{{ $retur->tanggalRetur }}</td>
                     <td>{{ $retur->alasanRetur }}</td>
-                    @switch($retur->status)
-                    @case(1)
-                        <td>Menunggu Konfirmasi.</td>
-                        @break
-                    @case(2)
-                        <td>Diterima</td>
-                        @break
-                    @case(3)
-                        <td>Ditolak</td>
-                        @break
-                    @default
-                        <td>Unknown retur status.</td>
-                @endswitch
+                    <td>
+                        @switch($retur->status)
+                            @case(0)
+                                <span class="badge bg-warning text-dark">Menunggu Konfirmasi</span>
+                                @break
+                            @case(1)
+                                <span class="badge bg-success">Diterima</span>
+                                @break
+                            @case(2)
+                                <span class="badge bg-danger">Ditolak</span>
+                                @break
+                            @default
+                                <span class="badge bg-secondary">Unknown</span>
+                        @endswitch
+                    </td>
                 </tr>
             @endforeach
         </tbody>
@@ -69,7 +71,7 @@
                     <tbody>
                         @foreach ($transactions as $transaction)
                             <tr>
-                                <td>{{ $transaction->id }}</td>
+                                <td>{{ $transaction->kodeTrans }}</td>
                                 <td>{{ $transaction->tanggalPembelian }}</td>
                                 <td>Rp. {{ number_format($transaction->totalPembelian, 2, ",", ".") }}</td>
                                 <td>
@@ -109,42 +111,54 @@
 </div>
 
 <!-- Return Request Form Modal -->
-
-    <div class="container">
-        <form action="{{ route('retur.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="returnRequestModalLabel">Return Request Details</h5>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="salesHeaderID" id="salesHeaderID">
-                    <input type="hidden" name="userID" value="{{ Auth::id() }}">
-                    
-                    <div id="selectedItemsList" class="mb-3"></div>
-        
-                    <div class="mb-3">
-                        <label for="fotoBarang" class="form-label">Upload Product Photo</label>
-                        <input type="file" class="form-control" id="fotoBarang" name="fotoBarang" required>
-                    </div>
-        
-                    <div class="mb-3">
-                        <label for="alasanRetur" class="form-label">Reason for Return</label>
-                        <textarea class="form-control" name="alasanRetur" id="alasanRetur" rows="3" required></textarea>
-                    </div>
-        
-                    <div class="mb-3">
-                        <label for="jumlahBarangRetur" class="form-label">Total Quantity</label>
-                        <input type="number" class="form-control" name="jumlahBarangRetur" id="jumlahBarangRetur" readonly>
-                    </div>
-                    <input type="hidden" name="selectedItemsData" id="selectedItemsData">
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Submit Return Request</button>
-                </div>
+<div class="container">
+    <form action="{{ route('retur.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="returnRequestModalLabel">Return Request Details</h5>
             </div>
-        </form>
-    </div>
+            <div class="modal-body">
+                <input type="hidden" name="salesHeaderID" id="salesHeaderID">
+                <input type="hidden" name="userID" value="{{ Auth::id() }}">
+
+                <div id="selectedItemsList" class="mb-3"></div>
+
+                <!-- Disable the form fields initially -->
+                <div class="mb-3">
+                    <label for="fotoBarang" class="form-label">Upload Product Photo</label>
+                    <input type="file" class="form-control" id="fotoBarang" name="fotoBarang" disabled required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="alasanRetur" class="form-label">Reason for Return</label>
+                    <textarea class="form-control" name="alasanRetur" id="alasanRetur" rows="3" disabled required></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="jumlahBarangRetur" class="form-label">Total Quantity</label>
+                    <input type="number" class="form-control" name="jumlahBarangRetur" id="jumlahBarangRetur" disabled readonly>
+                </div>
+
+                <!-- New Fields for Bank Details -->
+                <div class="mb-3">
+                    <label for="bankName" class="form-label">Bank Name</label>
+                    <input type="text" class="form-control" name="bankName" id="bankName" disabled required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="accountNumber" class="form-label">Account Number</label>
+                    <input type="text" class="form-control" name="accountNumber" id="accountNumber" placeholder="contoh, 1234567890 John Doe" disabled required>
+                </div>
+
+                <input type="hidden" name="selectedItemsData" id="selectedItemsData">
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success" id="submitReturnRequest" disabled>Kirim</button>
+            </div>
+        </div>
+    </form>
+</div>
 <br>
 @endsection
 
@@ -300,6 +314,19 @@ function addTransactionItems() {
     // Store selected item data as JSON in a hidden input for form submission
     document.getElementById('selectedItemsData').value = JSON.stringify(selectedItemsData);
     document.getElementById('jumlahBarangRetur').value = itemQuantity;
+
+    
+    // Enable the form fields after item selection
+    enableReturnForm();
+}
+function enableReturnForm() {
+    // Enable all form fields and the submit button
+    document.getElementById('fotoBarang').disabled = false;
+    document.getElementById('alasanRetur').disabled = false;
+    document.getElementById('jumlahBarangRetur').disabled = false;
+    document.getElementById('bankName').disabled = false;
+    document.getElementById('accountNumber').disabled = false;
+    document.getElementById('submitReturnRequest').disabled = false;
 }
 </script>
 @endsection

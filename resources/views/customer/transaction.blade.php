@@ -3,6 +3,31 @@
 @section('content')
 <div class="container">
     <h2>Transaksi</h2>
+
+    <!-- Search Form -->
+    <form method="GET" action="{{ url()->current() }}">
+        
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <label for="fromDate">From Date</label>
+                <input type="date" class="form-control" id="fromDate" name="fromDate">
+            </div>
+            <div class="col-md-3">
+                <label for="toDate">To Date</label>
+                <input type="date" class="form-control" id="toDate" name="toDate">
+            </div>
+            <div class="col-md-3">
+                <label for="minAmount">Min Amount</label>
+                <input type="number" class="form-control" id="minAmount" name="minAmount" placeholder="Min Amount">
+            </div>
+            <div class="col-md-3">
+                <label for="maxAmount">Max Amount</label>
+                <input type="number" class="form-control" id="maxAmount" name="maxAmount" placeholder="Max Amount">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
     <table class="table" id="tabelTransaksi">
         <thead>
             <tr>
@@ -25,7 +50,28 @@
                 <td>{{$k->addressSnapshot}}</td>
                 <td>{{ \Carbon\Carbon::parse($k->tanggalPembelian)->format('d-m-Y H:i:s') }}</td> 
                 <td>Rp. {{ number_format($k->totalPembelian, 2, ",", ".") }}</td>
-                @switch($k->status)
+                <td>
+                    @switch($k->status)
+                        @case(1)
+                            <span class="badge bg-warning text-dark">Menunggu pembayaran</span>
+                            @break
+                        @case(2)
+                            <span class="badge bg-warning text-dark">Pesanan sedang diproses</span>
+                            @break
+                        @case(3)
+                            <span class="badge bg-success">Transaksi Berhasil</span>
+                            @break
+                        @case(4)
+                            <span class="badge bg-danger">Pesanan dibatalkan Pembeli.</span>
+                            @break
+                        @case(5)
+                            <span class="badge bg-danger">Pesanan dibatalkan Penjual.</span>
+                            @break
+                        @default
+                            <span class="badge bg-secondary">Unknown</span>
+                    @endswitch
+                </td>
+                {{-- @switch($k->status)
                     @case(1)
                         <td>Menunggu pembayaran.</td>
                         @break
@@ -43,7 +89,7 @@
                         @break
                     @default
                         <td>Unknown order status.</td>
-                @endswitch
+                @endswitch --}}
                 <td>
                     @if ($k->status == 4)
                     <div class="text-center">
@@ -211,15 +257,6 @@
     function setCancelId(id,kode) {
         document.getElementById('transactionToCancel').value = id;
         document.getElementById('cancelConfirmationModalLabel').textContent = "Transaksi " + kode;
-    }
-
-    // function confirmCancel(orderId) {
-    //     if (confirm("Are you sure you want to cancel this order?")) {
-
-    //         window.location.href = "/cancel-order/" + orderId;
-    //     }
-    // }
-
-    
+    }   
 </script>
 @endsection

@@ -77,15 +77,6 @@ class AdminController extends Controller
     }
 
     public function adminPelanggan(){
-        // $customers = DB::table('users')
-        // ->leftJoin('htrans', 'users.id', '=', 'htrans.fkUserID')
-        // ->select('users.id', 'users.name','users.firstName','users.lastName','users.noHP','users.tanggalLahir','users.email', DB::raw('COUNT(htrans.id) as total_completed_transactions'))
-        // ->where('htrans.status', 3)
-        // ->groupBy('users.id','users.name','users.firstName','users.lastName','users.noHP','users.tanggalLahir','users.email')
-        // ->get();
-
-
-
         $customers = User::where('role','!=',1)->get()->map(function ($user) {
             $user->total_completed_transactions = $user->htrans()
                 ->where('status', 3) // Completed transactions
@@ -102,8 +93,10 @@ class AdminController extends Controller
     }
 
     public function adminRetur(){
-
-        return view('admin.manageRetur');
+        $returRequests = Retur::with(['dtrans.product', 'user'])
+        ->get();
+        
+        return view('admin.manageRetur',compact('returRequests'));
     }
 
 
@@ -475,7 +468,33 @@ class AdminController extends Controller
         }
     }
 
-
+    public function confirmRetur(Request $request)
+    {
+        $retur = Retur::find($request->returID);
+        
+        if ($retur) {
+            $retur->status = 1; // Assuming 1 means 'Confirmed'
+            $retur->save();
+    
+            return redirect()->back()->with('success', 'Return request confirmed.');
+        }
+    
+        return redirect()->back()->with('error', 'Return request not found.');
+    }
+    
+    public function rejectRetur(Request $request)
+    {
+        $retur = Retur::find($request->returID);
+        
+        if ($retur) {
+            $retur->status = 2; // Assuming 2 means 'Rejected'
+            $retur->save();
+    
+            return redirect()->back()->with('success', 'Return request rejected.');
+        }
+    
+        return redirect()->back()->with('error', 'Return request not found.');
+    }
 
 
 

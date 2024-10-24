@@ -36,9 +36,18 @@
             <tr>
               <td>{{$k->id}}</td>
               <td>
-                <a target="_blank" href="{{asset('images/uploads/'.$k->fotoPromosi)}}">
+                {{-- <a target="_blank" href="{{asset('images/uploads/'.$k->fotoPromosi)}}">
                   <img class="card-img-top thumbnail" src="{{asset('images/uploads/'.$k->fotoPromosi)}}" alt="Gambar Barang">
+                </a> --}}
+                @if($k->fotoPromosi)
+                <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
+                    data-image="{{ asset('images/uploads/'.$k->fotoPromosi) }}" 
+                    data-title="{{ $k->namaBarang }}">
+                    <img src="{{asset('images/uploads/'.$k->fotoPromosi) }}" alt="Product Image" style="width: 100px; height: auto;">
                 </a>
+                @else
+                    No image available
+                @endif
               </td>
               <td>
                 <a href="{{ url('/product/' . $k->slugBarang ) }}" class="nodecor">{{$k->namaBarang}}</a>
@@ -93,7 +102,20 @@
       </div>
     </div>
 
-    
+    <!-- Single Modal to show product images -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="imageModalLabel">Product Image</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body text-center">
+                  <img id="modalImage" src="" alt="Product Image" class="img-fluid">
+              </div>
+          </div>
+      </div>
+    </div>
         <!-- Modal for Tambah Jumlah -->
         <div class="modal fade" id="tambahJumlahModal" tabindex="-1" aria-labelledby="tambahJumlahModalLabel" aria-hidden="true">
           <div class="modal-dialog">
@@ -176,6 +198,23 @@
         optionBesar.text = satuanBesar + ' ( isi ' + isiSatuan + ' '+satuanKecil+' )'  ;
         satuanSelect.appendChild(optionBesar);
       }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('imageModalLabel');
+
+        document.querySelectorAll('.openImageModal').forEach(item => {
+            item.addEventListener('click', function() {
+                const imageSrc = this.getAttribute('data-image');
+                const imageTitle = this.getAttribute('data-title');
+                
+                // Set the image source and title dynamically
+                modalImage.src = imageSrc;
+                modalTitle.textContent = imageTitle;
+            });
+        });
     });
     // let table = new DataTable('#tableBarang');
 </script>

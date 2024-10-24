@@ -2,10 +2,12 @@
 
 @section('content')
 <div class="container">
-    <button>Manage Adress</button>
-    <div class="col">
+    <a href="{{ url('/address')}}" class="btn btn-info nodecor">Manage Adress</a>
+
+    <h4>Profile</h4>
+    <div class="col mt-2">
         <div class="row"> 
-            <form action="" method="POST">
+            <form action="{{ route('user.update') }}" method="POST">
                 @csrf
                 <div class="row">
                     <div class="col">
@@ -31,7 +33,17 @@
                         </div>
                     </div>
                 </div>
-    
+
+                <div class="form-floating mb-4">
+                    <input id="username" type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ $user->name }}" required autocomplete="username" placeholder="Username">
+                    <label for="username" class="form-label">Username</label>
+                    @error('username')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+
                 <div class="form-floating mb-4">
                     <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{$user->email }}" required autocomplete="email" placeholder="Email">
                     <label for="email" class="form-label">Email</label>
@@ -54,7 +66,7 @@
     
                 <div class="form-floating mb-4">
                     <input id="tanggalLahir" type="date" class="form-control @error('tanggalLahir') is-invalid @enderror" name="tanggalLahir" value="{{$user->tanggalLahir}}" required autocomplete="tanggalLahir" placeholder="tanggalLahir">
-                    <label for="tanggalLahir" class="form-label">Tanggal Lahir</label>
+                    <label for="tanggalLahir" class="form-label">Tanggal Lahir (mm/dd/yyyy)</label>
                     @error('tanggalLahir')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
@@ -68,14 +80,15 @@
             </form>
         </div>
 
+        <h4>Ubah password</h4>
         <div class="row">
-            <form action="{{ route('password.update') }}" method="POST">
+            <form action="{{ route('password.user.update') }}" method="POST">
                 @csrf
                 @method('PUT') <!-- If you're using a PUT request for updates -->
                 
                 <!-- Old Password -->
                 <div class="form-floating mb-4">
-                    <input id="passwordLama" type="password" class="form-control @error('passwordLama') is-invalid @enderror" name="passwordLama" required autocomplete="current-password" placeholder="Old Password">
+                    <input id="passwordLama" type="password" class="form-control @error('passwordLama') is-invalid @enderror" name="passwordLama" required  placeholder="Old Password">
                     <label for="passwordLama" class="form-label">Current Password</label>
                     @error('passwordLama')
                         <span class="invalid-feedback" role="alert">

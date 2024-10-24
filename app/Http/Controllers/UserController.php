@@ -58,43 +58,13 @@ class UserController extends Controller
         return view('customer.adressInput',compact('address'));
     }
 
-    // public function membershipPage(){
-    //     $userId = auth()->user()->id;
-    //     $membership = Membership::where('fkUserID', $userId)->first();
-    //     $totalPoints = 0;
-    //     if ($membership) {
-    //         $memberstatus = Membership::where('fkUserID','=', $userId)->first();
-    //         if($memberstatus){
-    //             $pointRecord = Point::where('memberID', $membership->memberID)
-    //                 ->where(function ($query) {
-    //                     $query->where('tanggalKadaluwarsaPoin', '>', now())
-    //                         ->orWhereNull('tanggalKadaluwarsaPoin');
-    //                 })
-    //                 ->get();
-    //             foreach ($pointRecord as $point) { 
-    //                 if ($point->jumlahPoin < 0) {
-    //                     $totalPoints = 0;
-    //                 } else {
-    //                     $totalPoints += $point->jumlahPoin;
-    //                 }
-    //             }
-    //         }
-
-    //         $pointHistory = Point::where('memberID', $membership->memberID)->get();
-            
-    //         return view('customer.membership.membershipPage', compact('totalPoints', 'pointHistory'));
-    //     } else {
-    //         return view('customer.membership.notMember');
-    //     }
-    // }
-
     public function membershipPage(){
         $userId = auth()->user()->id;
         $membership = Membership::where('fkUserID', $userId)->first();
         $totalPoints = 0;
         $totalTransactionAmount = Htrans::where('fkUserID', $userId)
-            ->where('status', 3) // Assuming status 3 indicates a completed transaction
-            ->sum('totalPembelian'); // Replace 'totalAmount' with the actual column name for transaction amount
+            ->where('status', 3)
+            ->sum('totalPembelian'); 
     
         if ($membership) {
             $memberstatus = Membership::where('fkUserID','=', $userId)->first();
@@ -116,9 +86,8 @@ class UserController extends Controller
     
             $pointHistory = Point::where('memberID', $membership->memberID)->get();
             
-            return view('customer.membership.membershipPage', compact('totalPoints', 'pointHistory', 'totalTransactionAmount'));
+            return view('customer.membership.membershipPage', compact('totalPoints', 'pointHistory', 'totalTransactionAmount','membership'));
         } else {
-            // If not a member, check if the total transaction amount is enough
             if ($totalTransactionAmount >= 500000) {
                 return view('customer.membership.notMember', compact('totalTransactionAmount'))->with('canJoin', true);
             } else {
@@ -127,18 +96,28 @@ class UserController extends Controller
         }
     }
 
-    public function transactionPage(){
-        $userId = Auth::user()->id; 
-        
-        $htransRecords = Htrans::with('dtrans.product')
-        ->where('fkUserID', $userId) 
-        ->orderBy('id', 'desc') 
-        ->get();
+    public function transactionPage(Request $request){
+        $userId = Auth::user()->id;
 
-        if (!$htransRecords) {
-            return response()->json(['error' => 'Transaction not found or unauthorized'], 404);
+        $query = Htrans::with('dtrans.product')->where('fkUserID', $userId);
+
+        if ($request->has('fromDate') && $request->fromDate != '') {
+            $query->where('tanggalPembelian', '>=', $request->fromDate);
         }
-        return view('customer.transaction',compact('htransRecords'));
+        if ($request->has('toDate') && $request->toDate != '') {
+            $query->where('tanggalPembelian', '<=', $request->toDate);
+        }
+
+        if ($request->has('minAmount') && $request->minAmount != '') {
+            $query->where('totalPembelian', '>=', $request->minAmount);
+        }
+        if ($request->has('maxAmount') && $request->maxAmount != '') {
+            $query->where('totalPembelian', '<=', $request->maxAmount);
+        }
+
+        $htransRecords = $query->orderBy('id', 'desc')->get();
+
+        return view('customer.transaction', compact('htransRecords'));
     }
 
     public function wishlistPage(){
@@ -155,10 +134,12 @@ class UserController extends Controller
         return view('customer.profile',compact('user'));
     }
 
-    public function showReturnHistory()
-    {
+    public function showReturnHistory(){
         // $returns = retur::where('fkUserID', auth()->id())->get();
-        $returns = retur::with(['dtrans.product'])->where('fkUserID', auth()->id())->get();
+        $returns = retur::with(['dtrans.product', 'htrans']) // Add htrans relationship
+        ->where('fkUserID', auth()->id())
+        ->get();
+        // $returns = retur::with(['dtrans.product'])->where('fkUserID', auth()->id())->get();
         $transactions = Htrans::with(['dtrans.product'])->where('fkUserID', auth()->id())
         ->where('tanggalPembelian', '>=', now()->subWeeks(2))
         ->get();
@@ -419,13 +400,11 @@ class UserController extends Controller
         $transaction->buktiPembayaran = $webpPath;
         $transaction->status=2;
         $transaction->save();
-    return redirect()->back()->with('success', 'Bukti pembayaran berhasil diupload');
+        return redirect()->back()->with('success', 'Bukti pembayaran berhasil diupload');
     }
 
 
     public function addRetur(Request $request){
-
-         // Validate incoming request data
          $request->validate([
             'salesHeaderID' => 'required|integer',
             'userID' => 'required|integer',
@@ -433,15 +412,8 @@ class UserController extends Controller
             'alasanRetur' => 'required|string|max:500',
             'selectedItemsData' => 'required|string',
         ]);
-        
-
-        // Parse selected item data from the hidden input
         $selectedItem = json_decode($request->selectedItemsData, true);
 
-        // $file = $request->file('fotoBarang');
-        // $webpPath = 'uploads/' . uniqid() . '.webp'; // Define the path for the WebP image
-        // $this->convertToWebP($file, public_path($webpPath));
-    
         $thumbnail = $request->file('fotoBarang');
         $thumbnailName =uniqid() . '.webp';  
         $thumbnailPath = public_path('images/userUpload/' . $thumbnailName);
@@ -458,7 +430,9 @@ class UserController extends Controller
                 'satuanBarangRetur' => $selectedItem['unit'],
                 'hargaPerBarang' => $selectedItem['price'],
                 'subtotal' => $selectedItem['quantity'] * $selectedItem['price'],
-                'status' => 1, 
+                'bankName' => $request->bankName,
+                'accountNumber' => $request->accountNumber,
+                'status' => 0, 
             ]);
             return redirect()->back()->with('success', 'Return request submitted successfully!');
         } catch (\Exception $e) {
@@ -555,6 +529,43 @@ class UserController extends Controller
         }
     }
 
+    public function updateUser(Request $request){
+        $request->validate([
+            'firstName' => 'required|string|max:255',
+            'lastName' => 'nullable|string|max:255',
+            'email' => 'required|email|unique:users,email,' . auth()->user()->id,
+            'username' => 'required|string|unique:users,name,' . auth()->user()->id,
+            'phone_number' => 'required|string|max:15',
+            'tanggalLahir' => 'required|date',
+        ]);
+
+        $user = auth()->user();
+        try {  
+            if ($user instanceof User) {
+                $user->firstName = $request->input('firstName');
+                $user->lastName = $request->input('lastName');
+                $user->email = $request->input('email');
+                $user->name = $request->input('username');
+                $user->noHp = $request->input('phone_number');
+                $user->tanggalLahir = $request->input('tanggalLahir');
+                
+                // Save updated user details
+                $user->save();
+            }
+            alert()->success('success!', 'Berhasil mengubah data');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            Log::error('Checkout error: '.$e->getMessage(), [
+                'stack_trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
+            alert()->error('Error!', 'Something went wrong. Please try again.');
+            return back();
+        }
+       
+
+        
+    }
 
  /**
      * Convert an image to WebP format using GD library.

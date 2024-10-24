@@ -44,7 +44,7 @@
               <td>Rp{{ number_format($htrans->totalPembelian, 2, ',', '.') }}</td>
               
               <td>
-                  @if ($htrans->buktiPembayaran)
+                  {{-- @if ($htrans->buktiPembayaran)
                       <div class="text-center">
                             <img src="{{ asset('storage/' . $htrans->buktiPembayaran) }}" alt="Bukti Pembayaran" class="img-fluid rounded mb-2" style="width: 100px;">
                             <p>
@@ -53,27 +53,38 @@
                         </div>
                   @else
                       No proof
+                  @endif --}}
+                  @if($htrans->buktiPembayaran)
+                    <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
+                        data-image="{{ asset('storage/' . $htrans->buktiPembayaran)}}" 
+                        data-title="{{ $htrans->kodeTrans }}">
+                        <img src="{{asset('storage/' . $htrans->buktiPembayaran) }}" alt="Product Image" style="width: 100px; height: auto;">
+                    </a>
+                  @else
+                      Belum ada
                   @endif
               </td>
-              @switch($htrans->status)
-                  @case(1)
-                      <td>Menunggu pembayaran.</td>
-                      @break
-                  @case(2)
-                      <td>The order is being processed.</td>
-                      @break
-                  @case(3)
-                      <td>The order has been completed.</td>
-                      @break
-                  @case(4)
-                      <td>Pesanan dibatalkan Pembeli.</td>
-                      @break
-                  @case(5)
-                      <td>Pesanan dibatalkan Penjual.</td>
-                      @break
-                  @default
-                      <td>Unknown order status.</td>
-              @endswitch
+              <td>
+                @switch($htrans->status)
+                    @case(1)
+                        <span class="badge bg-warning text-dark">Menunggu pembayaran</span>
+                        @break
+                    @case(2)
+                        <span class="badge bg-warning text-dark">Pesanan sedang diproses</span>
+                        @break
+                    @case(3)
+                        <span class="badge bg-success">Transaksi Berhasil</span>
+                        @break
+                    @case(4)
+                        <span class="badge bg-danger">Pesanan dibatalkan Pembeli.</span>
+                        @break
+                    @case(5)
+                        <span class="badge bg-danger">Pesanan dibatalkan Penjual.</span>
+                        @break
+                    @default
+                        <span class="badge bg-secondary">Unknown</span>
+                @endswitch
+              </td>
               <td>
                   @if ($htrans->status == 2)
                   <a href="#" class="btn btn-info btn-sm my-1" style="width: 120px" 
@@ -99,7 +110,20 @@
           </table>
       </div>
     </div>
-
+    <!-- Single Modal to show product images -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="imageModalLabel">Product Image</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body text-center">
+                  <img id="modalImage" src="" alt="Product Image" class="img-fluid">
+              </div>
+          </div>
+      </div>
+    </div>
     <!-- Modal for Confirming Order Cancellation -->
     <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -265,6 +289,22 @@
         inputTransactionId.value = transactionId;
         document.getElementById('showKode').textContent = kodeTrans;
       });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('imageModalLabel');
+
+        document.querySelectorAll('.openImageModal').forEach(item => {
+            item.addEventListener('click', function() {
+                const imageSrc = this.getAttribute('data-image');
+                const imageTitle = this.getAttribute('data-title');
+                
+                // Set the image source and title dynamically
+                modalImage.src = imageSrc;
+                modalTitle.textContent = "Transkasi "+imageTitle;
+            });
+        });
     });
 </script>
 @endsection

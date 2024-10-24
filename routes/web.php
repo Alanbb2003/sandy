@@ -72,6 +72,7 @@ Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
     Route::get('/get-transaction-items/{id}', [UserController::class, 'getTransactionItems']);
 
     Route::get('/profile',[UserController::class,'profilePage']);
+    Route::post('/profile/update', [UserController::class, 'updateUser'])->name('user.update');
     Route::put('/profile/password/update', [HomeController::class, 'updatePassword'])->name('password.user.update');
 });
 
@@ -102,6 +103,8 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
 
 
         route::get('/retur',[AdminController::class,"adminRetur"])->name('admin.retur');
+        Route::post('/retur/confirm-retur', [AdminController::class, 'confirmRetur'])->name('admin.confirmRetur');
+        Route::post('/retur/reject-retur', [AdminController::class, 'rejectRetur'])->name('admin.rejectRetur');
     });
 });
 
