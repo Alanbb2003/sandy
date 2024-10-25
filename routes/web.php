@@ -100,11 +100,14 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::post('/transaksi/cancel', [AdminController::class, 'cancelTransaction'])->name('admin.cancelOrder');
 
         route::get('/pelanggan',[AdminController::class,"adminPelanggan"])->name('admin.Pelanggan');
-
+        Route::get('/pelanggan/{id}', [AdminController::class, 'pelangganDetail'])->name('admin.customer.detail');
 
         route::get('/retur',[AdminController::class,"adminRetur"])->name('admin.retur');
         Route::post('/retur/confirm-retur', [AdminController::class, 'confirmRetur'])->name('admin.confirmRetur');
         Route::post('/retur/reject-retur', [AdminController::class, 'rejectRetur'])->name('admin.rejectRetur');
+
+
+        Route::get('/membership', [AdminController::class, 'adminMembership'])->name('admin.membership.page');
     });
 });
 

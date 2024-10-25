@@ -11,4 +11,9 @@ class Category extends Model
     public $table = "category";
     protected $primaryKey = "id";
     // protected $keyType = 'bigInt';
+
+    public function products()
+    {
+        return $this->hasMany(Products::class, 'fk_kategori'); // Make sure 'category_id' matches your foreign key in the product table
+    }
 }

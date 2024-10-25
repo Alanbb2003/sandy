@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -61,5 +62,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function htrans()
     {
         return $this->hasMany(Htrans::class, 'fkUserID', 'id');
+    }
+    public function membership()
+    {
+        return $this->hasOne(Membership::class, 'fkUserID', 'id');
+    }
+    public function scopeHasBirthdayToday($query)
+    {
+        $today = Carbon::today()->format('m-d');
+        return $query->whereNotNull('tanggalLahir')
+                    ->whereRaw('DATE_FORMAT(tanggalLahir, "%m-%d") = ?', [$today]);
     }
 }

@@ -19,7 +19,6 @@ class CartController extends Controller
             return response()->json(['message' => 'Product not found.'], 404);
         }
         $jumlahKecil = $product->totalQuantity;
-        //check if isiSatuanBesar is null
         if($product->isiSatuanBesar != null){
             $jumlahBesar = $product->totalQuantity / $product->isiSatuanBesar;
         }   
@@ -52,7 +51,6 @@ class CartController extends Controller
                 ];
             }
         } else {
-            // Jika produk belum ada dalam keranjang, tambahkan sebagai item baru
             $cart[$productId] = [
                 "id"=>$productId .'_' . $unit,
                 "productID"=>$productId,
@@ -64,14 +62,11 @@ class CartController extends Controller
                 "image" => $product->fotoPromosi,
             ];
         }
-
-        // Simpan cart ke session
         session()->put('cart', $cart);
         alert()->success('Success!','Berhasil menambahkan ke keranjang');
         return back();
-
-        // return response()->json(['message' => 'Item added to cart successfully.']);
     }
+
     public function view()
     {
         $cart = session()->get('cart', []);
@@ -87,7 +82,6 @@ class CartController extends Controller
         $product = Products::where('id',$productId)->first();
         echo($product);
         $productsmall = $product->totalQuantity;
-        //check if isiSatuanBesar is null
         if($product->isiSatuanBesar != null){
             $productbig = $product->totalQuantity / $product->isiSatuanBesar;
         } 
@@ -143,18 +137,4 @@ class CartController extends Controller
         toast("Berhasil menghilangkan produk",'info');
         return back();
     }
-
-    // public function update(Request $request)
-    // {
-    //     $productId = $request->input('product_id');
-    //     $quantity = $request->input('quantity');
-
-    //     $cart = session()->get('cart', []);
-    //     if (isset($cart[$productId])) {
-    //         $cart[$productId]['quantity'] = $quantity;
-    //         session()->put('cart', $cart);
-    //     }
-
-    //     return response()->json(['message' => 'Cart updated successfully.']);
-    // }
 }

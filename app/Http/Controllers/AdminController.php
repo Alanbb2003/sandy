@@ -51,8 +51,11 @@ class AdminController extends Controller
     }
     
     public function adminMembership(){
+        $members = Membership::with(['user', 'points'])->get(); // Adjust the relationship as necessary
+        $users = User::where('role', '!=', 1)->get(); // Fetch non-admin users
 
-        return view('admin.manageMembership');
+        
+        return view('admin.manageMembership', compact('members', 'users'));
     }
 
     public function adminTransaksi(){
@@ -77,19 +80,42 @@ class AdminController extends Controller
     }
 
     public function adminPelanggan(){
-        $customers = User::where('role','!=',1)->get()->map(function ($user) {
-            $user->total_completed_transactions = $user->htrans()
-                ->where('status', 3) // Completed transactions
-                ->count();
+        // $customers = User::where('role','!=',1)->get()->map(function ($user) {
+        //     $user->total_completed_transactions = $user->htrans()
+        //         ->where('status', 3) // Completed transactions
+        //         ->count();
     
-            $user->total_transaction_amount = $user->htrans()
-                ->where('status', 3) // Completed transactions
-                ->sum('totalPembelian');
+        //     $user->total_transaction_amount = $user->htrans()
+        //         ->where('status', 3) // Completed transactions
+        //         ->sum('totalPembelian');
     
-            return $user;
-        });;
+        //     return $user;
+        // });;
         
-        return view('admin.managePelanggan',compact('customers'));
+        // return view('admin.managePelanggan',compact('customers'));
+
+        $customers = User::where('role', '!=', 1)
+        ->with(['wishlists.product', 'htrans.dtrans.product.category'])
+        ->get()
+        ->map(function ($user) {
+            // Calculate the most bought category
+            $mostBoughtCategory = $user->htrans->where('status', 3)
+                ->flatMap->dtrans
+                ->groupBy('product.category.id')
+                ->sortByDesc(function ($items) {
+                    return count($items);
+                })
+                ->keys()
+                ->first();
+
+            $user->most_bought_category = $mostBoughtCategory ? Category::find($mostBoughtCategory) : null;
+
+            $user->total_completed_transactions = $user->htrans->where('status', 3)->count();
+            $user->total_transaction_amount = $user->htrans->where('status', 3)->sum('totalPembelian');
+            return $user;
+        });
+        // dd($customers);
+        return view('admin.managePelanggan', compact('customers'));
     }
 
     public function adminRetur(){
@@ -473,13 +499,13 @@ class AdminController extends Controller
         $retur = Retur::find($request->returID);
         
         if ($retur) {
-            $retur->status = 1; // Assuming 1 means 'Confirmed'
+            $retur->status = 1; 
             $retur->save();
-    
-            return redirect()->back()->with('success', 'Return request confirmed.');
+            alert()->success('Success!','Berhasil Konfirmasi retur');
+            return redirect()->back();
         }
-    
-        return redirect()->back()->with('error', 'Return request not found.');
+        alert()->success('error!','Request retur tidak ditemukan');
+        return redirect()->back();
     }
     
     public function rejectRetur(Request $request)
@@ -487,18 +513,18 @@ class AdminController extends Controller
         $retur = Retur::find($request->returID);
         
         if ($retur) {
-            $retur->status = 2; // Assuming 2 means 'Rejected'
+            $retur->status = 2; 
             $retur->save();
-    
-            return redirect()->back()->with('success', 'Return request rejected.');
+            alert()->success('Success!','Berhasil menolak retur');
+            return redirect()->back();
         }
-    
-        return redirect()->back()->with('error', 'Return request not found.');
+        alert()->success('error!','Request retur tidak ditemukan');
+        return redirect()->back();
     }
 
 
 
-        /**
+    /**
      * Convert an image to WebP format using GD library.
      *
      * @param \Illuminate\Http\UploadedFile $file

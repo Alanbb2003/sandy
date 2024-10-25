@@ -22,4 +22,12 @@ class Membership extends Model
     {
         return $this->belongsTo(User::class, 'fkUserID', 'id');
     }
+    public function points()
+    {
+        return $this->hasMany(Point::class, 'memberID', 'memberID')->orderBy('tanggalPemberianPoin', 'desc'); // Adjust the foreign key and local key as necessary
+    }
+    public function getTotalPointsAttribute()
+    {
+        return $this->points()->sum('jumlahPoin');
+    }
 }

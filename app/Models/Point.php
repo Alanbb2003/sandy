@@ -20,4 +20,9 @@ class Point extends Model
         'tanggalKadaluwarsaPoin',
         'saldoPoin'
     ];
+
+    public function membership()
+    {
+        return $this->belongsTo(Membership::class, 'memberID', 'memberID'); // Adjust the foreign key and local key as necessary
+    }
 }

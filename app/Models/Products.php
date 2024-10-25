@@ -18,4 +18,8 @@ class Products extends Model
     public function dtrans() {
         return $this->hasMany(Dtrans::class, 'fkProductID', 'id');
     }
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'fk_kategori'); // Make sure 'category_id' matches your foreign key in the product table
+    }   
 }
