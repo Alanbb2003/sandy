@@ -12,7 +12,6 @@
                 <input type="text" name="searchName" id="searchName" class="form-control" value="{{ request()->searchName }}" placeholder="Enter product name">
             </div>
     
-            <!-- Category and Price Filters in a Row -->
             <div class="row">
                 <!-- Category Filter -->
                 <div class="col-md-4">
@@ -66,32 +65,32 @@
       
         @if ($categoryItems->isNotEmpty())
             <div class="col-12 mt-3">
-                <h3>{{ $category->nama_category }}</h3> <!-- Category name -->
+                <h3>{{ $category->nama_category }}</h3> 
             </div>
             <div class="col-sm-12 p-1 d-flex flex-wrap">
                 @foreach ($categoryItems as $k)
-                <div class="card mb-4 p-1 mx-2 d-flex flex-column" style="width: 180px; min-height: 320px;"> <!-- Set a minimum consistent height -->
+                <div class="card mb-4 p-1 mx-2 d-flex flex-column" style="width: 180px; min-height: 320px;"> 
                     <a target="_blank" href="{{ url('/product/' . $k->slugBarang ) }}">
                       <img class="card-img-top thumbnail" src="{{ asset('images/uploads/' . $k->fotoPromosi) }}" alt="Gambar Barang" loading="lazy">
                     </a>
-                    <div class="card-body d-flex flex-column justify-content-between"> <!-- Flexbox to space out the content -->
+                    <div class="card-body d-flex flex-column justify-content-between"> 
                       <div>
                        <a href="{{ url('/product/' . $k->slugBarang ) }}" class="nodecor"><h5 class="card-title">{{ $k->namaBarang }}</h5></a> 
                         <p class="card-text">Rp.{{ number_format($k->hargaKecil, 0, ',', '.') }}</p>
                       </div>
     
-                      <div class="mt-auto d-flex justify-content-between align-items-center"> <!-- Align buttons next to each other -->
+                      <div class="mt-auto d-flex justify-content-between align-items-center"> 
                         <a href="{{ url('/product/' . $k->slugBarang ) }}" class="btn btn-primary me-2 w-75">Detail</a> 
                         
                         <button class="wishlist-toggle btn btn-outline-secondary w-25" data-product-id="{{ $k->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Wishlist">
                           @if(Auth::check())
                               @if(Auth::user()->wishlists->contains('fkProductID', $k->id))
-                                  <i class="fa-solid fa-heart"></i> <!-- Solid heart if in wishlist -->
+                                  <i class="fa-solid fa-heart"></i> 
                               @else
-                                  <i class="fa-regular fa-heart"></i> <!-- Regular heart if not in wishlist -->
+                                  <i class="fa-regular fa-heart"></i> 
                               @endif
                           @else
-                              <i class="fa-regular fa-heart"></i> <!-- Default regular heart for guests -->
+                              <i class="fa-regular fa-heart"></i> 
                           @endif
                         </button>
                       </div>

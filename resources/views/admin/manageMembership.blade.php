@@ -12,6 +12,7 @@
                 <thead>
                     <tr>
                         <th>Full Name</th>
+                        <th>Tanggal Daftar</th>
                         <th>Total Points</th>
                         <th>Action</th>
                     </tr>
@@ -20,6 +21,7 @@
                     @foreach($members as $member)
                     <tr>
                         <td>{{ $member->user->firstName }} {{ $member->user->lastName }}</td>
+                        <td>{{$member->tanggalDaftar}}</td>
                         <td>{{ number_format($member->total_points, 0, ',', '.') }}</td>
                         <td>
                             <button class="btn btn-info view-points-btn" data-member="{{ json_encode($member) }}" data-bs-toggle="modal" data-bs-target="#pointHistoryModal">View Point History</button>
@@ -41,13 +43,14 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="addMemberForm">
+                <form action="{{ route('admin.membershipAdd') }}" method="POST">
+                    @csrf
                     <div class="mb-3">
                         <label for="userSelect" class="form-label">Select User</label>
-                        <select id="userSelect" class="form-select" required>
+                        <select id="userSelect" class="form-select" name="userSelect" required>
                             <option value="">Choose a user...</option>
                             @foreach($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->firstName }} {{ $user->lastName }}</option>
+                            <option value="{{ $user->id }}">{{ $user->firstName }} {{ $user->lastName }},{{$user->email}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -109,13 +112,6 @@ $(document).ready(function() {
                 </tr>
             `);
         });
-    });
-
-    // Handle add member form submission
-    $('#addMemberForm').on('submit', function(e) {
-        e.preventDefault();
-        // Add your AJAX logic here to submit the form data
-        // Make sure to update the membership table after a successful addition
     });
 });
 </script>

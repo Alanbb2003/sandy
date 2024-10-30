@@ -220,7 +220,7 @@ class UserController extends Controller
         $address->kodePos = $request->editKodePos;
     
         $address->save();
-        alert()->success('Success!', 'Berhasil menambahkan alamat');
+        alert()->success('Success!', 'Berhasil mengubah alamat');
         return redirect()->back();
     }
 
@@ -386,9 +386,8 @@ class UserController extends Controller
                             ->where('fkUserID', auth()->id())
                             ->firstOrFail();
 
-        // Define the path where you want to store the image
         $webpDirectory = storage_path('app/public/bukti'); 
-        $webpFileName = $transaction->kodeTrans . '.' . uniqid() . '.webp'; // KodeTrans.uniqid().webp
+        $webpFileName = $transaction->kodeTrans . '.' . uniqid() . '.webp';
         $webpPath = 'bukti/' . $webpFileName;
         $outputWebPPath = storage_path('app/public/' . $webpPath);
 
@@ -400,7 +399,8 @@ class UserController extends Controller
         $transaction->buktiPembayaran = $webpPath;
         $transaction->status=2;
         $transaction->save();
-        return redirect()->back()->with('success', 'Bukti pembayaran berhasil diupload');
+        toast("Berhasil upload bukti",'info');
+        return redirect()->back();
     }
 
 
@@ -455,8 +455,8 @@ class UserController extends Controller
     
         $order->status = 4; 
         $order->save();
-    
-        return redirect()->back()->with('success', 'Order has been canceled.');
+        toast("Berhasil membatalkan pemesanan",'info');
+        return redirect()->back();
     }
     
     public function toggleWishlist(Request $request){
@@ -480,35 +480,24 @@ class UserController extends Controller
     }
 
     public function AddToMembership(Request $request){
-        // Validate the input
         $request->validate([
             'tanggalLahir' => 'required|date',
         ]);
 
-        // Get the current authenticated user
-        $user = auth()->user(); // Ensure user is authenticated
-        // dd($userID);
-        // $user = $user = User::find($userID->id); 
+        $user = auth()->user(); 
         DB::beginTransaction();
         try {  
             if ($user instanceof User) {
-                // Update the user's birthdate
-
-                // dd('berhasil');
-                $user->tanggalLahir = $request->input('tanggalLahir');
-        
-                // Save the updated user model
+                $user->tanggalLahir = $request->input('tanggalLahir');    
                 if ($user->save()) {
-                    // Check if the user is already a member
                     $membership = Membership::where('fkUserID', $user->id)->first();
         
-                    // If not a member, add to the membership table
                     if (!$membership) {
                         Membership::create([
-                            'fkUserID' => $user->id, // Ensure this is the correct column name
-                            'tanggalDaftar' => now(), // Start date is the current date
-                            'tanggalAkhir' => null, // Membership valid for 1 year
-                            'statusMembership' => 1, // Active membership
+                            'fkUserID' => $user->id, 
+                            'tanggalDaftar' => now(), 
+                            'tanggalAkhir' => null,
+                            'statusMembership' => 1, 
                         ]);
                     }
                     DB::commit();

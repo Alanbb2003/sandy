@@ -221,9 +221,8 @@
         });
 
         $('#detailModal').on('show.bs.modal', function (event) {
-          var button = $(event.relatedTarget); // Button that triggered the modal
-          
-          // Extract data from attributes
+          var button = $(event.relatedTarget); 
+
           var id = button.data('id');
           var namaPembeli = button.data('nama');
           var tanggalPembelian = button.data('tanggal');
@@ -231,16 +230,14 @@
           var transaksiDetails = button.data('transaksi');
           var diskon = button.data('diskon');
 
-          // Set modal title and fields
           var modal = $(this);
           modal.find('#modalNamaPembeli').text(namaPembeli);
           modal.find('#modalTanggalPembelian').text(tanggalPembelian);
           modal.find('#modalTotalTransaksi').text(totalTransaksi);
           modal.find('#modalDiskon').text(diskon);
-          // Clear existing table content
+
           modal.find('#modalTransaksiDetails').empty();
           
-          // Populate transaction details table
           transaksiDetails.forEach(function(item) {
               var productImage = item.product.fotoPromosi ? `<img src="{{ asset('images/uploads') }}/${item.product.fotoPromosi}" style="width: 100px;" alt="${item.product.namaBarang}">` : 'No Image';
               
@@ -262,14 +259,9 @@
     document.addEventListener('DOMContentLoaded', function () {
           var acceptModal = document.getElementById('acceptTransactionModal');
 
-          acceptModal.addEventListener('show.bs.modal', function (event) {
-            // Button that triggered the modal
+          acceptModal.addEventListener('show.bs.modal', function (event) {     
             var button = event.relatedTarget;
-
-            // Extract info from data-* attributes
             var transactionId = button.getAttribute('data-id');
-
-            // Update the form's hidden input value with the transaction ID
             var inputTransactionId = document.getElementById('transactionId');
             inputTransactionId.value = transactionId;
           });
@@ -278,13 +270,9 @@
       var cancelModal = document.getElementById('cancelOrderModal');
 
       cancelModal.addEventListener('show.bs.modal', function (event) {
-        // Button that triggered the modal
         var button = event.relatedTarget;
-
-        // Extract info from data-* attributes
         var transactionId = button.getAttribute('data-id');
         var kodeTrans = button.getAttribute('data-kode');
-        // Update the form's hidden input value with the transaction ID
         var inputTransactionId = document.getElementById('transactionIdcancel');
         inputTransactionId.value = transactionId;
         document.getElementById('showKode').textContent = kodeTrans;
@@ -300,7 +288,6 @@
                 const imageSrc = this.getAttribute('data-image');
                 const imageTitle = this.getAttribute('data-title');
                 
-                // Set the image source and title dynamically
                 modalImage.src = imageSrc;
                 modalTitle.textContent = "Transkasi "+imageTitle;
             });

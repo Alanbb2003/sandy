@@ -75,7 +75,7 @@ class HomeController extends Controller
                     $query->orderBy('product.hargaKecil', 'asc');
                     break;
                 default:
-                    $query->orderBy('product.created_at', 'desc'); // Default to newest
+                    $query->orderBy('product.created_at', 'asc'); // Default to newest
                     break;
             }
         } else {
@@ -133,31 +133,29 @@ class HomeController extends Controller
     }
 
     public function updatePassword(Request $request){
-    // Validate input fields
-    $request->validate([
-        'passwordLama' => 'required',
-        'password' => 'required|string|min:8|confirmed', // Ensure password confirmation
-    ]);
-    $userID = Auth::user()->id;
-    $user = User::find($userID); // Replace with actual ID source
+        $request->validate([
+            'passwordLama' => 'required',
+            'password' => 'required|string|min:8|confirmed', 
+        ]);
+        $userID = Auth::user()->id;
+        $user = User::find($userID); 
 
-    if (!$user) {
-        return redirect()->back()->with('error', 'User not found.');
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
+        }
+
+        // Optional: Verify the old password (remove this if you don't want to validate it)
+        if ($request->has('passwordLama') && !Hash::check($request->passwordLama, $user->password)) {
+            return back()->withErrors(['passwordLama' => 'Current password is incorrect.']);
+        }
+
+        // Update the password
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // Optionally, you can log the user out after password change
+        Auth::logout();
+
+        return redirect()->route('login')->with('success', 'Password successfully changed.');
     }
-
-    // Optional: Verify the old password (remove this if you don't want to validate it)
-    if ($request->has('passwordLama') && !Hash::check($request->passwordLama, $user->password)) {
-        return back()->withErrors(['passwordLama' => 'Current password is incorrect.']);
-    }
-
-    // Update the password
-    $user->password = Hash::make($request->password);
-    $user->save(); // Save changes to the database
-
-    // Optionally, you can log the user out after password change
-    Auth::logout();
-
-    // Redirect back or show success message
-    return redirect()->route('login')->with('success', 'Password successfully changed.');
-}
 }

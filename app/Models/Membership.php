@@ -24,7 +24,7 @@ class Membership extends Model
     }
     public function points()
     {
-        return $this->hasMany(Point::class, 'memberID', 'memberID')->orderBy('tanggalPemberianPoin', 'desc'); // Adjust the foreign key and local key as necessary
+        return $this->hasMany(Point::class, 'memberID', 'memberID')->orderBy('tanggalPemberianPoin', 'desc');
     }
     public function getTotalPointsAttribute()
     {

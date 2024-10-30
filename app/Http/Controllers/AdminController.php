@@ -14,7 +14,9 @@ use App\Models\retur;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -51,17 +53,18 @@ class AdminController extends Controller
     }
     
     public function adminMembership(){
-        $members = Membership::with(['user', 'points'])->get(); // Adjust the relationship as necessary
-        $users = User::where('role', '!=', 1)->get(); // Fetch non-admin users
-
+        $members = Membership::with(['user', 'points'])->get();
+        // $users = User::where('role', '!=', 1)->get(); 
+        $users = User::where('role', '!=', 1)
+        ->whereNotIn('id', Membership::pluck('fkUserID'))
+        ->get();
         
         return view('admin.manageMembership', compact('members', 'users'));
     }
 
     public function adminTransaksi(){
-        // Retrieve all transactions sorted by newest ID with their related details and products
         $transaksi = Htrans::with(['dtrans.product', 'user'])
-                    ->orderBy('id', 'desc') // Order by newest ID
+                    ->orderBy('id', 'desc')
                     ->get();
         
         return view('admin.manageTransaksi', compact('transaksi'));
@@ -80,25 +83,10 @@ class AdminController extends Controller
     }
 
     public function adminPelanggan(){
-        // $customers = User::where('role','!=',1)->get()->map(function ($user) {
-        //     $user->total_completed_transactions = $user->htrans()
-        //         ->where('status', 3) // Completed transactions
-        //         ->count();
-    
-        //     $user->total_transaction_amount = $user->htrans()
-        //         ->where('status', 3) // Completed transactions
-        //         ->sum('totalPembelian');
-    
-        //     return $user;
-        // });;
-        
-        // return view('admin.managePelanggan',compact('customers'));
-
         $customers = User::where('role', '!=', 1)
         ->with(['wishlists.product', 'htrans.dtrans.product.category'])
         ->get()
         ->map(function ($user) {
-            // Calculate the most bought category
             $mostBoughtCategory = $user->htrans->where('status', 3)
                 ->flatMap->dtrans
                 ->groupBy('product.category.id')
@@ -114,7 +102,6 @@ class AdminController extends Controller
             $user->total_transaction_amount = $user->htrans->where('status', 3)->sum('totalPembelian');
             return $user;
         });
-        // dd($customers);
         return view('admin.managePelanggan', compact('customers'));
     }
 
@@ -264,14 +251,10 @@ class AdminController extends Controller
     }
 
     public function toggleStatus($id){
-        // Find the product by ID
-        $barang = Products::find($id);
-    
+        $barang = Products::find($id);  
         if (!$barang) {
             return redirect()->back()->with('error', 'Product not found.');
         }
-    
-        // Toggle the status: if 1 (enabled), change to 2 (disabled) and vice versa
         $barang->Status = $barang->Status == 1 ? 2 : 1;
         $barang->save();
     
@@ -494,8 +477,7 @@ class AdminController extends Controller
         }
     }
 
-    public function confirmRetur(Request $request)
-    {
+    public function confirmRetur(Request $request){
         $retur = Retur::find($request->returID);
         
         if ($retur) {
@@ -522,6 +504,74 @@ class AdminController extends Controller
         return redirect()->back();
     }
 
+    public function adminAddMembership(Request $request){
+        $request->validate([
+            'userSelect' => 'required|exists:users,id',
+            'tanggalLahir'=>'required'
+        ]);
+
+        $userId = $request->input('userSelect');
+        $tanggalLahir = $request->input('tanggalLahir');
+
+        $user = User::find($userId);
+        if ($user) {
+            $user->tanggalLahir = $tanggalLahir;
+            $user->save();
+        }
+
+        Membership::create([
+            'fkUserID' => $userId,
+            'tanggalDaftar' => now(),
+            'tanggalAkhir' => null,
+            'statusMembership' => 1 
+        ]);
+
+        return redirect()->back()->with('success', 'Member added and tanggal lahir updated successfully.');
+    } 
+
+    public function changePassword(Request $request){
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+    
+        $userID = Auth::user()->id;
+        $user = User::find($userID); 
+        if (Hash::check($request->current_password, $user->password)) {
+            $user->password = Hash::make($request->new_password);
+            $user->Save();
+            Auth::logout();
+            alert()->success('success!','Berhasil mengubah password');
+            return redirect()->route('login');
+            // return redirect()->back();
+        } else {
+            alert()->error('error','Current password is incorrect');
+            return back();
+        }     
+    }
+
+    public function addAdmin(Request $request){
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $admin = User::create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => Hash::make($request->input('password')),
+            'role' => 1, 
+        ]);
+
+        if ($admin) {
+            alert()->success('success!','Berhasil menambah admin baru');
+            return redirect()->back();
+        } else {
+            alert()->error('error!','Gagal menambah admin baru');
+            return redirect()->back();
+        }
+    }
 
 
     /**

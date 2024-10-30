@@ -31,5 +31,5 @@
     </tfoot>
 </table>
 <p><strong>Total:</strong> Rp.{{ number_format($htrans->totalPembelian, 2, ",", ".") }}</p>
-<p>silahkan melakukan pembayaran dan mengirim bukti pembayaran melalui menu transaksi di website</p>
+<p>silahkan melakukan pembayaran ke <strong>BRI 71810 1000 129538 Hansen Bulain/strong> dan mengirim bukti pembayaran melalui menu transaksi di website</p>
 <p>Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi kami!</p>

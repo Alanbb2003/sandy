@@ -153,17 +153,14 @@ $(document).ready(function(){
         
         detailButtons.forEach(button => {
             button.addEventListener('click', function () {
-                // Parse customer data from the button's data attribute
                 const customer = JSON.parse(this.getAttribute('data-customer'));
-                
-                // Populate modal fields
+
                 document.getElementById('modal-email').textContent = customer.email;
                 document.getElementById('modal-phone').textContent = customer.noHp;
                 document.getElementById('modal-birthdate').textContent = customer.tanggalLahir ? customer.tanggalLahir : '-';
 
-                // Populate wishlist table
                 const wishlistContainer = document.getElementById('modal-wishlist');
-                wishlistContainer.innerHTML = ''; // Clear previous items
+                wishlistContainer.innerHTML = ''; 
                 customer.wishlists.forEach(item => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -173,7 +170,6 @@ $(document).ready(function(){
                     wishlistContainer.appendChild(row);
                 });
 
-               // Populate transactions table
               const transactionsContainer = document.getElementById('modal-transactions');
               transactionsContainer.innerHTML = ''; 
               customer.htrans.forEach(transaction => {
@@ -222,19 +218,16 @@ $(document).ready(function(){
                   transactionsContainer.appendChild(row);
               });
 
-              // Set most bought category if available
               document.getElementById('modal-most-bought-category').textContent = customer.most_bought_category 
                   ? customer.most_bought_category.nama_category 
                   : 'No transactions';
 
-              // Function to toggle and show dtrans details
               window.toggleDtrans = function(kodeTrans) {
                   const dtransContainer = document.getElementById('dtrans-details');
                   const dtransTableBody = document.getElementById('modal-dtrans');
                 
                   dtransTableBody.innerHTML = '';
 
-                  // Find the transaction by kodeTrans
                   const transaction = customer.htrans.find(t => t.kodeTrans === kodeTrans);
                   
                   if (transaction && transaction.dtrans) {
@@ -250,7 +243,7 @@ $(document).ready(function(){
                       });
                   }
 
-                  // Show or hide dtrans details
+
                   dtransContainer.style.display = dtransTableBody.innerHTML ? 'block' : 'none';
               };
                 

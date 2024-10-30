@@ -80,7 +80,7 @@ class CartController extends Controller
     public function addOne($id){
         $productId = $id;
         $product = Products::where('id',$productId)->first();
-        echo($product);
+        // echo($product);
         $productsmall = $product->totalQuantity;
         if($product->isiSatuanBesar != null){
             $productbig = $product->totalQuantity / $product->isiSatuanBesar;

@@ -81,6 +81,9 @@ Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
 Route::middleware(['auth','user-role:admin'])->group(function(){
     Route::prefix('/dashboard',)->group(function(){
         Route::get("/",[AdminController::class,'adminHome'])->name('homeAdmin');
+        Route::post('/changePasswordAdmin', [AdminController::class, 'changePassword'])->name('admin.changePassword');
+        Route::post('/adminAdd', [AdminController::class, 'addAdmin'])->name('admin.add');
+
         Route::get('/barang',[AdminController::class,'adminManageStock']);
         //add new barang
         Route::get('/barang/new',[AdminController::class,'adminBarangNew']);
@@ -106,8 +109,9 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::post('/retur/confirm-retur', [AdminController::class, 'confirmRetur'])->name('admin.confirmRetur');
         Route::post('/retur/reject-retur', [AdminController::class, 'rejectRetur'])->name('admin.rejectRetur');
 
-
         Route::get('/membership', [AdminController::class, 'adminMembership'])->name('admin.membership.page');
+        Route::post('/membership/add', [AdminController::class, 'adminAddMembership'])->name('admin.membershipAdd');
+        
     });
 });
 
