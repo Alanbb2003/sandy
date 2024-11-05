@@ -46,7 +46,7 @@
                         <a class="nav-link" href="{{url('/dashboard/retur')}}">Retur</a>
                         <a class="nav-link" href="{{url('/dashboard/pelanggan')}}">Pelanggan</a>
                         <a class="nav-link" href="{{url('/dashboard/membership')}}">Membership</a>
-                        <a class="nav-link" href="{{url('/dashboard/membership')}}">Laporan</a>
+                        <a class="nav-link" href="{{url('/dashboard/laporan/stok-barang')}}">Laporan</a>
                     </ul>
         
                     <!-- Right Side Of Navbar -->
@@ -85,6 +85,7 @@
                 </div>
             </div>
         </nav>
+        @yield('nav2')
         <main class="py-4">
             @include('sweetalert::alert')
             @yield('content')

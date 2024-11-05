@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -112,6 +113,9 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::get('/membership', [AdminController::class, 'adminMembership'])->name('admin.membership.page');
         Route::post('/membership/add', [AdminController::class, 'adminAddMembership'])->name('admin.membershipAdd');
         
+        Route::get('/laporan/stok-barang', [ReportController::class, 'laporanStok'])->name('laporan.stokBarang');
+        Route::get('/laporan/StatusPesanan', [ReportController::class, 'laporanStatusPesanan'])->name('laporan.statusPesanan');
+        Route::get('/laporan/Membership', [ReportController::class, 'laporanMembership'])->name('laporan.membership');
     });
 });
 

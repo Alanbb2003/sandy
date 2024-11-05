@@ -83,14 +83,12 @@ text-decoration: underline;
     background-color: #fff; 
     border: 2px solid #007bff;
 }
-
-/* Hide the scrollbar */
 .scroll-container::-webkit-scrollbar {
   display: none;
 }
 .scroll-container {
-  -ms-overflow-style: none; /* For Internet Explorer and Edge */
-  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
 }
 
 .main-carousel-image {
@@ -98,36 +96,42 @@ text-decoration: underline;
   object-fit: contain;
 }
 
-/* Adjust thumbnail size */
+
 .thumbnail-image {
   max-height: 90px;
   object-fit: cover;
 }
 
 .compact-table th, .compact-table td {
-  padding: 0.3rem; /* Reduce padding */
-  font-size: 0.875rem; /* Reduce font size */
+  padding: 0.3rem;
+  font-size: 0.875rem;
 }
 
-/* Reduce modal image size */
 #modalImage {
   max-width: 100%;
   height: auto;
 }
 
-/* Button size */
 .btn-sm {
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
 }
 
-/* Make the table more compact */
 .compact-table {
   margin-bottom: 1.5rem;
 }
 
-/* Adjust image size in table */
 .compact-table img {
   width: 60px;
   height: auto;
+}
+
+.btn-floating {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  border-radius: 50%;
+  padding: 15px 20px;
+  z-index: 1050;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

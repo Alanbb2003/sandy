@@ -35,6 +35,7 @@
                     data-tanggal="{{ \Carbon\Carbon::parse($htrans->tanggalPembelian)->format('d-m-Y H:i:s') }}"
                     data-diskon="Rp{{ number_format($htrans->discount, 2, ',', '.') }}"
                     data-total="Rp{{ number_format($htrans->totalPembelian, 2, ',', '.') }}"
+                    data-alamat="{{$htrans->addressSnapshot}}"
                     data-transaksi='@json($htrans->dtrans)'
                     data-bs-toggle="modal" data-bs-target="#detailModal">
                     Detail
@@ -180,7 +181,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h5>Nama Pembeli: <span id="modalNamaPembeli"></span></h5>
+                    <h4>Nama Pembeli: <span id="modalNamaPembeli"></span></h4>
+                    <strong>Alamat Pengiriman: <span id="modalAlamatPembelian"></span></strong>
                     <p>Tanggal Pembelian: <span id="modalTanggalPembelian"></span></p>
                     <strong>Diskon: <span id="modalDiskon"></span></strong>
                     <h6>Transaction Details:</h6>
@@ -228,10 +230,12 @@
           var tanggalPembelian = button.data('tanggal');
           var totalTransaksi = button.data('total');
           var transaksiDetails = button.data('transaksi');
+          var alamat = button.data('alamat');
           var diskon = button.data('diskon');
 
           var modal = $(this);
           modal.find('#modalNamaPembeli').text(namaPembeli);
+          modal.find('#modalAlamatPembelian').text(alamat);
           modal.find('#modalTanggalPembelian').text(tanggalPembelian);
           modal.find('#modalTotalTransaksi').text(totalTransaksi);
           modal.find('#modalDiskon').text(diskon);
