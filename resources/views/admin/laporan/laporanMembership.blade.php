@@ -1,27 +1,7 @@
 @extends('layouts.appAdmin')
 
 @section('nav2')
-<!-- Secondary Navigation Bar -->
-<nav class="navbar navbar-expand-md navbar-light bg-light" style="padding: 0.25rem 1rem;">
-    <div class="container">
-        <div class="d-flex  w-100">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('laporan.stokBarang')}}">Laporan Stok</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{route('laporan.statusPesanan') }}">Laporan Status Pesanan</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{route('laporan.membership') }}">Laporan Membership</a>
-                </li>
-                <li class="nav-item mx-2">
-                    <a class="nav-link" href="{{ url('/profile') }}">Profile</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+ @include('admin.partialNav')
 @endsection
 @section('content')
 <div class="container my-4">
@@ -56,14 +36,14 @@
                             </div>
 
                             <!-- Membership End Date Range -->
-                            <div class="row-md-4">
+                            {{-- <div class="row-md-4">
                                 <label class="form-label"><strong>End Date</strong></label>
                                 <div class="input-group">
                                     <input type="date" name="tanggalAkhir_min" class="form-control" placeholder="Start Date" value="{{ request('tanggalAkhir_min') }}">
                                     <span class="input-group-text">to</span>
                                     <input type="date" name="tanggalAkhir_max" class="form-control" placeholder="End Date" value="{{ request('tanggalAkhir_max') }}">
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <div class="row-md-4">
                                 <label class="form-label"><strong>Point Balance</strong></label>
@@ -99,8 +79,8 @@
                     <th scope="col">User ID</th>
                     <th scope="col">Membership Start</th>
                     {{-- <th scope="col">Membership End</th> --}}
-                    <th scope="col">Status</th>
                     <th scope="col">Point Balance</th>
+                    <th scope="col">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -108,14 +88,14 @@
                     <tr>
                         <td>{{ $membership->memberID }}</td>
                         <td>{{ $membership->user->firstName}} {{ $membership->user->lastName}}</td>
-                        <td>{{ \Carbon\Carbon::parse($membership->tanggalMulai)->format('d-m-Y') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($membership->tanggalDaftar)->format('d-m-Y') }}</td>
                         {{-- <td>{{ \Carbon\Carbon::parse($membership->tanggalAkhir)->format('d-m-Y') }}</td> --}}
+                        <td>{{ number_format($membership->points->sum('jumlahPoin')) }}</td>
                         <td>
                             <span class="badge {{ $membership->statusMembership ? 'bg-success' : 'bg-danger' }}">
                                 {{ $membership->statusMembership ? 'Active' : 'Inactive' }}
                             </span>
-                        </td>
-                        <td>{{ number_format($membership->points->sum('jumlahPoin')) }}</td>
+                        </td>    
                     </tr>
                 @endforeach
             </tbody>

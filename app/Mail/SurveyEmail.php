@@ -28,7 +28,7 @@ class SurveyEmail extends Mailable
                     ->view('emails.survey')
                     ->with([
                         'transaction' => $this->transaction,
-                        'surveyLink' => url('/survey/' . $this->transaction->id), // Pass survey link
+                        'surveyLink' => url('https://tally.so/r/n9JW2K'), 
                     ]);
     }
     /**

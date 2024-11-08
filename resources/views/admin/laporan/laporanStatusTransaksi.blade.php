@@ -1,27 +1,7 @@
 @extends('layouts.appAdmin')
 
 @section('nav2')
-<!-- Secondary Navigation Bar -->
-<nav class="navbar navbar-expand-md navbar-light bg-light" style="padding: 0.25rem 1rem;">
-    <div class="container">
-        <div class="d-flex  w-100">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('laporan.stokBarang')}}">Laporan Stok</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{route('laporan.statusPesanan') }}">Laporan Status Pesanan</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{route('laporan.membership') }}">Laporan Membership</a>
-                </li>
-                <li class="nav-item mx-2">
-                    <a class="nav-link" href="{{ url('/profile') }}">Profile</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+ @include('admin.partialNav')
 @endsection
 @section('content')
 <div class="container mt-5">
@@ -69,18 +49,24 @@
                             <div class="col-md-6">
                                 <h5>Range Filters</h5>
                                 <div class="row g-3">
-                                    <div class="col-12">
+                                    <div class="row-md-4">
                                         <label class="form-label"><strong>Total Harga</strong></label>
-                                        <div class="row g-2">
-                                            <div class="col">
-                                                <input type="number" name="total_min" class="form-control" placeholder="Min Total" value="{{ request('total_min') }}">
-                                            </div>
-                                            <div class="col">
-                                                <input type="number" name="total_max" class="form-control" placeholder="Max Total" value="{{ request('total_max') }}">
-                                            </div>
+                                        <div class="input-group">
+                                            <input type="number" name="total_min" class="form-control" placeholder="Min Total" value="{{ request('total_min') }}">
+                                            <span class="input-group-text">to</span>
+                                            <input type="number" name="total_max" class="form-control" placeholder="Max Total" value="{{ request('total_max') }}">
                                         </div>
                                     </div>
-                
+
+                                    <div class="row-md-4">
+                                        <label class="form-label"><strong>Tanggal Pemesanan</strong></label>
+                                        <div class="input-group">
+                                            <input type="date" name="salesHeaderDate_start" class="form-control" placeholder="Start Date" value="{{ request('salesHeaderDate_start') }}">
+                                            <span class="input-group-text">to</span>
+                                            <input type="date" name="salesHeaderDate_end" class="form-control" placeholder="End Date" value="{{ request('salesHeaderDate_end') }}">
+                                        </div>
+                                    </div>
+
                                     <div class="col-12">
                                         <label for="status" class="form-label"><strong>Status</strong></label>
                                         <select name="status" id="status" class="form-select">
@@ -111,7 +97,6 @@
         <i class="fa-solid fa-filter"></i>    
     </button>
 
-    <!-- Orders Table -->
     <div class="table-responsive">
         <table class="table table-bordered table-striped align-middle" id="tablePemesanan">
             <thead class="text-center">

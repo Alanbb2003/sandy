@@ -21,20 +21,35 @@ class SendSurveyEmail extends Command
     public function handle()
     {
         // Get transactions completed exactly 7 days ago
-        $oneWeekAgo = Carbon::now()->subWeek();
+        // $oneWeekAgo = Carbon::now()->subWeek();
         
-        $transactions = Htrans::where('status', 3) // Completed
+        // $transactions = Htrans::where('status', 3) 
+        //     ->whereDate('updated_at', $oneWeekAgo->toDateString())
+        //     ->with('user')
+        //     ->get();
+
+        // foreach ($transactions as $transaction) {
+        //     // Send survey email
+        //     Mail::to($transaction->user->email)->send(new SurveyEmail($transaction));
+
+        //     $this->info('Survey email sent to: ' . $transaction->user->email);
+        // }
+        $oneWeekAgo = Carbon::now()->subWeek();
+
+        $transactions = Htrans::where('status', 3)
             ->whereDate('updated_at', $oneWeekAgo->toDateString())
+            ->where('survey_sent', false)  // Only unsent surveys
             ->with('user')
             ->get();
 
-        foreach ($transactions as $transaction) {
-            // Send survey email
-            Mail::to($transaction->user->email)->send(new SurveyEmail($transaction));
-
-            $this->info('Survey email sent to: ' . $transaction->user->email);
-        }
-
+            foreach ($transactions as $transaction) {
+                Mail::to($transaction->user->email)->send(new SurveyEmail($transaction));
+            
+                $transaction->survey_sent = true;
+                $transaction->save(); 
+            
+                $this->info('Survey email sent to: ' . $transaction->user->email);
+            }
         return 0;
     }
 }

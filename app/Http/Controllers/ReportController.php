@@ -7,6 +7,7 @@ use App\Models\Htrans;
 use App\Models\Membership;
 use App\Models\Products;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
@@ -19,14 +20,6 @@ class ReportController extends Controller
         if ($request->filled('name')) {
             $query->where('namaBarang', 'LIKE', '%' . $request->name . '%');
         }
-    
-        // Filter by small unit price range
-        // if ($request->filled('price_min_small')) {
-        //     $query->where('hargaKecil', '>=', $request->price_min_small);
-        // }
-        // if ($request->filled('price_max_small')) {
-        //     $query->where('hargaKecil', '<=', $request->price_max_small);
-        // }
 
         if ($request->filled('price_min_small') && $request->filled('price_max_small')) {
             $query->whereBetween('hargaKecil', [$request->price_min_small, $request->price_max_small]);
@@ -36,14 +29,7 @@ class ReportController extends Controller
             $query->whereDate('hargaKecil', '<=', $request->price_max_small);
         }
 
-        // Filter by large unit price range
-        // if ($request->filled('price_min_big')) {
-        //     $query->where('hargaBesar', '>=', $request->price_min_big);
-        // }
-        // if ($request->filled('price_max_big')) {
-        //     $query->where('hargaBesar', '<=', $request->price_max_big);
-        // }
-    
+
         if ($request->filled('price_min_big') && $request->filled('price_min_big')) {
             $query->whereBetween('hargaBesar', [$request->price_min_big, $request->price_max_big]);
         } elseif ($request->filled('price_min_big')) {
@@ -52,13 +38,6 @@ class ReportController extends Controller
             $query->whereDate('hargaBesar', '<=', $request->price_max_big);
         }
 
-        // Filter by small unit stock range
-        // if ($request->filled('stok_min')) {
-        //     $query->where('totalQuantity', '>=', $request->stok_min);
-        // }
-        // if ($request->filled('stok_max')) {
-        //     $query->where('totalQuantity', '<=', $request->stok_max);
-        // }
         
         if ($request->filled('stok_min') && $request->filled('stok_max')) {
             $query->whereBetween('totalQuantity', [$request->stok_min, $request->stok_max]);
@@ -77,10 +56,6 @@ class ReportController extends Controller
     
         if ($request->filled('category')) {
             $query->where('fk_kategori', $request->category);
-        }
-    
-        if ($request->filled('created_at')) {
-            $query->whereDate('created_at', $request->created_at);
         }
     
         $products = $query->get();
@@ -103,7 +78,10 @@ class ReportController extends Controller
         }
     
         if ($request->filled('salesHeaderDate_start') && $request->filled('salesHeaderDate_end')) {
-            $query->whereBetween('tanggalPembelian', [$request->salesHeaderDate_start, $request->salesHeaderDate_end]);
+            $query->whereBetween(DB::raw('DATE(tanggalPembelian)'), [
+                $request->salesHeaderDate_start, 
+                $request->salesHeaderDate_end
+            ]);
         } elseif ($request->filled('salesHeaderDate_start')) {
             $query->whereDate('tanggalPembelian', '>=', $request->salesHeaderDate_start);
         } elseif ($request->filled('salesHeaderDate_end')) {
@@ -129,41 +107,65 @@ class ReportController extends Controller
     public function laporanMembership(Request $request){
         $query = Membership::with(['user', 'points']);
 
-        // Filter by membership status
         if ($request->filled('statusMembership')) {
             $query->where('statusMembership', $request->statusMembership);
         }
 
-        // Filter by membership start date range
-        if ($request->filled('tanggalMulai_min')) {
-            $query->where('tanggalMulai', '>=', $request->tanggalMulai_min);
-        }
-        if ($request->filled('tanggalMulai_max')) {
-            $query->where('tanggalMulai', '<=', $request->tanggalMulai_max);
-        }
-
-        // Filter by membership end date range
-        if ($request->filled('tanggalAkhir_min')) {
-            $query->where('tanggalAkhir', '>=', $request->tanggalAkhir_min);
-        }
-        if ($request->filled('tanggalAkhir_max')) {
-            $query->where('tanggalAkhir', '<=', $request->tanggalAkhir_max);
+        if ($request->filled('tanggalMulai_min') && $request->filled('tanggalMulai_max')) {
+            $query->whereBetween(DB::raw('DATE(tanggalDaftar)'), [
+                $request->tanggalMulai_min, 
+                $request->tanggalMulai_max
+            ]);
+        } elseif ($request->filled('tanggalMulai_min')) {
+            $query->where('tanggalDaftar', '>=', $request->tanggalMulai_min);
+        } elseif ($request->filled('tanggalMulai_max')) {
+            $query->where('tanggalDaftar', '<=', $request->tanggalMulai_max);
         }
 
-        // Optionally filter by point balance range in `poin` table
-        if ($request->filled('saldo_min')) {
-            $query->whereHas('pointHistory', function ($subQuery) use ($request) {
-                $subQuery->where('saldoPoin', '>=', $request->saldo_min);
-            });
+        if ($request->filled('saldo_min') && $request->filled('saldo_max')) {
+            $query->whereBetween('saldoPoin', [$request->saldo_min, $request->saldo_max]);
+        } elseif ($request->filled('saldo_min')) {
+            $query->where('saldoPoin', '>=', $request->saldo_min);
+        } elseif ($request->filled('saldo_max')) {
+            $query->where('saldoPoin', '<=', $request->saldo_max);
         }
-        if ($request->filled('saldo_max')) {
-            $query->whereHas('pointHistory', function ($subQuery) use ($request) {
-                $subQuery->where('saldoPoin', '<=', $request->saldo_max);
-            });
-        }
-
+        
         $memberships = $query->get();
 
         return view('admin.laporan.laporanMembership', compact('memberships'));
+    }
+
+    public function laporanPendapatan(Request $request){
+            // Retrieve date range from request
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+
+        // If no date range is specified, show all transactions
+        $query = Htrans::where('status', 3); // Assuming '1' indicates a completed transaction
+
+        if ($startDate && $endDate) {
+            $query->whereBetween(DB::raw('DATE(tanggalPembelian)'), [
+                $startDate, 
+                $endDate
+            ]);
+        }   
+
+        // Fetch transactions based on query
+        $transactions = $query->get();
+
+        // Calculate Gross Revenue, Discounts, and Net Revenue
+        $netRevenue = $transactions->sum('totalPembelian');
+        $totalDiscount = $transactions->sum('discount');
+        $grossRevenue = $netRevenue + $totalDiscount;
+
+        // Pass data to the view
+        return view('admin.laporan.laporanPendapatan', [
+            'transactions' => $transactions,
+            'grossRevenue' => $grossRevenue,
+            'totalDiscount' => $totalDiscount,
+            'netRevenue' => $netRevenue,
+            'startDate' => $startDate,
+            'endDate' => $endDate
+        ]);
     }
 }

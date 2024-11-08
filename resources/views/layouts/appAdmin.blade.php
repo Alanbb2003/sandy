@@ -46,7 +46,7 @@
                         <a class="nav-link" href="{{url('/dashboard/retur')}}">Retur</a>
                         <a class="nav-link" href="{{url('/dashboard/pelanggan')}}">Pelanggan</a>
                         <a class="nav-link" href="{{url('/dashboard/membership')}}">Membership</a>
-                        <a class="nav-link" href="{{url('/dashboard/laporan/stok-barang')}}">Laporan</a>
+                        <a class="nav-link" href="{{route('laporan.stokBarang')}}">Laporan</a>
                     </ul>
         
                     <!-- Right Side Of Navbar -->

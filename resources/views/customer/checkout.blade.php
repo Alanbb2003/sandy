@@ -171,6 +171,7 @@
                 </div>
 
                 <div class="col-12">
+                    <p>pembayaran dilakukan ke <strong>BRI 71810 1000 129538 Hansen Bulain</strong> </p>
                     <button type="submit" class="btn btn-primary">Buat Pesanan</button>
                 </div>
             </form>

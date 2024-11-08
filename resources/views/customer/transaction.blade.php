@@ -71,25 +71,6 @@
                             <span class="badge bg-secondary">Unknown</span>
                     @endswitch
                 </td>
-                {{-- @switch($k->status)
-                    @case(1)
-                        <td>Menunggu pembayaran.</td>
-                        @break
-                    @case(2)
-                        <td>Pesanan sedang diproses.</td>
-                        @break
-                    @case(3)
-                        <td>The order has been completed.</td>
-                        @break
-                    @case(4)
-                        <td>Pesanan dibatalkan Pembeli.</td>
-                        @break
-                    @case(5)
-                        <td>Pesanan dibatalkan Penjual.</td>
-                        @break
-                    @default
-                        <td>Unknown order status.</td>
-                @endswitch --}}
                 <td>
                     @if ($k->status == 4)
                     <div class="text-center">
@@ -108,7 +89,7 @@
                                 <div class="card" style="width: 18rem;">
                                     <div class="card-body">
                                         <h5 class="card-title">Upload Bukti Pembayaran</h5>
-                                        <p class="card-text">Silakan unggah bukti pembayaran Anda.</p>
+                                        <p class="card-text">Silakan unggah bukti pembayaran setelah melakukan pembayaran ke <strong>BRI 71810 1000 129538 Hansen Bulain</strong>.</p>
                     
                                         <div class="input-group mb-3">
                                             <input type="file" class="form-control" id="buktiPembayaran" name="buktiPembayaran" accept="image/*" required>

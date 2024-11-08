@@ -9,7 +9,7 @@ class Htrans extends Model
 {
     use HasFactory;
     public $table = "htrans";
-
+    protected $fillable = ['survey_sent'];
     public function items()
     {
         return $this->hasMany(Dtrans::class, 'fkHtransID', 'id');

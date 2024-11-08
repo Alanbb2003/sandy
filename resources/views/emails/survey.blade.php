@@ -4,9 +4,9 @@
     <title>Survey Request</title>
 </head>
 <body>
-    <h1>Thank You for Your Purchase!</h1>
-    <p>We hope you are satisfied with your recent purchase.</p>
-    <p>We would love to hear your feedback! Please take a moment to fill out our survey:</p>
-    <a href="{{ $surveyLink }}">Click here to complete the survey</a>
+    <h1>Terima kasih telah melakukan pembelian dengan kode {{$transaction->kodeTrans}}!</h1>
+    <p>Kami harap anda puas dengan produk yang diterima.</p>
+    <p>Kami akan senang mendengar tanggapan Anda! Mohon luangkan waktu sejenak untuk mengisi survei kami:</p>
+    <a href="{{ $surveyLink }}">{{ $surveyLink }}</a>
 </body>
 </html>

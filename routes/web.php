@@ -113,9 +113,10 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::get('/membership', [AdminController::class, 'adminMembership'])->name('admin.membership.page');
         Route::post('/membership/add', [AdminController::class, 'adminAddMembership'])->name('admin.membershipAdd');
         
-        Route::get('/laporan/stok-barang', [ReportController::class, 'laporanStok'])->name('laporan.stokBarang');
+        Route::get('/laporan/Stok-barang', [ReportController::class, 'laporanStok'])->name('laporan.stokBarang');
         Route::get('/laporan/StatusPesanan', [ReportController::class, 'laporanStatusPesanan'])->name('laporan.statusPesanan');
         Route::get('/laporan/Membership', [ReportController::class, 'laporanMembership'])->name('laporan.membership');
+        Route::get('/laporan/Pendapatan', [ReportController::class, 'laporanPendapatan'])->name('laporan.pendapatan');
     });
 });
 
