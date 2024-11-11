@@ -445,6 +445,7 @@ class AdminController extends Controller
     
         $order->status = 5; 
         $order->save();
+        $order->alasanBatal = $request->input('inputAlasan');
         alert()->success('Success!', 'Transaksi Ditolak');
         return redirect()->back();
     }

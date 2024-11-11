@@ -168,7 +168,7 @@
     </div>
 </div>
 <!-- cancel Confirmation Modal -->
-<div class="modal fade" id="cancelConfirmationModal" tabindex="-1" aria-labelledby="cancelConfirmationModalLabel" aria-hidden="true">
+{{-- <div class="modal fade" id="cancelConfirmationModal" tabindex="-1" aria-labelledby="cancelConfirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -189,8 +189,35 @@
             </div>
         </div>
     </div>
+</div> --}}
+<!-- Modal for Confirming Order Cancellation -->
+<div class="modal fade" id="cancelConfirmationModal" tabindex="-1" aria-labelledby="cancelConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelConfirmationModalLabel">Konfirmasi Pembatalan Pesanan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Apakah Anda yakin ingin membatalkan pesanan dengan Kode <strong id="showKode"></strong>?
+            </div>
+            <div class="modal-footer">
+                <form action="{{ url('/transaction/cancel') }}" method="POST" class="w-100" id="cancelTransactionForm">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="inputAlasan" class="form-label">Alasan Pembatalan</label>
+                        <textarea class="form-control @error('inputAlasan') is-invalid @enderror" id="inputAlasan" name="inputAlasan" rows="5" placeholder="Enter your text here..." required></textarea>
+                    </div>
+                    <input type="hidden" id="transactionToCancel" name="transactionID">
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-danger">Ya, Batalkan Pesanan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
-
 
 @endsection
 
@@ -237,6 +264,7 @@
 
     function setCancelId(id,kode) {
         document.getElementById('transactionToCancel').value = id;
+        document.getElementById('showKode').textContent = kode;
         document.getElementById('cancelConfirmationModalLabel').textContent = "Transaksi " + kode;
     }   
 </script>

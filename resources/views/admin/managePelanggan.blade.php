@@ -94,7 +94,7 @@
                       </tr>
                   </thead>
                   <tbody id="modal-wishlist">
-                      <!-- Wishlist items will be injected here -->
+                      
                   </tbody>
               </table>
 
@@ -106,11 +106,11 @@
                           <th>Date</th>
                           <th>Total Amount</th>
                           <th>Status</th>
-                          <th>Action</th> <!-- New column for the action button -->
+                          <th>Action</th> 
                       </tr>
                   </thead>
                   <tbody id="modal-transactions">
-                      <!-- Transaction items will be injected here -->
+                      
                   </tbody>
               </table>
 

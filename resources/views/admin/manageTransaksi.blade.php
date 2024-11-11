@@ -128,25 +128,31 @@
     <!-- Modal for Confirming Order Cancellation -->
     <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
       <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="cancelOrderModalLabel">Konfirmasi Pembatalan Pesanan</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="cancelOrderModalLabel">Konfirmasi Pembatalan Pesanan</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  Apakah Anda yakin ingin membatalkan pesanan dengan Kode <strong id="showKode"></strong>?
+              </div>
+              <div class="modal-footer">
+                  <form action="{{ route('admin.cancelOrder') }}" method="POST" class="w-100">
+                      @csrf
+                      <div class="mb-3">
+                          <label for="inputAlasan" class="form-label">Alasan Pembatalan</label>
+                          <textarea class="form-control @error('inputAlasan') is-invalid @enderror" id="inputAlasan" name="inputAlasan" rows="5" placeholder="Enter your text here..." required></textarea>
+                      </div>
+                      <input type="hidden" name="transaction_idcancel" id="transactionIdcancel">
+                      <div class="d-flex justify-content-end">
+                          <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Tutup</button>
+                          <button type="submit" class="btn btn-danger">Ya, Batalkan Pesanan</button>
+                      </div>
+                  </form>
+              </div>
           </div>
-          <div class="modal-body">
-            Apakah Anda yakin ingin membatalkan pesanan dengan Kode <strong id="showKode"></strong>?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-            <form action="{{ route('admin.cancelOrder') }}" method="POST">
-              @csrf
-              <input type="hidden" name="transaction_idcancel" id="transactionIdcancel">
-              <button type="submit" class="btn btn-danger">Ya, Batalkan Pesanan</button>
-            </form>
-          </div>
-        </div>
       </div>
-    </div>
+  </div>
 
     <!-- Accept Confirmation Modal -->
     <div class="modal fade" id="acceptTransactionModal" tabindex="-1" aria-labelledby="acceptModalLabel" aria-hidden="true">

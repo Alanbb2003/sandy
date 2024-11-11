@@ -454,6 +454,7 @@ class UserController extends Controller
         }
     
         $order->status = 4; 
+        $order->alasanBatal = $request->input('inputAlasan');
         $order->save();
         toast("Berhasil membatalkan pemesanan",'info');
         return redirect()->back();
