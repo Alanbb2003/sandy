@@ -31,14 +31,10 @@ class CartController extends Controller
         }
 
         $cart = session()->get('cart', []);
-        // Cek apakah produk sudah ada dalam keranjang dengan unit yang sama
         if (isset($cart[$productId])) {
-            // Jika unit yang ditambahkan sama dengan unit yang sudah ada dalam keranjang
             if ($cart[$productId]['unitHidden'] == $unit) {
-                // Tambahkan jumlah sesuai dengan yang diminta
                 $cart[$productId]['quantity'] += $quantity;
             } else {
-                // Jika unit berbeda, tambahkan produk baru dengan key unik berdasarkan unit
                 $cart[$productId . '_' . $unit] = [
                     "id"=>$productId. '_' . $unit,
                     "productID"=>$productId,
@@ -86,7 +82,6 @@ class CartController extends Controller
             $productbig = $product->totalQuantity / $product->isiSatuanBesar;
         } 
         
-        //get cart session
         $cart = session()->get('cart', []);
         if (isset($cart[$productId])) {
             if($cart[$productId]['unitHidden'] == "small"){

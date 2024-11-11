@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -530,6 +531,18 @@ class UserController extends Controller
         ]);
 
         $user = auth()->user();
+        $oldProfilePicture = $user->profilePicture;
+        if ($request->hasFile('profilePicture')) {
+            $webpFileName =  uniqid() . '.webp';
+            $webpPath = 'photos/' . $webpFileName;
+            $outputWebPPath = storage_path('app/public/' . $webpPath);
+            $this->convertToWebP($request->file('profilePicture'), $outputWebPPath);
+            $profile_picture = $webpPath;
+            if ($oldProfilePicture) {
+                Storage::delete('public/photos/' . $oldProfilePicture);
+            }
+        }
+
         try {  
             if ($user instanceof User) {
                 $user->firstName = $request->input('firstName');
@@ -538,8 +551,7 @@ class UserController extends Controller
                 $user->name = $request->input('username');
                 $user->noHp = $request->input('phone_number');
                 $user->tanggalLahir = $request->input('tanggalLahir');
-                
-                // Save updated user details
+                $user->picture = $profile_picture;
                 $user->save();
             }
             alert()->success('success!', 'Berhasil mengubah data');

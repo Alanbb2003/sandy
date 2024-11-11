@@ -196,10 +196,6 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
-                        {{-- <form class="d-flex" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Search</button>
-                        </form> --}}
                         <a href="{{ url('/membership') }}" class="mt-2 mx-1">
                             <i class="fa-regular fa-address-card"> Membership</i>
                         </a>
@@ -242,11 +238,18 @@
                         <a href="{{ url('/wishlist') }}" class="btn mt-2 mx-1 position-relative">
                             <i class="fa-solid fa-heart"></i>
                         </a>
-                            <li class="nav-item mt-2 mx-1 position-relative">
-                                <a class="nav-link" href="#" role="button">
-                                    {{ Auth::user()->name }}
-                                </a>
-                            </li>
+                        <li class="nav-item mt-2 mx-1 position-relative d-flex align-items-center">
+                            <a class="nav-link d-flex align-items-center" href="{{ url('/profile') }}" role="button">
+                                @if(Auth::user()->picture)
+                                    <!-- Display profile picture if available -->
+                                    <img src="{{ asset('storage/' .Auth::user()->picture) }}" alt="Profile Picture" class="rounded-circle me-2" width="30" height="30">
+                                @else
+                                    <!-- Display default icon if no profile picture -->
+                                    <i class="fa-solid fa-user fa-lg me-2"></i>
+                                @endif
+                                {{ Auth::user()->name }}
+                            </a>
+                        </li>
                             <li class="nav-item mt-2 mx-1 position-relative">
                                 <a class="nav-link" href="{{ route('logout') }}"
                                    onclick="event.preventDefault();

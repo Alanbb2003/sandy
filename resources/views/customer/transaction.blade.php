@@ -74,11 +74,13 @@
                 <td>
                     @if ($k->status == 4)
                     <div class="text-center">
-                        <p>Pesanan dibatalkan oleh pembeli.</p>
+                        <p>Pesanan dibatalkan oleh pembeli dengan alasan:</p>
+                        <p>{{$k->alasanBatal}}</p>
                     </div>
                     @elseif ($k->status == 5)
                     <div class="text-center">
-                        <p>Pesanan dibatalkan oleh penjual.</p>
+                        <p>Pesanan dibatalkan oleh penjual dengan alasan:</p>
+                        <p>{{$k->alasanBatal}}</p>
                     </div>
                     @else
                         @if ($k->buktiPembayaran == null)
