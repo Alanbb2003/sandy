@@ -1,111 +1,5 @@
-{{-- @extends('layouts.app') --}}
 @extends('layouts.appAdmin')
 @section('content')
-
-<!-- Button trigger modal -->
-{{-- <button type="button" data-bs-toggle="modal" data-bs-target="#addKategori" class="btn btn-primary mx-5">Tambah Kategori</button>
-<br>
-<div class="modal fade bd-example-modal-lg" id="addKategori" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editModalLabel">Tambah Kategori</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-        </button>
-      </div>
-      <div class="modal-body">
-        <form class="form-inline" action="{{url('/dashboard/barang/new/kategori') }}" method="POST">
-           @csrf
-           <div class="row">
-              <div class="col-md-5 form" style="height: 30px;">
-                <input type="text" class="form-control  @error('inputkategori') is-invalid @enderror" id="inputkategori" name="inputkategori" placeholder="nama kategori">
-              </div>
-              @error('inputkategori')
-              <div class="alert alert-danger">{{ $message }}</div>
-              @enderror
-              <div class="col">
-                <button type="submit" class="btn btn-primary">Insert</button>
-              </div>
-           </div>
-        </form>
-      </div>
-      <div class="container">
-        <table class="display responsive nowrap" id="tableKategori" style="width:100%">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>kategori</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-          @foreach ($kategori as $k)
-          <tr>
-            <td>{{$k->id}}</td>
-            <td>{{$k->nama_category}}</td>
-            <td style="width: 100px;">
-              <div class="container d-flex-inline flex-row"></div>
-              <a href="#" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
-              <a href="#" data-method="DELETE" data-confirm="Yakin hapus kategori ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
-            </td>
-          </tr>
-          @endforeach
-          </tbody>
-        </table>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div> --}}
-{{-- <div class="container">
-  <div class="col">
-    <div class="my-3 card">
-        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#insertKategori" aria-expanded="false" aria-controls="insertKategori">
-          Kategori
-        </button>
-    </div>
-    <div class="collapse p-2 my-2" id="insertKategori" style="background-color:rgb(233, 237, 242)">
-      <form class="row g-3 mb-2" action="{{url('/dashboard/barang/new/kategori') }}" method="POST">
-        @csrf
-        <div class="col-md-5 form-floating">
-          <input type="text" class="form-control  @error('inputkategori') is-invalid @enderror" id="inputkategori" name="inputkategori" placeholder="nama kategori">
-          <label for="inputNamaKategori">Nama kategori</label>
-        </div>
-        @error('inputkategori')
-        <div class="alert alert-danger">{{ $message }}</div>
-        @enderror
-        <div class="col-md-3 mt-4">
-          <button type="submit" class="btn btn-primary">Insert</button>
-        </div>
-      </form>
-
-      <table class="display responsive nowrap" id="tableKategori" style="width:100%">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>kategori</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-        @foreach ($kategori as $k)
-        <tr>
-          <td>{{$k->id}}</td>
-          <td>{{$k->nama_category}}</td>
-          <td style="width: 100px;">
-            <div class="container d-flex-inline flex-row"></div>
-            <a href="#" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a>
-            <a href="#" data-method="DELETE" data-confirm="Yakin hapus kategori ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a>
-          </td>
-        </tr>
-        @endforeach
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div> --}}
 
 <!-- Button trigger kategori -->
 <div class="mx-5 my-3 card">
@@ -114,7 +8,6 @@
   </button>
 </div>
 <br>
-<!-- Button trigger kategori -->
 <!-- ISI PAGE -->
 <div class="container d-flex" id="insertBarang" style="background-color:rgb(233, 237, 242)">
 
@@ -150,8 +43,6 @@
       <td style="width: 100px;">
         <div class="container d-flex-inline flex-row"></div>
         <button type="button" class="btn btn-success edit-item" id="edit-item" data-item-id="{{$k->id}}"><i class="fa-regular fa-pen-to-square"></i></button>
-        {{-- <a href="#" class="btn btn-primary"><i class="fa-regular fa-pen-to-square"></i></a> --}}
-        {{-- <a href="#" data-method="DELETE" data-confirm="Yakin hapus kategori ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a> --}}
       </td>
     </tr>
     @endforeach
@@ -160,7 +51,7 @@
 </div>
 
 <!-- ISI Data barang -->
-    <form class="row g-3" action="{{url('/dashboard/barang/new') }}" method="POST" enctype="multipart/form-data">
+    {{-- <form class="row g-3" action="{{url('/dashboard/barang/new') }}" method="POST" enctype="multipart/form-data">
       @csrf
       <div class="mb-3 d-flex">
         <img id="frame" src="" width="100px" height="100px" class="img-thumbnail mt-1"/>
@@ -190,7 +81,6 @@
       <div class="col-md-3">
         <label for="" class="form-label">Kategori</label>
         <select class="form-select" id="inputKategori" name="inputKategori" placeholder="select Kategori..." >
-          {{-- <option value="">Select None...</option> --}}
           @foreach ($kategori as $k)
             <option value="{{$k->id}}">{{$k->nama_category}}</option>
           @endforeach
@@ -199,7 +89,6 @@
 
       <div class="col-md-4">
         <label for="inputDeskripsi" class="form-label">Deskripsi</label>
-        {{-- <input type="text" class="form-control  @error('inputDeskripsi') is-invalid @enderror" id="inputDeskripsi" name="inputDeskripsi"> --}}
         <textarea class="form-control  @error('inputDeskripsi') is-invalid @enderror" id="inputDeskripsi" name="inputDeskripsi" rows="5" cols="40" placeholder="Enter your text here..." required></textarea>
       </div>
       @error('inputDeskripsi')
@@ -257,6 +146,117 @@
      
       <div class="col-12">
         <button type="submit" class="btn btn-primary">Tambah</button>
+      </div>
+    </form> --}}
+    <form class="container py-3" action="{{url('/dashboard/barang/new') }}" method="POST" enctype="multipart/form-data">
+      @csrf
+      <div class="row mb-3 align-items-center">
+          <div class="col-auto">
+              <img id="frame" src="" width="100" height="100" class="img-thumbnail mt-1" alt="Product Preview"/>
+          </div>
+          <div class="col">
+              <label for="thumbnail" class="form-label">Foto produk promosi</label>
+              <input class="form-control" type="file" id="thumbnail" name="thumbnail">
+              @error('thumbnail')
+              <div class="alert alert-danger">{{ $message }}</div>
+              @enderror
+          </div>
+      </div>
+  
+      <div class="mb-3">
+          <label for="images" class="form-label">Gambar Tambahan</label>
+          <input class="form-control" type="file" id="images" name="images[]" multiple>
+          <div id="frames"></div>
+      </div>
+  
+      <div class="row g-3">
+          <div class="col-md-6">
+              <label for="inputNamaBarang" class="form-label">Nama Barang</label>
+              <input type="text" class="form-control @error('inputNamaBarang') is-invalid @enderror" id="inputNamaBarang" name="inputNamaBarang">
+              @error('inputNamaBarang')
+              <div class="alert alert-danger">{{ $message }}</div>
+              @enderror
+          </div>
+  
+          <div class="col-md-6">
+              <label for="inputKategori" class="form-label">Kategori</label>
+              <select class="form-select" id="inputKategori" name="inputKategori">
+                  <option selected disabled>Pilih Kategori...</option>
+                  @foreach ($kategori as $k)
+                      <option value="{{$k->id}}">{{$k->nama_category}}</option>
+                  @endforeach
+              </select>
+          </div>
+      </div>
+  
+      <div class="mb-3 mt-3">
+          <label for="inputDeskripsi" class="form-label">Deskripsi</label>
+          <textarea class="form-control @error('inputDeskripsi') is-invalid @enderror" id="inputDeskripsi" name="inputDeskripsi" rows="3" placeholder="Enter your text here..." required></textarea>
+          @error('inputDeskripsi')
+          <div class="alert alert-danger">{{ $message }}</div>
+          @enderror
+      </div>
+  
+      <div class="row g-3">
+          <div class="col-md-3">
+              <label for="inputJumlahKecil" class="form-label">Jumlah Terkecil</label>
+              <input type="number" min="0" class="form-control @error('inputJumlahKecil') is-invalid @enderror" id="inputJumlahKecil" name="inputJumlahKecil">
+              @error('inputJumlahKecil')
+              <div class="alert alert-danger">{{ $message }}</div>
+              @enderror
+          </div>
+  
+          <div class="col-md-3">
+              <label for="inputSatuanKecil" class="form-label">Satuan Terkecil</label>
+              <input type="text" class="form-control @error('inputSatuanKecil') is-invalid @enderror" id="inputSatuanKecil" name="inputSatuanKecil">
+              @error('inputSatuanKecil')
+              <div class="alert alert-danger">{{ $message }}</div>
+              @enderror
+          </div>
+  
+          <div class="col-md-3">
+              <label for="inputJumlahBesar" class="form-label">Jumlah Terbesar Dalam</label>
+              <input type="number" min="0" class="form-control @error('inputJumlahBesar') is-invalid @enderror" id="inputJumlahBesar" name="inputJumlahBesar">
+              @error('inputJumlahBesar')
+              <div class="alert alert-danger">{{ $message }}</div>
+              @enderror
+          </div>
+  
+          <div class="col-md-3">
+              <label for="inputSatuanBesar" class="form-label">Satuan Terbesar</label>
+              <input type="text" class="form-control @error('inputSatuanBesar') is-invalid @enderror" id="inputSatuanBesar" name="inputSatuanBesar">
+              @error('inputSatuanBesar')
+              <div class="alert alert-danger">{{ $message }}</div>
+              @enderror
+          </div>
+      </div>
+  
+      <div class="row g-3 mt-3">
+          <div class="col-md-3">
+              <label for="inputHargaKecil" class="form-label">Harga Jumlah Terkecil</label>
+              <div class="input-group">
+                  <span class="input-group-text">Rp.</span>
+                  <input type="number" min="0" class="form-control @error('inputHargaKecil') is-invalid @enderror" id="inputHargaKecil" name="inputHargaKecil">
+              </div>
+              @error('inputHargaKecil')
+              <div class="alert alert-danger">{{ $message }}</div>
+              @enderror
+          </div>
+  
+          <div class="col-md-3">
+              <label for="inputHargaBesar" class="form-label">Harga Jumlah Terbesar</label>
+              <div class="input-group">
+                  <span class="input-group-text">Rp.</span>
+                  <input type="number" min="0" class="form-control @error('inputHargaBesar') is-invalid @enderror" id="inputHargaBesar" name="inputHargaBesar">
+              </div>
+              @error('inputHargaBesar')
+              <div class="alert alert-danger">{{ $message }}</div>
+              @enderror
+          </div>
+      </div>
+  
+      <div class="d-flex justify-content-end mt-4">
+          <button type="submit" class="btn btn-primary">Tambah</button>
       </div>
     </form>
   </div>
@@ -322,8 +322,6 @@ $(document).ready(function(){
 
     // Clear previous error messages
     $('#editCategoryForm .error-message').remove();
-
-    // Open the modal
     $('#editCategoryModal').modal('show');
     // var myModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
     // myModal.show();

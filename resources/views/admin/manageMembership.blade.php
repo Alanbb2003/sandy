@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h2>Membership Management</h2>
+    <h4>Manage Membership</h4>
     <div class="card">
         <div class="card-header">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">Add New Member</button>

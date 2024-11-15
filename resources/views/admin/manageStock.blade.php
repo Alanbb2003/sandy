@@ -17,7 +17,7 @@
 
 <div class="row justify-content-center">
     <div class="col-md-11">
-      <div class="card-header"> <b>Manage Barang</b> </div>
+      <div class="card-header"> <h4>Manage Barang</h4> </div>
       <div class="card-body">
           <table class="display responsive nowrap" id="tableBarang" style="width:100%">
             <thead>

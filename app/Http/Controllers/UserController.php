@@ -136,11 +136,9 @@ class UserController extends Controller
     }
 
     public function showReturnHistory(){
-        // $returns = retur::where('fkUserID', auth()->id())->get();
-        $returns = retur::with(['dtrans.product', 'htrans']) // Add htrans relationship
+        $returns = retur::with(['dtrans.product', 'htrans']) 
         ->where('fkUserID', auth()->id())
         ->get();
-        // $returns = retur::with(['dtrans.product'])->where('fkUserID', auth()->id())->get();
         $transactions = Htrans::with(['dtrans.product'])->where('fkUserID', auth()->id())
         ->where('tanggalPembelian', '>=', now()->subWeeks(2))
         ->get();
@@ -296,6 +294,7 @@ class UserController extends Controller
             $htrans->tanggalPembelian = $today;
             $htrans->totalPembelian = $totalPayment;
             $htrans->discount = 0; 
+            $htrans->status = 0;
             $htrans->save();
 
             $currentPoints = 0;
@@ -412,14 +411,22 @@ class UserController extends Controller
             'fotoBarang' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'alasanRetur' => 'required|string|max:500',
             'selectedItemsData' => 'required|string',
+            'bankName' => 'nullable|string|max:100',
+            'accountNumber' => 'nullable|string|max:50', 
         ]);
         $selectedItem = json_decode($request->selectedItemsData, true);
 
-        $thumbnail = $request->file('fotoBarang');
-        $thumbnailName =uniqid() . '.webp';  
-        $thumbnailPath = public_path('images/userUpload/' . $thumbnailName);
-        $this->convertToWebP($thumbnail, $thumbnailPath);
+        if (!$selectedItem || !isset($selectedItem['id'], $selectedItem['quantity'], $selectedItem['price'], $selectedItem['unit'])) {
+            alert()->error('Error!', 'Data barang error. Silahkan coba lagi.');
+            return back();
+        }
+       
         try{
+            $thumbnail = $request->file('fotoBarang');
+            $thumbnailName =uniqid() . '.webp';  
+            $thumbnailPath = public_path('images/userUpload/' . $thumbnailName);
+            $this->convertToWebP($thumbnail, $thumbnailPath);
+
             Retur::create([
                 'fkHeaderID' => $request->salesHeaderID,
                 'fkUserID' => $request->userID,
@@ -431,11 +438,13 @@ class UserController extends Controller
                 'satuanBarangRetur' => $selectedItem['unit'],
                 'hargaPerBarang' => $selectedItem['price'],
                 'subtotal' => $selectedItem['quantity'] * $selectedItem['price'],
+                'TipePengembalian'=>$request->returnType,
                 'bankName' => $request->bankName,
                 'accountNumber' => $request->accountNumber,
                 'status' => 0, 
             ]);
-            return redirect()->back()->with('success', 'Return request submitted successfully!');
+            alert()->success('Success!', 'Berhasil mengajukan retur.');
+            return redirect()->back();
         } catch (\Exception $e) {
             alert()->error('Error!', 'Something went wrong. Please try again.');
             return back();
@@ -532,6 +541,7 @@ class UserController extends Controller
 
         $user = auth()->user();
         $oldProfilePicture = $user->profilePicture;
+        $profile_picture = null;
         if ($request->hasFile('profilePicture')) {
             $webpFileName =  uniqid() . '.webp';
             $webpPath = 'photos/' . $webpFileName;

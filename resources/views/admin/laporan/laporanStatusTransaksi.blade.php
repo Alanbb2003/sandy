@@ -21,10 +21,10 @@
                             
                             <!-- General Filters Column -->
                             <div class="col-md-6">
-                                <h5>General Filters</h5>
+                                {{-- <h5>General Filters</h5> --}}
                                 <div class="row g-3">
                                     <div class="col-12">
-                                        <label for="kodeTrans" class="form-label"><strong>Kode Trans</strong></label>
+                                        <label for="kodeTrans" class="form-label"><strong>Kode Transaksi</strong></label>
                                         <input type="text" name="kodeTrans" id="kodeTrans" class="form-control" placeholder="Kode Trans" value="{{ request('kodeTrans') }}">
                                     </div>
                                     
@@ -47,7 +47,7 @@
                     
                             <!-- Range Filters Column -->
                             <div class="col-md-6">
-                                <h5>Range Filters</h5>
+                                {{-- <h5>Range Filters</h5> --}}
                                 <div class="row g-3">
                                     <div class="row-md-4">
                                         <label class="form-label"><strong>Total Harga</strong></label>
@@ -71,6 +71,7 @@
                                         <label for="status" class="form-label"><strong>Status</strong></label>
                                         <select name="status" id="status" class="form-select">
                                             <option value="">All Statuses</option>
+                                            <option value="0" {{ request('status') == 1 ? 'selected' : '' }}>Menunggu konfirmasi</option>
                                             <option value="1" {{ request('status') == 1 ? 'selected' : '' }}>Menunggu pembayaran</option>
                                             <option value="2" {{ request('status') == 2 ? 'selected' : '' }}>Pesanan sedang diproses</option>
                                             <option value="3" {{ request('status') == 3 ? 'selected' : '' }}>Transaksi Berhasil</option>
@@ -121,6 +122,9 @@
                     <td>Rp {{ number_format($order->totalPembelian, 0, ',', '.') }}</td>
                     <td class="text-center">
                         @switch($order->status)
+                            @case(0)
+                                <span class="badge bg-warning text-dark">Menunggu konfirmasi</span>
+                                @break
                             @case(1)
                                 <span class="badge bg-warning text-dark">Menunggu pembayaran</span>
                                 @break

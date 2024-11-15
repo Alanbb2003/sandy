@@ -21,6 +21,7 @@ class retur extends Model
         'satuanBarangRetur',
         'hargaPerBarang',
         'subtotal',
+        'TipePengembalian',
         'bankName',
         'accountNumber',
         'status'

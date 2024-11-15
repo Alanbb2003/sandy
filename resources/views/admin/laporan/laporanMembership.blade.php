@@ -16,14 +16,14 @@
                 <div class="modal-body">
                     <form method="GET" action="{{ url()->current() }}" class="p-3">
                         <div class="row g-3 mb-3">
-                            <div class="col-md-4">
+                            {{-- <div class="col-md-4">
                                 <label for="statusMembership" class="form-label"><strong>Membership Status</strong></label>
                                 <select name="statusMembership" id="statusMembership" class="form-select">
                                     <option value="">All Statuses</option>
                                     <option value="1" {{ request('statusMembership') == '1' ? 'selected' : '' }}>Active</option>
                                     <option value="0" {{ request('statusMembership') == '0' ? 'selected' : '' }}>Inactive</option>
                                 </select>
-                            </div>
+                            </div> --}}
 
                            
                             <div class="row-md-4">
@@ -70,17 +70,17 @@
     <button type="button" class="btn btn-primary btn-floating" data-bs-toggle="modal" data-bs-target="#filterModal">
         <i class="fa-solid fa-filter"></i>    
     </button>
-
+    <h2 class="text-center">Laporan Membership</h2>
     <div class="table-responsive mt-4">
         <table class="table table-bordered table-striped align-middle" id="tableMembership">
             <thead class="text-center">
                 <tr>
                     <th scope="col">Member ID</th>
-                    <th scope="col">User ID</th>
-                    <th scope="col">Membership Start</th>
+                    <th scope="col">Nama Lengkap</th>
+                    <th scope="col">Tanggal Daftar Membership</th>
                     {{-- <th scope="col">Membership End</th> --}}
-                    <th scope="col">Point Balance</th>
-                    <th scope="col">Status</th>
+                    <th scope="col">Poin Yang Dimiliki</th>
+                    {{-- <th scope="col">Status</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -91,11 +91,11 @@
                         <td>{{ \Carbon\Carbon::parse($membership->tanggalDaftar)->format('d-m-Y') }}</td>
                         {{-- <td>{{ \Carbon\Carbon::parse($membership->tanggalAkhir)->format('d-m-Y') }}</td> --}}
                         <td>{{ number_format($membership->points->sum('jumlahPoin')) }}</td>
-                        <td>
+                        {{-- <td>
                             <span class="badge {{ $membership->statusMembership ? 'bg-success' : 'bg-danger' }}">
                                 {{ $membership->statusMembership ? 'Active' : 'Inactive' }}
                             </span>
-                        </td>    
+                        </td>     --}}
                     </tr>
                 @endforeach
             </tbody>

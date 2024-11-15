@@ -82,7 +82,8 @@ Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
 Route::middleware(['auth','user-role:admin'])->group(function(){
     Route::prefix('/dashboard',)->group(function(){
         Route::get("/",[AdminController::class,'adminHome'])->name('homeAdmin');
-        Route::post('/changePasswordAdmin', [AdminController::class, 'changePassword'])->name('admin.changePassword');
+        Route::post('/changePasswordAdmin', [AdminController::class, 'changePassword'])->name('admin.changePassword');        
+        Route::post('/changeEmailAdmin', [AdminController::class, 'changeEmail'])->name('admin.changeEmail');        
         Route::post('/adminAdd', [AdminController::class, 'addAdmin'])->name('admin.add');
 
         Route::get('/barang',[AdminController::class,'adminManageStock']);
@@ -91,7 +92,7 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::get('/barang/new/get-categories',[AdminController::class,'getCategories']);
         Route::post('/barang/new',[AdminController::class,'addBarang']);    
         Route::post('/barang/new/kategori',[AdminController::class,"addKategori"]);
-        Route::post('/barang/new/kategori/update-category', [AdminController::class, 'updateKategori']);
+        Route::post('/barang/new/kategori/update-category', [AdminController::class, 'updateKategori'])->name('category.update');
         //edit barang
         Route::get('/barang/edit/{id}', [AdminController::class, 'showeditBarang'])->name('dashboard.barang.edit');
         Route::put('/barang/edit/{id}', [AdminController::class, 'updateBarang']);
@@ -105,6 +106,7 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
 
         route::get('/pelanggan',[AdminController::class,"adminPelanggan"])->name('admin.Pelanggan');
         Route::get('/pelanggan/{id}', [AdminController::class, 'pelangganDetail'])->name('admin.customer.detail');
+        Route::post('/pelanggan/email', [AdminController::class, 'sendCustomEmail'])->name('admin.customer.email');
 
         route::get('/retur',[AdminController::class,"adminRetur"])->name('admin.retur');
         Route::post('/retur/confirm-retur', [AdminController::class, 'confirmRetur'])->name('admin.confirmRetur');
@@ -117,6 +119,8 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::get('/laporan/StatusPesanan', [ReportController::class, 'laporanStatusPesanan'])->name('laporan.statusPesanan');
         Route::get('/laporan/Membership', [ReportController::class, 'laporanMembership'])->name('laporan.membership');
         Route::get('/laporan/Pendapatan', [ReportController::class, 'laporanPendapatan'])->name('laporan.pendapatan');
+        Route::get('/laporan/Penjualan', [ReportController::class, 'laporanPenjualan'])->name('laporan.penjualan');
+        Route::get('/laporan/Aktif', [ReportController::class, 'laporanAktif'])->name('laporan.Aktif');
     });
 });
 

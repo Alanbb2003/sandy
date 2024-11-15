@@ -3,8 +3,6 @@
 @section('content')
 <div class="container">
     <h2>Transaksi</h2>
-
-    <!-- Search Form -->
     <form method="GET" action="{{ url()->current() }}">
         
         <div class="row mb-4">
@@ -52,6 +50,9 @@
                 <td>Rp. {{ number_format($k->totalPembelian, 2, ",", ".") }}</td>
                 <td>
                     @switch($k->status)
+                        @case(0)
+                            <span class="badge bg-warning text-dark">Menunggu Konfirmasi</span>
+                            @break
                         @case(1)
                             <span class="badge bg-warning text-dark">Menunggu pembayaran</span>
                             @break
@@ -74,16 +75,16 @@
                 <td>
                     @if ($k->status == 4)
                     <div class="text-center">
-                        <p>Pesanan dibatalkan oleh pembeli dengan alasan:</p>
+                        <span class="badge bg-danger">Pesanan dibatalkan oleh pembeli dengan alasan:</span>
                         <p>{{$k->alasanBatal}}</p>
                     </div>
                     @elseif ($k->status == 5)
                     <div class="text-center">
-                        <p>Pesanan dibatalkan oleh penjual dengan alasan:</p>
+                        <span class="badge bg-danger">Pesanan dibatalkan oleh penjual dengan alasan:</span>
                         <p>{{$k->alasanBatal}}</p>
                     </div>
                     @else
-                        @if ($k->buktiPembayaran == null)
+                        @if ($k->status == 1)
                             <form method="POST" action="{{ route('uploadBuktiPembayaran') }}" enctype="multipart/form-data">
                                 @csrf
                                 <input type="hidden" name="transaction_id" value="{{ $k->id }}">
@@ -101,13 +102,17 @@
                                     </div>
                                 </div>
                             </form>
+                        @elseif ($k->status == 0)
+                        <div class="text-center">
+                            <span class="badge bg-warning text-dark">Menunggu Konfirmasi</span>
+                        </div>
                         @else
-                            <!-- Show uploaded image and provide the image URL -->
                             <div class="text-center">
-                                <img src="{{ asset('storage/' . $k->buktiPembayaran) }}" alt="Bukti Pembayaran" class="img-fluid rounded mb-2" style="width: 100px;">
-                                <p>
-                                    <a href="{{ asset('storage/' . $k->buktiPembayaran) }}" target="_blank" class="btn btn-link">Lihat Bukti Pembayaran</a>
-                                </p>
+                                <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
+                                data-image="{{ asset('storage/' . $k->buktiPembayaran)}}" 
+                                data-title="{{ $k->kodeTrans }}">
+                                <img src="{{asset('storage/' . $k->buktiPembayaran) }}" alt="Product Image" style="width: 100px; height: auto;">
+                                </a>
                             </div>
                         @endif
                     @endif
@@ -123,8 +128,12 @@
                             Detail
                     </button>
 
-                    @if ($k->status == 1)
-                    <button class="btn btn-danger btn-sm" style="width: 120px" data-bs-toggle="modal" data-bs-target="#cancelConfirmationModal" onclick="setCancelId({{ $k->id }}, '{{ $k->kodeTrans }}')">
+                    @if ($k->status == 1 || $k->status == 0)
+                    <button class="btn btn-danger btn-sm cancelbtn" style= "width: 120px;" 
+                    data-bs-toggle="modal"
+                    data-bs-target="#cancelConfirmationModal" 
+                    data-id = "{{$k->id}}"
+                    data-kode = "{{$k->kodeTrans}}">
                         Batalkan
                     </button>
                     @endif
@@ -135,7 +144,22 @@
         </tbody>
     </table>
 </div>
-<!-- Modal for Transaction Details -->
+
+<!--Modal gambar bukti -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Product Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Product Image" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- modal detail -->
 <div class="modal fade" id="transactionDetailModal" tabindex="-1" aria-labelledby="transactionDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -146,7 +170,6 @@
             <div class="modal-body">
                 <p><strong>Tanggal Pembelian:</strong> <span id="modalTanggalPembelian"></span></p>
                 <p><strong>Pemotongan Harga:</strong> <span id="modalDiskon"></span></p>
-                <!-- Transaction Details Table -->
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -169,30 +192,8 @@
         </div>
     </div>
 </div>
-<!-- cancel Confirmation Modal -->
-{{-- <div class="modal fade" id="cancelConfirmationModal" tabindex="-1" aria-labelledby="cancelConfirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="cancelConfirmationModalLabel">Confirm cancelation</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Yakin membatalkan transaksi?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
-     
-                <form id="cancelTransactionForm" method="POST" action="{{ url('/transaction/cancel') }}">
-                    @csrf
-                    <input type="hidden" id="transactionToCancel" name="transactionID">
-                    <button type="submit" class="btn btn-danger">Yakin</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div> --}}
-<!-- Modal for Confirming Order Cancellation -->
+
+<!-- Modal pembatalan -->
 <div class="modal fade" id="cancelConfirmationModal" tabindex="-1" aria-labelledby="cancelConfirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -224,17 +225,16 @@
 @endsection
 
 @section('script')
-<script>
+{{-- <script>
     $(document).ready(function(){
         $('#tabelTransaksi').dataTable({
             responsive: true,
-            order: [[0, 'desc']] // Order by the 4th column (Tanggal Pembelian)
+            order: [[0, 'desc']] 
         });
 
         $('#transactionDetailModal').on('show.bs.modal', function (event) {
           var button = $(event.relatedTarget); 
 
-          // Extract data from attributes
           var id = button.data('id');
           var tanggalPembelian = button.data('tanggal');
           var totalTransaksi = button.data('total');
@@ -269,5 +269,88 @@
         document.getElementById('showKode').textContent = kode;
         document.getElementById('cancelConfirmationModalLabel').textContent = "Transaksi " + kode;
     }   
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('imageModalLabel');
+
+        document.querySelectorAll('.openImageModal').forEach(item => {
+            item.addEventListener('click', function() {
+                const imageSrc = this.getAttribute('data-image');
+                const imageTitle = this.getAttribute('data-title');
+                
+                modalImage.src = imageSrc;
+                modalTitle.textContent = "Transkasi "+imageTitle;
+            });
+        });
+    });
+</script> --}}
+<script>
+    $(document).ready(function() {
+    $('#tabelTransaksi').dataTable({
+        responsive: true,
+        order: [[0, 'desc']]
+    });
+
+    // detail transaksi
+    $('#transactionDetailModal').on('show.bs.modal', function(event) {
+        const button = $(event.relatedTarget);
+        const id = button.data('id');
+        const tanggalPembelian = button.data('tanggal');
+        const totalTransaksi = button.data('total');
+        const transaksiDetails = button.data('transaksi');
+        const diskon = button.data('diskon');
+
+        const modal = $(this);
+        modal.find('#modalTanggalPembelian').text(tanggalPembelian);
+        modal.find('#modalTotalTransaksi').text(totalTransaksi);
+        modal.find('#modalDiskon').text(diskon);
+        modal.find('#transactionDetailsBody').empty();
+        
+        transaksiDetails.forEach(function(item) {
+            const productImage = item.product.fotoPromosi 
+                ? `<img src="{{ asset('images/uploads') }}/${item.product.fotoPromosi}" style="width: 100px;" alt="${item.product.namaBarang}">`
+                : 'No Image';
+
+            const row = `
+                <tr>
+                    <td>${productImage}</td>
+                    <td>${item.product.namaBarang}</td>
+                    <td>${item.totalJumlah} ${item.satuanBarang}</td>
+                    <td>Rp${parseFloat(item.hargaSatuan).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
+                    <td>Rp${(item.hargaSatuan * item.totalJumlah).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
+                </tr>
+            `;
+            modal.find('#transactionDetailsBody').append(row);
+        });
+    });
+
+    // modal pembatalan 
+    document.querySelectorAll('.cancelbtn').forEach(button => {
+        button.addEventListener('click', function () {
+            const id = this.getAttribute('data-id');
+            const kode = this.getAttribute('data-kode');
+            document.getElementById('transactionToCancel').value = id;
+            document.getElementById('showKode').textContent = kode;
+            document.getElementById('cancelConfirmationModalLabel').textContent = "Transaksi " + kode;
+        });
+    });
+
+    // modal gambar bukti
+    const imageModal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('imageModalLabel');
+
+    document.querySelectorAll('.openImageModal').forEach(item => {
+        item.addEventListener('click', function() {
+            const imageSrc = this.getAttribute('data-image');
+            const imageTitle = this.getAttribute('data-title');
+            
+            modalImage.src = imageSrc;
+            modalTitle.textContent = "Transaksi " + imageTitle;
+        });
+    });
+});
 </script>
 @endsection

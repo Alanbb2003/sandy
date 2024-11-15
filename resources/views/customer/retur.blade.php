@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Your Return History</h2>
+    <h2 class="text-center mb-4">Retur</h2>
 
     <div class="text-end mb-3">
         <button class="btn btn-outline-warning fw-bold px-4 py-2" data-bs-toggle="modal" data-bs-target="#returnPolicyModal">
@@ -11,15 +11,18 @@
     </div>
     
     <div class="table-responsive">
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered table-hover" id="tabelRetur">
             <thead class="table-primary text-center">
                 <tr>
-                    <th>Return ID</th>
+                    <th>ID</th>
                     <th>Transaction ID</th>
-                    <th>Product Name</th>
-                    <th>Quantity</th>
-                    <th>Return Date</th>
-                    <th>Reason</th>
+                    <th>Foto</th>
+                    <th>Nama Produk</th>
+                    <th>Jumlah</th>
+                    <th>Total Harga</th>
+                    <th>Tanggal Pengajuan</th>
+                    <th>Tipe</th>
+                    <th>Alasan</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -28,9 +31,22 @@
                     <tr>
                         <td>{{ $retur->id }}</td>
                         <td>{{ $retur->htrans->kodeTrans ?? 'Transaction Not Found' }}</td>
+                        <td>
+                            <div class="text-center">
+                                <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
+                                data-image="{{asset('images/userUpload/' . $retur->fotoBarang)}}" 
+                                data-title="{{ $retur->id }}">
+                                <img src="{{asset('images/userUpload/' . $retur->fotoBarang) }}" alt="Product Image" style="width: 100px; height: auto;">
+                                </a>
+                            </div>
+                        </td>
                         <td>{{ $retur->dtrans->product->namaBarang ?? 'Product Not Found' }}</td>
                         <td>{{ $retur->jumlahBarangRetur }} {{ $retur->satuanBarangRetur }}</td>
+                        <td>
+                            {{ 'Rp. ' . number_format($retur->subTotal, 0, ',', '.') }}
+                        </td>
                         <td>{{ $retur->tanggalRetur }}</td>
+                        <td>{{$retur->TipePengembalian}}</td>
                         <td>{{ $retur->alasanRetur }}</td>
                         <td>
                             @switch($retur->status)
@@ -63,18 +79,56 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title" id="returnPolicyModalLabel">Return Policy</h5>
+                    <h5 class="modal-title" id="returnPolicyModalLabel">Kebijakan Pengembalian</h5>
                     <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Return Policy Overview:</strong></p>
-                    <p>Our return policy allows you to return products within 30 days of purchase if they meet the conditions outlined below. Please ensure that:</p>
-                    <ul>
-                        <li>The product is unused and in its original packaging.</li>
-                        <li>The return request includes a valid reason and proof of purchase.</li>
-                        <li>The return is requested within the specified timeframe.</li>
-                    </ul>
-                    <p>For more details, contact our customer service.</p>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Alasan Pengembalian</th>
+                                <th>Refund</th>
+                                <th>Pengembalian</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Produk rusak/cacat</td>
+                                <td><i class="fa-solid fa-check"></i></td>
+                                <td><i class="fa-solid fa-check"></i></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Spesifikasi produk tidak sesuai yang tertera di website</td>
+                                <td><i class="fa-solid fa-check"></i></td>
+                                <td><i class="fa-solid fa-check"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+    
+                    <p><strong>Ketentuan:</strong></p>
+                    <p>
+                        Rusak adalah cacat produksi dan kerusakan akibat pengiriman dan bukan dari kesalahan penggunaan. 
+                        Ketentuan tidak sesuai website adalah produk yang diterima berbeda dengan spesifikasi produk di website 
+                        seperti jumlah, tipe, dan ukuran produk. Ketika pengajuan retur diterima, pelanggan dapat melakukan 
+                        pengiriman barang yang biaya pengiriman ditanggung sendiri, dan pengiriman ulang akan dilakukan toko 
+                        tanpa dikenakan biaya pengiriman.
+                    </p>
+                    
+                    <p><strong>Metode dan Jangka Waktu Pengembalian Uang:</strong></p>
+                    <p>
+                        Pengembalian uang akan dilakukan melalui transfer bank. Pelanggan akan diminta untuk menginformasikan 
+                        nomor rekening bank yang digunakan melalui form di halaman retur. Jangka waktu pengembalian uang maksimal 
+                        14 hari kerja setelah pelanggan mendapat email konfirmasi.
+                    </p>
+
+                    <p><strong>Konfirmasi Terhadap Pengajuan Pengembalian Produk:</strong></p>
+                    <p>
+                        Keputusan dan Kebijakan mengenai persetujuan pengembalian produk dan/atau pengembalian uang bersifat mutlak dan tidak dapat diganggu gugat.
+                        Toko berhak untuk menolak pengajuan pengembalian Anda jika pengajuan pengembalian tidak sesuai dengan syarat dan ketentuan yang berlaku.
+                    </p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -162,29 +216,42 @@
                         <div id="selectedItemsList" class="mb-3"></div>
 
                         <div class="mb-3">
-                            <label for="fotoBarang" class="form-label">Upload Product Photo</label>
+                            <label for="fotoBarang" class="form-label">Upload Foto Barang</label>
                             <input type="file" class="form-control" id="fotoBarang" name="fotoBarang" disabled required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="alasanRetur" class="form-label">Reason for Return</label>
+                            <label for="alasanRetur" class="form-label">Alasan Pengembalian</label>
                             <textarea class="form-control" name="alasanRetur" id="alasanRetur" rows="3" disabled required></textarea>
                         </div>
 
                         <div class="mb-3">
-                            <label for="jumlahBarangRetur" class="form-label">Total Quantity</label>
+                            <label for="jumlahBarangRetur" class="form-label">Total Jumlah barang</label>
                             <input type="number" class="form-control" name="jumlahBarangRetur" id="jumlahBarangRetur" disabled readonly>
                         </div>
 
-                        <!-- Bank Details -->
-                        <h6 class="text-muted">Bank Details</h6>
+                        <!-- Return Type -->
                         <div class="mb-3">
-                            <label for="bankName" class="form-label">Bank Name</label>
-                            <input type="text" class="form-control" name="bankName" id="bankName" disabled required>
+                            <label for="returnType" class="form-label">Return Type</label>
+                            <select class="form-select" name="returnType" id="returnType" required>
+                                <option value="" disabled selected>Select Return Type</option>
+                                <option value="Pengembalian Dana">Pengembalian Dana</option>
+                                <option value="Pengembalian Barang">Pengembalian Barang</option>
+                            </select>
                         </div>
-                        <div class="mb-3">
-                            <label for="accountNumber" class="form-label">Account Number</label>
-                            <input type="text" class="form-control" name="accountNumber" id="accountNumber" placeholder="e.g., 1234567890 John Doe" disabled required>
+
+                        <!-- Bank Details -->
+                        <div id="bankDetails">
+                            <h6 class="text-muted">Bank Details</h6>
+                            <div class="mb-3">
+                                <label for="bankName" class="form-label">Nama Bank</label>
+                                <input type="text" class="form-control" name="bankName" id="bankName">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="accountNumber" class="form-label">Nomor Akun</label>
+                                <input type="text" class="form-control" name="accountNumber" id="accountNumber" placeholder="e.g., 1234567890 John Doe">
+                            </div>
                         </div>
 
                         <input type="hidden" name="selectedItemsData" id="selectedItemsData">
@@ -196,174 +263,238 @@
             </div>
         </form>
     </div>
+
+    <!--Modal gambar bukti -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">Product Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" alt="Product Image" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
 @section('script')
-
 {{-- <script>
+     $(document).ready(function() {
+        $('#tabelRetur').dataTable({
+            responsive: true,
+            order: [[0, 'desc']]
+        });
+    }); 
     function loadTransactionItems(transactionId) {
-    $.ajax({
-        url: '/get-transaction-items/' + transactionId,
-        method: 'GET',
-        success: function(data) {
-            if (data.dtrans.length === 0) {
-                alert('No items found for this transaction.');
-                return;
+        $.ajax({
+            url: '/get-transaction-items/' + transactionId,
+            method: 'GET',
+            success: function(data) {
+                if (data.dtrans.length === 0) {
+                    alert('tidak ada barang dalam transaksi.');
+                    return;
+                }
+
+                document.getElementById('salesHeaderID').value = transactionId;
+
+                if (data.discount) {
+                    $('#discountAmount').text(`Rp. ${parseFloat(data.discount).toLocaleString('id-ID', {minimumFractionDigits: 2})}`);
+                    $('#transactionDiscount').show();
+                } else {
+                    $('#transactionDiscount').hide();
+                }
+
+                let itemsHtml = '';
+                data.dtrans.forEach(function(item) {
+                    itemsHtml += `
+                        <tr>
+                            <td>${item.product.namaBarang}</td>
+                            <td>${item.totalJumlah} ${item.satuanBarang}</td>
+                            <td>Rp.${parseFloat(item.hargaSatuan).toLocaleString('id-ID', {minimumFractionDigits: 2})}</td>
+                            <td>
+                                <input type="radio" name="itemRadio" class="item-radio" value="${item.id}" data-item-name="${item.product.namaBarang}" data-quantity="${item.totalJumlah}" data-price="${item.hargaSatuan}" data-unit="${item.satuanBarang}">
+                                <input type="number" class="form-control item-quantity" min="1" max="${item.totalJumlah}" value="1" style="width: 80px; display:inline;" disabled />
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                $('#transactionItemsBody').html(itemsHtml);
+                $('#transactionItems').show();
+                $('#confirmSelection').show();
+            },
+            error: function() {
+                alert('Failed to load transaction items. Please try again.');
             }
-
-            // Display discount (if available)
-            if (data.discount) {
-                $('#discountAmount').text(`Rp. ${parseFloat(data.discount).toLocaleString('id-ID', {minimumFractionDigits: 2})}`);
-                $('#transactionDiscount').show();
-            } else {
-                $('#transactionDiscount').hide();
-            }
-
-            // Display transaction items
-            let itemsHtml = '';
-            data.dtrans.forEach(function(item) {
-                itemsHtml += `
-                    <tr>
-                        <td>${item.product.namaBarang}</td>
-                        <td>${item.totalJumlah} ${item.satuanBarang}</td>
-                        <td>Rp.${parseFloat(item.hargaSatuan).toLocaleString('id-ID', {minimumFractionDigits: 2})}</td>
-                        <td>
-                            <input type="checkbox" class="item-checkbox" value="${item.id}" data-item-name="${item.product.namaBarang}" data-quantity="${item.totalJumlah}" data-price="${item.hargaSatuan}" data-unit="${item.satuanBarang}">
-                            <input type="number" class="form-control item-quantity" min="1" max="${item.totalJumlah}" value="1" style="width: 80px; display:inline;" />
-                        </td>
-                    </tr>
-                `;
-            });
-
-            $('#transactionItemsBody').html(itemsHtml);
-            $('#transactionItems').show();
-            $('#confirmSelection').show();
-        },
-        error: function() {
-            alert('Failed to load transaction items. Please try again.');
-        }
-    });
+        });
     }
+    $(document).on('change', '.item-radio', function() {
+        $('.item-quantity').prop('disabled', true);
+        $(this).closest('tr').find('.item-quantity').prop('disabled', false); 
+    });
 
-function addTransactionItems() {
-    const selectedItems = document.querySelectorAll('.item-checkbox:checked');
-    let selectedItemsHtml = '';
-    let selectedItemsList = []; // To hold selected item details
+    function addTransactionItems() {
+        const selectedItem = document.querySelector('.item-radio:checked');
+        if (!selectedItem) {
+            alert('Please select an item.');
+            return;
+        }
 
-    selectedItems.forEach(function(item) {
-        const itemRow = item.closest('tr'); // Find the parent row of the checkbox
-        const itemQuantity = itemRow.querySelector('.item-quantity').value; // Get the quantity input in the same row
-        const itemName = item.getAttribute('data-item-name');
-        const itemUnit = item.getAttribute('data-unit');
-        const itemPrice = item.getAttribute('data-price');
+        const itemRow = selectedItem.closest('tr');
+        const itemQuantity = itemRow.querySelector('.item-quantity').value;
+        const itemName = selectedItem.getAttribute('data-item-name');
+        const itemUnit = selectedItem.getAttribute('data-unit');
+        const itemPrice = parseFloat(selectedItem.getAttribute('data-price'));
 
-        selectedItemsHtml += `<p>${itemName} (Jumlah: ${itemQuantity} ${itemUnit}) (Harga per barang: ${itemPrice})</p>`;
-        selectedItemsList.push({
-            id: item.value,
+        // Format item details
+        const formattedPrice = itemPrice.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+        const selectedItemsHtml = `<p>${itemName} (Jumlah: ${itemQuantity} ${itemUnit}) (Harga per barang: ${formattedPrice})</p>`;
+
+        // Update selected item details in the form
+        document.getElementById('selectedItemsList').innerHTML = selectedItemsHtml;
+        document.getElementById('selectedItemsData').value = JSON.stringify({
+            id: selectedItem.value,
             name: itemName,
             quantity: itemQuantity,
-            price: itemPrice
+            price: itemPrice,
+            unit: itemUnit
+        });
+        document.getElementById('jumlahBarangRetur').value = itemQuantity;
+
+        // Enable the return form and show the modal
+        enableReturnForm();
+        const returnRequestModal = new bootstrap.Modal(document.getElementById('returnRequestModal'), { keyboard: false });
+        returnRequestModal.show();
+    }
+
+    // Enable the Return Form Inputs
+    function enableReturnForm() {
+        document.getElementById('fotoBarang').disabled = false;
+        document.getElementById('alasanRetur').disabled = false;
+        document.getElementById('jumlahBarangRetur').disabled = false;
+        document.getElementById('submitReturnRequest').disabled = false;
+    }
+
+    const imageModal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('imageModalLabel');
+
+    document.querySelectorAll('.openImageModal').forEach(item => {
+        item.addEventListener('click', function() {
+            const imageSrc = this.getAttribute('data-image');
+            const imageTitle = this.getAttribute('data-title');
+            
+            modalImage.src = imageSrc;
+            modalTitle.textContent = "Retur " + imageTitle;
         });
     });
 
-    document.getElementById('s  electedItemsList').innerHTML = selectedItemsHtml;
-
-    // Store selected items data as JSON in a hidden input for form submission
-    document.getElementById('selectedItemsData').value = JSON.stringify(selectedItemsList);
-}
 </script> --}}
 
 <script>
+    $(document).ready(function () {
+    $('#tabelRetur').dataTable({
+        responsive: true,
+        order: [[0, 'desc']],
+    });
+
     function loadTransactionItems(transactionId) {
-    $.ajax({
-        url: '/get-transaction-items/' + transactionId,
-        method: 'GET',
-        success: function(data) {
-            if (data.dtrans.length === 0) {
-                alert('tidak ada barang dalam transaksi.');
-                return;
-            }
-
-            document.getElementById('salesHeaderID').value = transactionId;
-
-            if (data.discount) {
-                $('#discountAmount').text(`Rp. ${parseFloat(data.discount).toLocaleString('id-ID', {minimumFractionDigits: 2})}`);
-                $('#transactionDiscount').show();
-            } else {
-                $('#transactionDiscount').hide();
-            }
-
-            let itemsHtml = '';
-            data.dtrans.forEach(function(item) {
-                itemsHtml += `
+        $.ajax({
+            url: `/get-transaction-items/${transactionId}`,
+            method: 'GET',
+            success: function (data) {
+                if (data.dtrans.length === 0) {
+                    alert('Tidak ada barang dalam transaksi.');
+                    return;
+                }
+                $('#salesHeaderID').val(transactionId);
+                if (data.discount) {
+                    $('#discountAmount').text(`Rp. ${parseFloat(data.discount).toLocaleString('id-ID', { minimumFractionDigits: 2 })}`);
+                    $('#transactionDiscount').show();
+                } else {
+                    $('#transactionDiscount').hide();
+                }
+                const itemsHtml = data.dtrans.map(item => `
                     <tr>
                         <td>${item.product.namaBarang}</td>
                         <td>${item.totalJumlah} ${item.satuanBarang}</td>
-                        <td>Rp.${parseFloat(item.hargaSatuan).toLocaleString('id-ID', {minimumFractionDigits: 2})}</td>
+                        <td>Rp. ${parseFloat(item.hargaSatuan).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
                         <td>
-                            <input type="radio" name="itemRadio" class="item-radio" value="${item.id}" data-item-name="${item.product.namaBarang}" data-quantity="${item.totalJumlah}" data-price="${item.hargaSatuan}" data-unit="${item.satuanBarang}">
-                            <input type="number" class="form-control item-quantity" min="1" max="${item.totalJumlah}" value="1" style="width: 80px; display:inline;" disabled />
+                            <input type="radio" name="itemRadio" class="item-radio" 
+                                value="${item.id}" 
+                                data-item-name="${item.product.namaBarang}" 
+                                data-quantity="${item.totalJumlah}" 
+                                data-price="${item.hargaSatuan}" 
+                                data-unit="${item.satuanBarang}">
+                            <input type="number" class="form-control item-quantity" 
+                                min="1" max="${item.totalJumlah}" value="1" 
+                                style="width: 80px; display: inline;" disabled>
                         </td>
                     </tr>
-                `;
-            });
-
-            $('#transactionItemsBody').html(itemsHtml);
-            $('#transactionItems').show();
-            $('#confirmSelection').show();
-        },
-        error: function() {
-            alert('Failed to load transaction items. Please try again.');
-        }
+                `).join('');
+                
+                $('#transactionItemsBody').html(itemsHtml);
+                $('#transactionItems, #confirmSelection').show();
+            },
+            error: function () {
+                alert('Failed to load transaction items. Please try again.');
+            },
+        });
+    }
+    $(document).on('change', '.item-radio', function () {
+        $('.item-quantity').prop('disabled', true);
+        $(this).closest('tr').find('.item-quantity').prop('disabled', false);
     });
-}
-$(document).on('change', '.item-radio', function() {
-    $('.item-quantity').prop('disabled', true);
-    $(this).closest('tr').find('.item-quantity').prop('disabled', false); 
-});
 
-function addTransactionItems() {
-    const selectedItem = document.querySelector('.item-radio:checked');
-    if (!selectedItem) {
-        alert('Please select an item.');
-        return;
+    function addTransactionItems() {
+        const selectedItem = $('.item-radio:checked');
+        if (!selectedItem.length) {
+            alert('Please select an item.');
+            return;
+        }
+
+        const itemRow = selectedItem.closest('tr');
+        const itemQuantity = itemRow.find('.item-quantity').val();
+        const itemName = selectedItem.data('item-name');
+        const itemUnit = selectedItem.data('unit');
+        const itemPrice = parseFloat(selectedItem.data('price'));
+
+        const formattedPrice = itemPrice.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+        const selectedItemsHtml = `<p>${itemName} (Jumlah: ${itemQuantity} ${itemUnit}) (Harga per barang: ${formattedPrice})</p>`;
+
+        $('#selectedItemsList').html(selectedItemsHtml);
+        $('#selectedItemsData').val(JSON.stringify({
+            id: selectedItem.val(),
+            name: itemName,
+            quantity: itemQuantity,
+            price: itemPrice,
+            unit: itemUnit,
+        }));
+        $('#jumlahBarangRetur').val(itemQuantity);
+
+        enableReturnForm();
+        const returnRequestModal = new bootstrap.Modal($('#returnRequestModal')[0], { keyboard: false });
+        returnRequestModal.show();
     }
 
-    const itemRow = selectedItem.closest('tr');
-    const itemQuantity = itemRow.querySelector('.item-quantity').value;
-    const itemName = selectedItem.getAttribute('data-item-name');
-    const itemUnit = selectedItem.getAttribute('data-unit');
-    const itemPrice = selectedItem.getAttribute('data-price');
+    function enableReturnForm() {
+        $('#fotoBarang, #alasanRetur, #jumlahBarangRetur, #submitReturnRequest').prop('disabled', false);
+    }
 
-    const selectedItemsHtml = `<p>${itemName} (Jumlah: ${itemQuantity} ${itemUnit}) (Harga per barang: ${itemPrice})</p>`;
-    document.getElementById('selectedItemsList').innerHTML = selectedItemsHtml;
+    $(document).on('click', '.openImageModal', function () {
+        const imageSrc = $(this).data('image');
+        const imageTitle = $(this).data('title');
 
-    const selectedItemsData = {
-        id: selectedItem.value,
-        name: itemName,
-        quantity: itemQuantity,
-        price: itemPrice,
-        unit: itemUnit
-    };
-
-    document.getElementById('selectedItemsData').value = JSON.stringify(selectedItemsData);
-    document.getElementById('jumlahBarangRetur').value = itemQuantity;
-
-    enableReturnForm();
-    const returnRequestModal = new bootstrap.Modal(document.getElementById('returnRequestModal'), {
-        keyboard: false 
+        $('#modalImage').attr('src', imageSrc);
+        $('#imageModalLabel').text(`Retur ${imageTitle}`);
     });
-    returnRequestModal.show();
-}
-function enableReturnForm() {
-    // Enable all form fields and the submit button
-    document.getElementById('fotoBarang').disabled = false;
-    document.getElementById('alasanRetur').disabled = false;
-    document.getElementById('jumlahBarangRetur').disabled = false;
-    document.getElementById('bankName').disabled = false;
-    document.getElementById('accountNumber').disabled = false;
-    document.getElementById('submitReturnRequest').disabled = false;
-}
+
+    window.loadTransactionItems = loadTransactionItems;
+    window.addTransactionItems = addTransactionItems;
+});
 </script>
 @endsection

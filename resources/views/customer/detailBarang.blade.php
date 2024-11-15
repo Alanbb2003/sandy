@@ -173,9 +173,9 @@
  
             <div class="mb-4">
                 <h5>Harga:</h5>
-                <p>Rp. {{ $barang->hargaKecil }} per {{ $barang->satuanTerkecil }}</p>
+                <p>Rp. {{ number_format($barang->hargaKecil, 2, ",", ".") }} per {{ $barang->satuanTerkecil }}</p>
                 @if($barang->satuanBesar && $barang->hargaBesar)
-                    <p>Rp. {{ $barang->hargaBesar }} per {{ $barang->satuanBesar }}</p>
+                    <p>Rp. {{ number_format($barang->hargaBesar, 2, ",", ".") }} per {{ $barang->satuanBesar }}</p>
                 @endif
             </div>
 

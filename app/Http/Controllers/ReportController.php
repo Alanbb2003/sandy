@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Dtrans;
 use App\Models\Htrans;
 use App\Models\Membership;
 use App\Models\Products;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,7 +19,6 @@ class ReportController extends Controller
         $categories = Category::all();
         $query = Products::with('category');
     
-        // Apply filters conditionally
         if ($request->filled('name')) {
             $query->where('namaBarang', 'LIKE', '%' . $request->name . '%');
         }
@@ -107,9 +109,9 @@ class ReportController extends Controller
     public function laporanMembership(Request $request){
         $query = Membership::with(['user', 'points']);
 
-        if ($request->filled('statusMembership')) {
-            $query->where('statusMembership', $request->statusMembership);
-        }
+        // if ($request->filled('statusMembership')) {
+        //     $query->where('statusMembership', $request->statusMembership);
+        // }
 
         if ($request->filled('tanggalMulai_min') && $request->filled('tanggalMulai_max')) {
             $query->whereBetween(DB::raw('DATE(tanggalDaftar)'), [
@@ -136,12 +138,10 @@ class ReportController extends Controller
     }
 
     public function laporanPendapatan(Request $request){
-            // Retrieve date range from request
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
 
-        // If no date range is specified, show all transactions
-        $query = Htrans::where('status', 3); // Assuming '1' indicates a completed transaction
+        $query = Htrans::where('status', 3);
 
         if ($startDate && $endDate) {
             $query->whereBetween(DB::raw('DATE(tanggalPembelian)'), [
@@ -150,15 +150,15 @@ class ReportController extends Controller
             ]);
         }   
 
-        // Fetch transactions based on query
         $transactions = $query->get();
 
-        // Calculate Gross Revenue, Discounts, and Net Revenue
         $netRevenue = $transactions->sum('totalPembelian');
         $totalDiscount = $transactions->sum('discount');
         $grossRevenue = $netRevenue + $totalDiscount;
 
-        // Pass data to the view
+        $startDate = Carbon::parse($startDate)->format('d/m/Y');
+        $endDate = Carbon::parse($endDate)->format('d/m/Y');
+        
         return view('admin.laporan.laporanPendapatan', [
             'transactions' => $transactions,
             'grossRevenue' => $grossRevenue,
@@ -167,5 +167,87 @@ class ReportController extends Controller
             'startDate' => $startDate,
             'endDate' => $endDate
         ]);
+    }
+
+    public function laporanPenjualan(Request $request){
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+
+        $startDateFormatted = $startDate ? Carbon::parse($startDate)->format('d/m/Y') : '';
+        $endDateFormatted = $endDate ? Carbon::parse($endDate)->format('d/m/Y') : '';
+
+        $salesPerProduct = Dtrans::with('product')
+        ->whereHas('htrans', function ($query) use ($startDate, $endDate) {
+            $query->where('status', 3);
+            
+            if ($startDate && $endDate) {
+                $query->whereBetween('tanggalPembelian', [$startDate, $endDate]);
+            }
+        })
+        ->select(
+            'fkProductID',
+            'satuanBarang as unit',
+            DB::raw('SUM(totalJumlah) as total_quantity_sold'),
+            DB::raw('SUM(totalJumlah * hargaSatuan) as total_income')
+        )
+        ->groupBy('fkProductID', 'unit') 
+        ->with('product:id,namaBarang')
+        ->get()
+        ->groupBy('product.namaBarang');
+        return view('admin.laporan.laporanPenjualan', compact('salesPerProduct', 'startDateFormatted', 'endDateFormatted'));
+    }
+    
+    // public function laporanAktif(){
+    //     $customers = User::where('role', '!=', 1)
+    //     ->with(['wishlists.product', 'htrans.dtrans.product.category'])
+    //     ->get()
+    //     ->map(function ($user) {
+    //         $completedTransactions = $user->htrans->where('status', 3);
+    //         $user->total_completed_transactions = $completedTransactions->count();
+    //         $user->total_transaction_amount = $completedTransactions->sum('totalPembelian');
+    //         $user->newest_transaction_date = $completedTransactions->max('tanggalPembelian');
+    //         return $user;
+    //     });
+    //     return view('admin.laporan.laporanAktif', compact('customers'));
+    // }
+    public function laporanAktif(Request $request){
+        $query = User::where('role', '!=', 1)->with(['htrans.dtrans.product']);
+
+        if ($request->filled('minTransactions') || $request->filled('maxTransactions')) {
+            $query->whereHas('htrans', function ($q) use ($request) {
+                $q->select(DB::raw('COUNT(*) as completed_transactions'))
+                ->where('status', 3);
+                if ($request->filled('minTransactions')) {
+                    $q->havingRaw('completed_transactions >= ?', [$request->minTransactions]);
+                }
+                if ($request->filled('maxTransactions')) {
+                    $q->havingRaw('completed_transactions <= ?', [$request->maxTransactions]);
+                }
+            });
+        }
+
+        if ($request->filled('minAmount') || $request->filled('maxAmount')) {
+            $query->whereHas('htrans', function ($q) use ($request) {
+                $q->select(DB::raw('SUM(totalPembelian) as total_amount'))
+                ->where('status', 3);
+                if ($request->filled('minAmount')) {
+                    $q->havingRaw('total_amount >= ?', [$request->minAmount]);
+                }
+                if ($request->filled('maxAmount')) {
+                    $q->havingRaw('total_amount <= ?', [$request->maxAmount]);
+                }
+            });
+        }
+
+        $customers = $query->get()->map(function ($user) {
+            $completedTransactions = $user->htrans->where('status', 3);
+            $user->total_completed_transactions = $completedTransactions->count();
+            $user->total_transaction_amount = $completedTransactions->sum('totalPembelian');
+            $user->newest_transaction_date = $completedTransactions->max('tanggalPembelian');
+
+            return $user;
+        });
+
+        return view('admin.laporan.laporanAktif', compact('customers'));
     }
 }

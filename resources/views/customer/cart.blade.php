@@ -22,9 +22,9 @@
                         <td><img src="{{ asset('images/uploads/'.$details['image'] )}}" width="50" height="50" class="img-thumbnail" /></td>
                         <td>{{ $details['name'] }}</td>
                         <td>
-                            <a href="{{url('/cart/addOne/'.$id )}}" class="btn nodecor mb-2">+</a>
+                            <a href="{{url('/cart/addOne/'.$id )}}" class="btn nodecor mb-2"><i class="fa-solid fa-plus"></i></a>
                             {{ $details['quantity'] }}
-                            <a href="{{url('/cart/removeOne/'.$id )}}" class="btn nodecor mb-2">-</a>
+                            <a href="{{url('/cart/removeOne/'.$id )}}" class="btn nodecor mb-2"><i class="fa-solid fa-minus"></i></a>
                         </td>
                         <td>{{ $details['unit'] }}</td>
                         <td>Rp.{{ number_format($details['price'], 0, ',', '.') }}</td>

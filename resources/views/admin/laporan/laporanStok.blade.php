@@ -18,17 +18,17 @@
                     <form method="GET" action="{{ url()->current() }}">
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <h5>General Filters</h5>
+                                {{-- <h5>General Filters</h5> --}}
                                 <div class="row g-3">
                                     <div class="col-12">
-                                        <label for="name" class="form-label"><strong>Product Name</strong></label>
-                                        <input type="text" name="name" id="name" class="form-control" placeholder="Product Name" value="{{ request('name') }}">
+                                        <label for="name" class="form-label"><strong>Nama Barang</strong></label>
+                                        <input type="text" name="name" id="name" class="form-control" placeholder="Nama Barang" value="{{ request('name') }}">
                                     </div>
                                     
                                     <div class="col-12">
-                                        <label for="category" class="form-label"><strong>Category</strong></label>
+                                        <label for="category" class="form-label"><strong>Kategori</strong></label>
                                         <select name="category" id="category" class="form-select">
-                                            <option value="">All Categories</option>
+                                            <option value="">Semua Kategori</option>
                                             @foreach ($categories as $category)
                                                 <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
                                                     {{ $category->nama_category }}
@@ -36,16 +36,11 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    
-                                    {{-- <div class="col-12">
-                                        <label for="created_at" class="form-label"><strong>Created Date</strong></label>
-                                        <input type="date" name="created_at" id="created_at" class="form-control" value="{{ request('created_at') }}">
-                                    </div> --}}
                                 </div>
                             </div>
                     
                             <div class="col-md-6">
-                                <h5>Range Filters</h5>
+                                {{-- <h5>Range Filters</h5> --}}
                                 <div class="row g-3">
 
                                     <div class="row-md-4">

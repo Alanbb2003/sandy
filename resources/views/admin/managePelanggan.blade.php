@@ -1,11 +1,10 @@
-{{-- @extends('layouts.app') --}}
 @extends('layouts.appAdmin')
 
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-11">
-          <div class="card-header"> <b>Manage Barang</b> </div>
+          <div class="card-header"> <b>Manage Pelanggan</b> </div>
           <div class="card-body">
               <table class="table table-striped table-bordered" id="tablePelanggan" style="width:100%">
                 <thead>
@@ -31,11 +30,14 @@
                         <td>{{ $c->total_completed_transactions }}</td>
                         <td>{{ number_format($c->total_transaction_amount, 2) }}</td>
                         <td>
-                          <button class="btn btn-sm btn-primary detail-btn" 
-                            data-customer="{{ json_encode($c) }}"
-                            data-bs-toggle="modal" 
-                            data-bs-target="#customerDetailModal">
+                            <button class="btn btn-sm btn-primary detail-btn" 
+                                data-customer="{{ json_encode($c) }}"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#customerDetailModal">
                                 Detail
+                            </button>
+                            <button class="btn btn-sm btn-secondary email-btn" data-customer="{{ json_encode($c) }}" data-bs-toggle="modal" data-bs-target="#sendEmailModal">
+                                Send Email
                             </button>
                         </td>
                     </tr>
@@ -46,32 +48,6 @@
         </div>
     </div>
 </div>
-
-
-{{-- <!-- Single Modal for Customer Details -->
-<div class="modal fade" id="customerDetailModal" tabindex="-1" aria-labelledby="customerDetailModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title" id="customerDetailModalLabel">Customer Details</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-              <p><strong>Email:</strong> <span id="modal-email"></span></p>
-              <p><strong>Phone:</strong> <span id="modal-phone"></span></p>
-              <p><strong>Birthdate:</strong> <span id="modal-birthdate"></span></p>
-
-              <h4>Wishlist</h4>
-              <ul id="modal-wishlist"></ul>
-
-              <h4>Most Bought Category</h4>
-              <p id="modal-most-bought-category"></p>
-          </div>
-      </div>
-  </div>
-</div> --}}
-
-
 <!-- Single Modal for Customer Details -->
 <div class="modal fade" id="customerDetailModal" tabindex="-1" aria-labelledby="customerDetailModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -84,7 +60,6 @@
               <p><strong>Email:</strong> <span id="modal-email"></span></p>
               <p><strong>Phone:</strong> <span id="modal-phone"></span></p>
               <p><strong>Birthdate:</strong> <span id="modal-birthdate"></span></p>
-
               <h4>Wishlist</h4>
               <table class="table table-bordered">
                   <thead>
@@ -97,7 +72,6 @@
                       
                   </tbody>
               </table>
-
               <h4>Past Transactions</h4>
               <table class="table table-bordered">
                   <thead>
@@ -113,8 +87,6 @@
                       
                   </tbody>
               </table>
-
-              <!-- Section to display dtrans details -->
               <div id="dtrans-details" class="mt-3" style="display:none;">
                   <h5>Transaction Details</h5>
                   <table class="table table-bordered" id="dtrans-table">
@@ -127,7 +99,7 @@
                           </tr>
                       </thead>
                       <tbody id="modal-dtrans">
-                          <!-- dtrans items will be injected here -->
+
                       </tbody>
                   </table>
               </div>
@@ -138,6 +110,36 @@
       </div>
   </div>
 </div>
+
+<!-- Modal for Sending Custom Email -->
+<div class="modal fade" id="sendEmailModal" tabindex="-1" aria-labelledby="sendEmailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="sendEmailModalLabel">Send Custom Email</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="sendEmailForm" action="{{ route('admin.customer.email') }}" method="POST">
+          @csrf
+          <div class="modal-body">
+            <input type="hidden" id="email-recipient" name="recipient">
+            <div class="mb-3">
+              <label for="email-subject" class="form-label">Subject</label>
+              <input type="text" class="form-control" id="email-subject" name="subject" required>
+            </div>
+            <div class="mb-3">
+              <label for="email-message" class="form-label">Message</label>
+              <textarea class="form-control" id="email-message" name="message" rows="5" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Send Email</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 @endsection
 
 @section('script')
@@ -165,7 +167,7 @@ $(document).ready(function(){
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${item.product ? item.product.namaBarang : 'Product Not Found'}</td>
-                        <td>${item.product ? item.product.hargaKecil : '-'}</td>
+                        <td>${item.product ? `Rp. ${item.product.hargaKecil.toLocaleString('id-ID', { minimumFractionDigits: 0 })}` : '-'}</td>
                     `;
                     wishlistContainer.appendChild(row);
                 });
@@ -175,6 +177,7 @@ $(document).ready(function(){
               customer.htrans.forEach(transaction => {
                   const statusClass = (() => {
                       switch (transaction.status) {
+                          case 0:
                           case 1:
                           case 2:
                               return 'badge bg-warning text-dark'; // Menunggu Pembayaran / Pesanan Sedang Diproses
@@ -190,6 +193,8 @@ $(document).ready(function(){
 
                   const statusText = (() => {
                       switch (transaction.status) {
+                          case 0:
+                              return 'Menunggu Konfirmasi';
                           case 1:
                               return 'Menunggu Pembayaran';
                           case 2:
@@ -242,16 +247,33 @@ $(document).ready(function(){
                           dtransTableBody.appendChild(dtransRow);
                       });
                   }
-
-
                   dtransContainer.style.display = dtransTableBody.innerHTML ? 'block' : 'none';
               };
-                
                 document.getElementById('modal-most-bought-category').textContent = customer.most_bought_category 
                     ? customer.most_bought_category.nama_category 
                     : 'No transactions';
             });
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const emailButtons = document.querySelectorAll('.email-btn');
+    const emailModal = new bootstrap.Modal(document.getElementById('sendEmailModal'));
+    const emailRecipient = document.getElementById('email-recipient');
+    const emailSubject = document.getElementById('email-subject');
+    const emailMessage = document.getElementById('email-message');
+    const emailTemplate = document.getElementById('email-template');
+
+    emailButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const customer = JSON.parse(this.getAttribute('data-customer'));
+
+            emailRecipient.value = customer.email; 
+            emailSubject.value = '';              
+            emailMessage.value = 'Halo, '+ customer.firstName +' '+ customer.lastName;      
+            emailTemplate.value = '';              
+        });
+    });
+});
 </script>
 @endsection

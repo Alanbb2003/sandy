@@ -90,7 +90,7 @@
 
                 <hr>
                 <h5>Change Email</h5>
-                <form action="{{ url('/dashboard/changeEmail') }}" method="POST">
+                <form action="{{route('admin.changeEmail') }}" method="POST">
                     @csrf
                     <div class="mb-3">
                         <label for="current_email" class="form-label">Current Email</label>
@@ -109,62 +109,6 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Change Email</button>
                 </form>
-            </div>
-        </div>
-        <div class="footer-main-content">
-            <div class="footer-section">
-                <div class="row">
-                    <div class="col-md-4 col-sm-12 address-section">
-                        <div data-content-type="html" data-appearance="default" data-element="main" data-decoded="true">
-                            <p class="customer-address">Jl. Raya Serpong Km.2 Pakulonan Serpong Tangerang 15325 – Indonesia
-                            </p>
-                            <p class="customer-service">Hubungi kami jika membutuhkan bantuan atau saran di:</p>
-                            <div class="number"><a href="tel:(62-21) 5312-0808">(62-21) 5312-0808</a></div>
-                            <div class="whatsapp"><a href="https://wa.me/+6281119099088">081-1190-99088</a></div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-12 menu-section mage-accordion-disabled">
-                        <div class="row">
-                            <div class="col-md-6 col-sm-12 menu-items accordion-item">
-                                <style>
-                                    #html-body [data-pb-style=N8SR16R] {
-                                        justify-content: flex-start;
-                                        display: flex;
-                                        flex-direction: column;
-                                        background-position: left top;
-                                        background-size: cover;
-                                        background-repeat: no-repeat;
-                                        background-attachment: scroll
-                                    }
-                                </style>
-                                <div data-content-type="row" data-appearance="contained" data-element="main">
-                                    <div data-enable-parallax="0" data-parallax-speed="0.5" data-background-images="{}"
-                                        data-background-type="image" data-video-loop="true"
-                                        data-video-play-only-visible="true" data-video-lazy-load="true"
-                                        data-video-fallback-src="" data-element="inner" data-pb-style="N8SR16R">
-                                        <div data-content-type="html" data-appearance="default" data-element="main"
-                                            data-decoded="true">
-                                            <p class="title" tabindex="0">PERUSAHAAN</p>
-                                            <ul class="list">
-                                                <li><a href="/tentang-kami">Tentang Kami</a></li>
-                                                <li><a href="https://corporate.depobangunan.co.id/"
-                                                        target="_blank">Korporasi</a></li>
-                                                <li><a href="/contact">Hubungi Kami</a></li>
-                                                <li><a href="/faq">FAQ</a></li>
-                                                <li><a href="/kebijakan-privasi">Kebijakan Privasi</a></li>
-                                                <li><a href="/syarat-ketentuan">Syarat dan Ketentuan</a></li>
-                                                <li><a href="/karir">Karir</a></li>
-                                                <li><a href="/kegiatan-sosial">Kegiatan Sosial</a></li>
-                                                <li><a href="/store-locator">Lokasi Toko</a></li>
-                                                <li><a href="/blog.html">Blog</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

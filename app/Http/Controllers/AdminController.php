@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CustomerEmail;
 use App\Mail\NewProductNotification;
 use App\Mail\OrderAcceptedMail;
 use App\Models\Category;
@@ -303,50 +304,35 @@ class AdminController extends Controller
             $first_character = mb_substr($request->inputNamaBarang, 0, 2);
             $item = $first_character;
         }
-        // Check if thumbnail was uploaded
         if ($request->hasFile('thumbnail')) {
-            // Check if the product already has a thumbnail
             if ($product->fotoPromosi) {
-                // Get the full path of the old thumbnail
                 $oldThumbnailPath = public_path('images/uploads/' . basename($product->fotoPromosi));
                 
-                // Delete the old thumbnail if it exists
                 if (file_exists($oldThumbnailPath)) {
                     unlink($oldThumbnailPath);
                 }
             }
-        
-            // Handle file upload for new thumbnail
+    
             $thumbnail = $request->file('thumbnail');
-            $thumbnailName = $item . time() . '.webp';  // Save as WebP format
+            $thumbnailName = $item . time() . '.webp';  
             $thumbnailPath = public_path('images/uploads/' . $thumbnailName);
-        
-            // Convert the new thumbnail to WebP
             $this->convertToWebP($thumbnail, $thumbnailPath);
-        
-            // Save the new thumbnail name to the product
             $product->fotoPromosi = $thumbnailName;
         }
-        // Save the updated product
         $product->save();
 
-        // Check if new images were uploaded for the product
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                // Create a unique file name for each image
-                $fileName = time() . rand(1, 99) . '.webp';  // Saving as WebP format
-        
-                // Define the file path for saving the WebP image
+                $fileName = time() . rand(1, 99) . '.webp'; 
+
                 $imagePath = public_path('images/uploads/' . $fileName);
-        
-                // Convert the image to WebP format and save
+
                 $this->convertToWebP($image, $imagePath);
-        
-                // Store the image details in the Pictures table
+
                 Pictures::create([
                     'productID' => $product->id,
-                    'fileName' => $fileName,  // Store the WebP file name
-                    'filePath' => asset('images/uploads/' . $fileName),  // If needed, store the full path
+                    'fileName' => $fileName,
+                    'filePath' => asset('images/uploads/' . $fileName), 
                 ]);
             }
         }
@@ -362,72 +348,71 @@ class AdminController extends Controller
     }
 
     public function acceptTransaction(Request $request) {
-        $transactionId = $request->input('transaction_id'); // Get transaction ID from form
+        $transactionId = $request->input('transaction_id'); 
         $transaksi = Htrans::with(['dtrans.product', 'user'])->where('id', $transactionId)->firstOrFail();
         
-        // Calculate total transaction amount and points earned
-        $transactionAmount = $transaksi->totalPembelian + $transaksi->discount;
-        $pointsEarned = floor($transactionAmount / 500);
-        
-        $userID = $transaksi->fkUserID;
-        $isMember = Membership::where('fkUserID', $userID)->first();
-
-        DB::beginTransaction();
-        try {   
-        // If the user is a member, add points
-        if ($isMember) {
-            $tanggalPemberian = Carbon::now();
-            $tanggalKadaluwarsa = $tanggalPemberian->copy()->addYear(1);
-            $tipeTransaksi = 'Purchase';
-            $sumberPoin = 'Pembelian dengan jumlah Rp.' . number_format($transactionAmount, 0, ',', '.');
-            $saldoPoin = $pointsEarned;
-        
-            // Add points to the database
-            Point::create([
-                'memberID' => $isMember->memberID,
-                'htransID' => $transaksi->id,
-                'tanggalPemberianPoin' => $tanggalPemberian,
-                'jumlahPoin' => $pointsEarned,
-                'tipeTransaksi' => $tipeTransaksi,
-                'sumberPoin' => $sumberPoin,
-                'tanggalKadaluwarsaPoin' => $tanggalKadaluwarsa, // Fixed typo here
-                'saldoPoin' => $saldoPoin,
-            ]);
-        }
-    
-        // Reduce stock for each product in the transaction
-        foreach ($transaksi->dtrans as $item) {
-            $product = Products::find($item->fkProductID);
-            // dd($product);
-            if ($product) {
-                if ($item->satuanBarang == $product->satuanTerkecil) {
-                    $product->totalQuantity -= $item->totalJumlah;
-                    
-                } else {
-                    $reduceBig = $item->totalJumlah * $product->isiSatuanBesar;
-                    $product->totalQuantity -= $reduceBig;
-                    
-                }
-                $product->save();
-            }
-        }
-    
-            // Update the transaction status to 3 (completed)
-            $transaksi->status = 3;
+        if ($transaksi->status == 0) {
+            $transaksi->status = 1;
             $transaksi->save();
-        
-                // Send email notification to the user
             Mail::to($transaksi->user->email)->send(new OrderAcceptedMail($transaksi->user, $transaksi));
-
-            DB::commit();
-            alert()->success('Success!', 'Transaksi diterima, stok produk dikurangi, dan poin telah diberikan');
+            alert()->success('Success!', 'Transaksi diterima');
             return redirect()->back();
-        } catch (\Exception $e) {
-            // Rollback transaction if something goes wrong
-            DB::rollBack();
-            Log::error('Error adding product: ' . $e->getMessage());
-            alert()->error('Error!', 'Gagal konfirmasi transaksi');
-            return back()->withErrors(['error' => 'Failed to add product']);
+
+        }else{
+            $transactionAmount = $transaksi->totalPembelian + $transaksi->discount;
+            $pointsEarned = floor($transactionAmount / 500);
+            
+            $userID = $transaksi->fkUserID;
+            $isMember = Membership::where('fkUserID', $userID)->first();
+    
+            DB::beginTransaction();
+            try {   
+            if ($isMember) {
+                $tanggalPemberian = Carbon::now();
+                $tanggalKadaluwarsa = $tanggalPemberian->copy()->addYear(1);
+                $tipeTransaksi = 'Purchase';
+                $sumberPoin = 'Pembelian dengan jumlah Rp.' . number_format($transactionAmount, 0, ',', '.');
+                $saldoPoin = $pointsEarned;
+    
+                Point::create([
+                    'memberID' => $isMember->memberID,
+                    'htransID' => $transaksi->id,
+                    'tanggalPemberianPoin' => $tanggalPemberian,
+                    'jumlahPoin' => $pointsEarned,
+                    'tipeTransaksi' => $tipeTransaksi,
+                    'sumberPoin' => $sumberPoin,
+                    'tanggalKadaluwarsaPoin' => $tanggalKadaluwarsa, 
+                    'saldoPoin' => $saldoPoin,
+                ]);
+            }
+            foreach ($transaksi->dtrans as $item) {
+                $product = Products::find($item->fkProductID);
+                if ($product) {
+                    if ($item->satuanBarang == $product->satuanTerkecil) {
+                        $product->totalQuantity -= $item->totalJumlah;
+                        
+                    } else {
+                        $reduceBig = $item->totalJumlah * $product->isiSatuanBesar;
+                        $product->totalQuantity -= $reduceBig;
+                        
+                    }
+                    $product->save();
+                }
+            }
+                $transaksi->status = 3;
+                $transaksi->save();
+            
+                Mail::to($transaksi->user->email)->send(new OrderAcceptedMail($transaksi->user, $transaksi));
+    
+                DB::commit();
+                alert()->success('Success!', 'Pembayaran dikonfirmasi, stok produk dikurangi, dan poin telah diberikan');
+                return redirect()->back();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Error adding product: ' . $e->getMessage());
+                alert()->error('Error!', 'Gagal konfirmasi transaksi');
+                return back()->withErrors(['error' => 'Failed to add product']);
+            }
         }
     }
 
@@ -574,7 +559,45 @@ class AdminController extends Controller
         }
     }
 
+    public function sendCustomEmail(Request $request)
+    {
+        $request->validate([
+            'recipient' => 'required|email',
+            'subject' => 'required|string',
+            'message' => 'required|string',
+        ]);
+        try{
+            $recipient = $request->input('recipient');
+            $subject = $request->input('subject');
+            $messageContent = $request->input('message');
 
+            Mail::to($recipient)->send(new CustomerEmail($subject, $messageContent));
+
+            alert()->success('success!','Berhasil mengirim email');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            Log::error('Error sending mail: ' . $e->getMessage());
+            toast("Gagal mengirim email",'error');
+            return back();
+        }
+    }
+    public function changeEmail(Request $request){
+        // Validate the new email
+        $request->validate([
+            'new_email' => 'required|email|unique:users,email',
+        ]);
+        $userID = Auth::user()->id;
+        $user = User::find($userID); 
+
+        if ($request->new_email === $user->email) {
+            toast("email harus berbeda",'error');
+            return back();
+        }
+        $user->email = $request->new_email;
+        $user->save();
+        toast("Berhasil mengubah email",'success');
+        return back();
+    }
     /**
      * Convert an image to WebP format using GD library.
      *

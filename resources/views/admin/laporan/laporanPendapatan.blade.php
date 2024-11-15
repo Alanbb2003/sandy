@@ -12,11 +12,11 @@
         <div class="row justify-content-center">
             <div class="col-md-3">
                 <label for="startDate" class="form-label">Start Date</label>
-                <input type="date" id="startDate" name="startDate" class="form-control" value="{{ $startDate }}">
+                <input type="date" id="startDate" name="startDate" class="form-control" value="{{  request('startDate') }}">
             </div>
             <div class="col-md-3">
                 <label for="endDate" class="form-label">End Date</label>
-                <input type="date" id="endDate" name="endDate" class="form-control" value="{{ $endDate }}">
+                <input type="date" id="endDate" name="endDate" class="form-control" value="{{request('endDate') }}">
             </div>
             <div class="col-md-2 align-self-end">
                 <button type="submit" class="btn btn-primary mt-3">Filter</button>
@@ -33,7 +33,7 @@
     </p>
 
     <!-- Transactions Table -->
-    <table class="table table-bordered">
+    <table class="table table-bordered" id="tabelPendapatan">
         <thead class="table-light">
             <tr>
                 <th>Transaction ID</th>
@@ -65,4 +65,16 @@
         <h4>Total Net Revenue: Rp. {{ number_format($netRevenue, 2, ",", ".") }}</h4>
     </div>
 </div>
+@endsection
+@section('script')
+<script>
+     $(document).ready(function(){
+        $('#tabelPendapatan').dataTable({
+            language: {
+            emptyTable: "No data available in table"
+        },
+        responsive: true
+        } );
+    });
+</script>
 @endsection

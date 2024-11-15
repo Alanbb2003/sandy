@@ -15,10 +15,10 @@
                     <a class="nav-link" href="{{route('laporan.pendapatan') }}">Laporan Pendapatan</a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link" href="{{route('laporan.pendapatan') }}">Laporan Penjualan</a>
+                    <a class="nav-link" href="{{route('laporan.penjualan') }}">Laporan Penjualan</a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link" href="{{route('laporan.pendapatan') }}">Laporan Pelanggan Aktif</a>
+                    <a class="nav-link" href="{{route('laporan.Aktif') }}">Laporan Pelanggan Aktif</a>
                 </li>
             </ul>
         </div>

@@ -2,21 +2,21 @@
 
 @section('content')
 <div class="container">
-    <h2>Manage Return Requests</h2>
+    <h4>Permohonan Retur</h4>
 
     <table class="table table-bordered table-sm compact-table" id="tableRetur">
         <thead>
             <tr>
-                <th>Return ID</th>
-                <th>Product</th>
+                <th>ID</th>
+                <th>Barang</th>
                 <th>Image</th> 
-                <th>Buyer</th>
-                <th>Quantity</th>
-                <th>Unit</th>
+                <th>Pembeli</th>
+                <th>Jumlah</th>
                 <th>Price</th>
                 <th>Subtotal</th>
                 <th>Tanggal request</th>
-                <th>Reason</th>
+                <th>Tipe Pengembalian</th>
+                <th>Alasan</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -38,11 +38,11 @@
                   @endif
               </td>
               <td>{{ $retur->user->firstName }} {{ $retur->user->lastName }} ({{ $retur->user->email }}) (<strong>{{ $retur->bankName }} {{ $retur->accountNumber }}</strong>)</td>
-              <td>{{ $retur->jumlahBarangRetur }}</td>
-              <td>{{ $retur->satuanBarangRetur }}</td>
-              <td>{{ number_format($retur->hargaPerBarang, 2) }}</td>
-              <td>{{ number_format($retur->subTotal, 2) }}</td>
+              <td>{{ $retur->jumlahBarangRetur }} {{ $retur->satuanBarangRetur }}</td>
+              <td>Rp.{{ number_format($retur->hargaPerBarang, 2) }}</td>
+              <td>Rp.{{ number_format($retur->subTotal, 2) }}</td>
               <td>{{ $retur->tanggalRetur }}</td>
+              <td>{{ $retur->TipePengembalian}}</td>
               <td>{{ $retur->alasanRetur }}</td>
 
               <!-- Improved Status Display -->

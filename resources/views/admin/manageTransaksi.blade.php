@@ -3,7 +3,7 @@
 @section('content')
 <div class="row justify-content-center">
     <div class="col-md-11">
-      <div class="card-header"><b>Manage Barang</b></div>
+      <div class="card-header"><h4>Manage Transaksi</h4></div>
       <div class="card-body">
           <table class="display responsive nowrap" id="tabelTransaksi" style="width:100%">
             <thead>
@@ -45,16 +45,6 @@
               <td>Rp{{ number_format($htrans->totalPembelian, 2, ',', '.') }}</td>
               
               <td>
-                  {{-- @if ($htrans->buktiPembayaran)
-                      <div class="text-center">
-                            <img src="{{ asset('storage/' . $htrans->buktiPembayaran) }}" alt="Bukti Pembayaran" class="img-fluid rounded mb-2" style="width: 100px;">
-                            <p>
-                                <a href="{{ asset('storage/' . $htrans->buktiPembayaran) }}" target="_blank" class="btn btn-link">Lihat Bukti Pembayaran</a>
-                            </p>
-                        </div>
-                  @else
-                      No proof
-                  @endif --}}
                   @if($htrans->buktiPembayaran)
                     <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
                         data-image="{{ asset('storage/' . $htrans->buktiPembayaran)}}" 
@@ -67,6 +57,9 @@
               </td>
               <td>
                 @switch($htrans->status)
+                    @case(0)
+                        <span class="badge bg-warning text-dark">Menunggu Konfirmasi</span>
+                        @break
                     @case(1)
                         <span class="badge bg-warning text-dark">Menunggu pembayaran</span>
                         @break
@@ -87,17 +80,18 @@
                 @endswitch
               </td>
               <td>
-                  @if ($htrans->status == 2)
-                  <a href="#" class="btn btn-info btn-sm my-1" style="width: 120px" 
+                  @if ($htrans->status == 0 || $htrans->status == 2)
+                  <a href="#" class="btn btn-info btn-sm my-1 acceptTrans" style="width: 120px" 
                       data-bs-toggle="modal" 
                       data-bs-target="#acceptTransactionModal" 
-                      data-id="{{ $htrans->id }}">
+                      data-id="{{ $htrans->id }}"
+                      data-kode="{{$htrans->kodeTrans}}">
                     <i class="fa fa-check"></i> Terima
                   </a>
                   @endif
 
-                  @if ($htrans->status == 1)
-                  <a href="#" class="btn btn-danger btn-sm my-1" style="width: 120px" 
+                  @if ($htrans->status == 0)
+                  <a href="#" class="btn btn-danger btn-sm my-1 denyTrans" style="width: 120px" 
                       data-bs-toggle="modal" 
                       data-bs-target="#cancelOrderModal" 
                       data-id="{{ $htrans->id }}" 
@@ -111,7 +105,7 @@
           </table>
       </div>
     </div>
-    <!-- Single Modal to show product images -->
+    <!--Modal gambar bukti -->
     <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
@@ -125,7 +119,7 @@
           </div>
       </div>
     </div>
-    <!-- Modal for Confirming Order Cancellation -->
+    <!-- Modal pembatalan -->
     <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
       <div class="modal-dialog">
           <div class="modal-content">
@@ -152,9 +146,9 @@
               </div>
           </div>
       </div>
-  </div>
+    </div>
 
-    <!-- Accept Confirmation Modal -->
+    <!-- Modal konfirmasi -->
     <div class="modal fade" id="acceptTransactionModal" tabindex="-1" aria-labelledby="acceptModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -163,7 +157,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            Are you sure you want to accept this transaction?
+            yakin menerima transaksi <strong id="kodetransaksiShow"></strong>?
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -193,7 +187,6 @@
                     <strong>Diskon: <span id="modalDiskon"></span></strong>
                     <h6>Transaction Details:</h6>
     
-                    <!-- Table to display transaction details -->
                     <table class="table table-striped" id="transactionTable">
                         <thead>
                             <tr>
@@ -205,7 +198,7 @@
                             </tr>
                         </thead>
                         <tbody id="modalTransaksiDetails">
-                            <!-- Dynamic Content -->
+
                         </tbody>
                     </table>
     
@@ -222,86 +215,83 @@
 
 @section('script')
 <script>
-    $(document).ready(function(){
-        $('#tabelTransaksi').dataTable({
-          responsive: true,
-          order: [[0, 'desc']]
-        });
-
-        $('#detailModal').on('show.bs.modal', function (event) {
-          var button = $(event.relatedTarget); 
-
-          var id = button.data('id');
-          var namaPembeli = button.data('nama');
-          var tanggalPembelian = button.data('tanggal');
-          var totalTransaksi = button.data('total');
-          var transaksiDetails = button.data('transaksi');
-          var alamat = button.data('alamat');
-          var diskon = button.data('diskon');
-
-          var modal = $(this);
-          modal.find('#modalNamaPembeli').text(namaPembeli);
-          modal.find('#modalAlamatPembelian').text(alamat);
-          modal.find('#modalTanggalPembelian').text(tanggalPembelian);
-          modal.find('#modalTotalTransaksi').text(totalTransaksi);
-          modal.find('#modalDiskon').text(diskon);
-
-          modal.find('#modalTransaksiDetails').empty();
-          
-          transaksiDetails.forEach(function(item) {
-              var productImage = item.product.fotoPromosi ? `<img src="{{ asset('images/uploads') }}/${item.product.fotoPromosi}" style="width: 100px;" alt="${item.product.namaBarang}">` : 'No Image';
-              
-              var row = `
-                  <tr>
-                      <td>${productImage}</td>
-                      <td>${item.product.namaBarang}</td>
-                      <td>${item.totalJumlah} ${item.satuanBarang}</td>
-                      <td>Rp${parseFloat(item.hargaSatuan).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
-                      <td>Rp${(item.hargaSatuan * item.totalJumlah).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
-                  </tr>
-              `;
-              modal.find('#modalTransaksiDetails').append(row);
-          });
-      });
-
-      
+    $(document).ready(function() {
+    $('#tabelTransaksi').dataTable({
+        responsive: true,
+        order: [[0, 'desc']]
     });
-    document.addEventListener('DOMContentLoaded', function () {
-          var acceptModal = document.getElementById('acceptTransactionModal');
 
-          acceptModal.addEventListener('show.bs.modal', function (event) {     
-            var button = event.relatedTarget;
-            var transactionId = button.getAttribute('data-id');
-            var inputTransactionId = document.getElementById('transactionId');
-            inputTransactionId.value = transactionId;
-          });
-        });
-    document.addEventListener('DOMContentLoaded', function () {
-      var cancelModal = document.getElementById('cancelOrderModal');
+    // detail transaksi
+    $('#detailModal').on('show.bs.modal', function(event) {
+        const button = $(event.relatedTarget);
 
-      cancelModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
-        var transactionId = button.getAttribute('data-id');
-        var kodeTrans = button.getAttribute('data-kode');
-        var inputTransactionId = document.getElementById('transactionIdcancel');
-        inputTransactionId.value = transactionId;
-        document.getElementById('showKode').textContent = kodeTrans;
-      });
-    });
-    document.addEventListener('DOMContentLoaded', function() {
-        const imageModal = document.getElementById('imageModal');
-        const modalImage = document.getElementById('modalImage');
-        const modalTitle = document.getElementById('imageModalLabel');
+        const id = button.data('id');
+        const namaPembeli = button.data('nama');
+        const tanggalPembelian = button.data('tanggal');
+        const totalTransaksi = button.data('total');
+        const transaksiDetails = button.data('transaksi');
+        const alamat = button.data('alamat');
+        const diskon = button.data('diskon');
+        const modal = $(this);
+        modal.find('#modalNamaPembeli').text(namaPembeli);
+        modal.find('#modalAlamatPembelian').text(alamat);
+        modal.find('#modalTanggalPembelian').text(tanggalPembelian);
+        modal.find('#modalTotalTransaksi').text(totalTransaksi);
+        modal.find('#modalDiskon').text(diskon);
+        modal.find('#modalTransaksiDetails').empty();
+        transaksiDetails.forEach(function(item) {
+            const productImage = item.product.fotoPromosi
+                ? `<img src="{{ asset('images/uploads') }}/${item.product.fotoPromosi}" style="width: 100px;" alt="${item.product.namaBarang}">`
+                : 'No Image';
 
-        document.querySelectorAll('.openImageModal').forEach(item => {
-            item.addEventListener('click', function() {
-                const imageSrc = this.getAttribute('data-image');
-                const imageTitle = this.getAttribute('data-title');
-                
-                modalImage.src = imageSrc;
-                modalTitle.textContent = "Transkasi "+imageTitle;
-            });
+            const row = `
+                <tr>
+                    <td>${productImage}</td>
+                    <td>${item.product.namaBarang}</td>
+                    <td>${item.totalJumlah} ${item.satuanBarang}</td>
+                    <td>Rp${parseFloat(item.hargaSatuan).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
+                    <td>Rp${(item.hargaSatuan * item.totalJumlah).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
+                </tr>
+            `;
+            modal.find('#modalTransaksiDetails').append(row);
         });
     });
+
+    // modal konfirmasi
+    document.querySelectorAll('.acceptTrans').forEach(button=>{
+        button.addEventListener('click',function(){
+            const transactionId = button.getAttribute('data-id');
+            const transactionKode = button.getAttribute('data-kode');
+
+            document.getElementById('transactionId').value = transactionId;
+            document.getElementById('kodetransaksiShow').textContent = transactionKode;
+        })
+    });
+    // modal batal
+    document.querySelectorAll('.denyTrans').forEach(button=>{
+        button.addEventListener('click',function(){
+            const transactionId = button.getAttribute('data-id');
+            const transactionKode = button.getAttribute('data-kode');
+
+            document.getElementById('transactionIdcancel').value = transactionId;
+            document.getElementById('showKode').textContent = transactionKode;
+        })
+    });
+
+    // modal bukti
+    const imageModal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('imageModalLabel');
+
+    document.querySelectorAll('.openImageModal').forEach(item => {
+        item.addEventListener('click', function() {
+            const imageSrc = this.getAttribute('data-image');
+            const imageTitle = this.getAttribute('data-title');
+
+            modalImage.src = imageSrc;
+            modalTitle.textContent = "Transaksi " + imageTitle;
+        });
+    });
+});
 </script>
 @endsection
