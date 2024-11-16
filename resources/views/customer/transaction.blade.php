@@ -225,67 +225,6 @@
 @endsection
 
 @section('script')
-{{-- <script>
-    $(document).ready(function(){
-        $('#tabelTransaksi').dataTable({
-            responsive: true,
-            order: [[0, 'desc']] 
-        });
-
-        $('#transactionDetailModal').on('show.bs.modal', function (event) {
-          var button = $(event.relatedTarget); 
-
-          var id = button.data('id');
-          var tanggalPembelian = button.data('tanggal');
-          var totalTransaksi = button.data('total');
-          var transaksiDetails = button.data('transaksi');
-          var diskon = button.data('diskon');
-
-          var modal = $(this);
-          modal.find('#modalTanggalPembelian').text(tanggalPembelian);
-          modal.find('#modalTotalTransaksi').text(totalTransaksi);
-          modal.find('#modalDiskon').text(diskon);
-          modal.find('#transactionDetailsBody').empty();
-          
-          transaksiDetails.forEach(function(item) {
-              var productImage = item.product.fotoPromosi ? `<img src="{{ asset('images/uploads') }}/${item.product.fotoPromosi}" style="width: 100px;" alt="${item.product.namaBarang}">` : 'No Image';
-              
-              var row = `
-                  <tr>
-                      <td>${productImage}</td>
-                      <td>${item.product.namaBarang}</td>
-                      <td>${item.totalJumlah} ${item.satuanBarang}</td>
-                      <td>Rp${parseFloat(item.hargaSatuan).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
-                      <td>Rp${(item.hargaSatuan * item.totalJumlah).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
-                  </tr>
-              `;
-              modal.find('#transactionDetailsBody').append(row);
-          });
-      });
-    });
-
-    function setCancelId(id,kode) {
-        document.getElementById('transactionToCancel').value = id;
-        document.getElementById('showKode').textContent = kode;
-        document.getElementById('cancelConfirmationModalLabel').textContent = "Transaksi " + kode;
-    }   
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const imageModal = document.getElementById('imageModal');
-        const modalImage = document.getElementById('modalImage');
-        const modalTitle = document.getElementById('imageModalLabel');
-
-        document.querySelectorAll('.openImageModal').forEach(item => {
-            item.addEventListener('click', function() {
-                const imageSrc = this.getAttribute('data-image');
-                const imageTitle = this.getAttribute('data-title');
-                
-                modalImage.src = imageSrc;
-                modalTitle.textContent = "Transkasi "+imageTitle;
-            });
-        });
-    });
-</script> --}}
 <script>
     $(document).ready(function() {
     $('#tabelTransaksi').dataTable({

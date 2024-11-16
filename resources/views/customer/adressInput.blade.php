@@ -68,7 +68,7 @@
                     <label for="kota" class="form-label">Kabupaten/Kota:</label>
                     <select name="kota" id="kota" class="form-select" placeholder="Pilih Kabupaten/Kota">
                         <option value="">Pilih Kabupaten/Kota</option>
-                        <!-- Populate with data dynamically -->
+
                     </select>
                 </div>
             
@@ -76,7 +76,7 @@
                     <label for="kecamatan" class="form-label">Kecamatan:</label>
                     <select name="kecamatan" id="kecamatan" class="form-select" placeholder="Pilih Kecamatan">
                         <option value="">Pilih Kecamatan</option>
-                        <!-- Populate with data dynamically -->
+
                     </select>
                 </div>
             
@@ -84,7 +84,7 @@
                     <label for="kelurahan" class="form-label">Kelurahan:</label>
                     <select name="kelurahan" id="kelurahan" class="form-select" placeholder="Pilih Kelurahan">
                         <option value="">Pilih Kelurahan</option>
-                        <!-- Populate with data dynamically -->
+
                     </select>
                 </div>
             
@@ -113,7 +113,7 @@
         </div>
     </div>
 </div>
-<!-- Edit Address Modal -->
+<!-- Modal edit alamat -->
 <div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -186,7 +186,7 @@
     </div>
   </div>
 
-<!-- Delete Confirmation Modal -->
+<!-- modal hapus alamat -->
 <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -199,7 +199,6 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <!-- Form to delete the address -->
                 <form id="deleteAddressForm" method="POST" action="{{ url('/address/delete') }}">
                     @csrf
                     @method('DELETE')
@@ -297,7 +296,6 @@ selectKecamatan.addEventListener('change',(e)=>{
     }
 </script>
 <script>
-    // Fetch Provinces
     fetch('https://alanbb2003.github.io/api-wilayah-indonesia/api/provinces.json')
     .then(response => response.json())
     .then(provinces => {
@@ -308,7 +306,6 @@ selectKecamatan.addEventListener('change',(e)=>{
         document.getElementById('editProvinsi').innerHTML = tampung;
     });
 
-    // Event listener for Provinsi change
     document.getElementById('editProvinsi').addEventListener('change', (e) => {
         let provinsiId = e.target.options[e.target.selectedIndex].dataset.reg;
         fetch(`https://alanbb2003.github.io/api-wilayah-indonesia/api/regencies/${provinsiId}.json`)
@@ -324,7 +321,6 @@ selectKecamatan.addEventListener('change',(e)=>{
         });
     });
 
-    // Event listener for Kota change
     document.getElementById('editKota').addEventListener('change', (e) => {
         let kotaId = e.target.options[e.target.selectedIndex].dataset.dist;
         fetch(`https://alanbb2003.github.io/api-wilayah-indonesia/api/districts/${kotaId}.json`)
@@ -339,7 +335,6 @@ selectKecamatan.addEventListener('change',(e)=>{
         });
     });
 
-    // Event listener for Kecamatan change
     document.getElementById('editKecamatan').addEventListener('change', (e) => {
         let kecamatanId = e.target.options[e.target.selectedIndex].dataset.vill;
         fetch(`https://alanbb2003.github.io/api-wilayah-indonesia/api/villages/${kecamatanId}.json`)

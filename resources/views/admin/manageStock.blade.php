@@ -1,4 +1,3 @@
-{{-- @extends('layouts.app') --}}
 @extends('layouts.appAdmin')
 
 @section('content')
@@ -36,9 +35,6 @@
             <tr>
               <td>{{$k->id}}</td>
               <td>
-                {{-- <a target="_blank" href="{{asset('images/uploads/'.$k->fotoPromosi)}}">
-                  <img class="card-img-top thumbnail" src="{{asset('images/uploads/'.$k->fotoPromosi)}}" alt="Gambar Barang">
-                </a> --}}
                 @if($k->fotoPromosi)
                 <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
                     data-image="{{ asset('images/uploads/'.$k->fotoPromosi) }}" 
@@ -79,14 +75,12 @@
                     </button>
                   </div>
                 
-                  <!-- Button for Edit -->
                   <div class="row px-2 mb-2">
                     <a href="{{ url('/dashboard/barang/edit/'.$k->id) }}" class="btn btn-primary w-100">
                       <i class="fa-regular fa-pen-to-square"></i> Edit
                     </a>
                   </div>
                 
-                  <!-- Button for Enable/Disable -->
                   <div class="row px-2">
                     <a href="/dashboard/barang/toggle-status/{{$k->id}}" 
                       class="btn {{ $k->Status == 1 ? 'btn-danger' : 'btn-success' }}">
@@ -102,7 +96,7 @@
       </div>
     </div>
 
-    <!-- Single Modal to show product images -->
+    <!-- Modal gambar -->
     <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
@@ -116,47 +110,44 @@
           </div>
       </div>
     </div>
-        <!-- Modal for Tambah Jumlah -->
-        <div class="modal fade" id="tambahJumlahModal" tabindex="-1" aria-labelledby="tambahJumlahModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="tambahJumlahModalLabel">Tambah Jumlah Barang</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <form action="{{ route('admin.TambahJumlah') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                  <input type="hidden" id="barangId" name="barangId">
-                  
-                  <!-- Satuan Selection -->
-                  <div class="mb-3">
-                    <label for="satuan" class="form-label">Pilih Satuan</label>
-                    <select class="form-select" id="satuan" name="satuan">
-                      <!-- Options will be populated by JavaScript -->
-                    </select>
-                  </div>
-        
-                  <!-- Amount Input -->
-                  <div class="mb-3">
-                    <label for="amount" class="form-label">Jumlah</label>
-                    <input type="number" class="form-control" id="amount" name="amount" placeholder="Masukkan jumlah" required>
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                  <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-              </form>
-            </div>
+    <!-- Modal Tambah Jumlah -->
+    <div class="modal fade" id="tambahJumlahModal" tabindex="-1" aria-labelledby="tambahJumlahModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="tambahJumlahModalLabel">Tambah Jumlah Barang</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
+          <form action="{{ route('admin.TambahJumlah') }}" method="POST">
+            @csrf
+            <div class="modal-body">
+              <input type="hidden" id="barangId" name="barangId">
+              
+              <div class="mb-3">
+                <label for="satuan" class="form-label">Pilih Satuan</label>
+                <select class="form-select" id="satuan" name="satuan">
+
+                </select>
+              </div>
+    
+              <div class="mb-3">
+                <label for="amount" class="form-label">Jumlah</label>
+                <input type="number" class="form-control" id="amount" name="amount" placeholder="Masukkan jumlah" required>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+              <button type="submit" class="btn btn-primary">Simpan</button>
+            </div>
+          </form>
         </div>
+      </div>
+    </div>
 </div>
 @endsection
 
 @section('script')
 <script>
-  // type="text/javascript"
     $(document).ready(function(){
         $('#tableBarang').dataTable({
           responsive: true
@@ -175,15 +166,13 @@
       var satuanKecil = button.getAttribute('data-satuan-kecil');
       var satuanBesar = button.getAttribute('data-satuan-besar');
       var isiSatuan = button.getAttribute('data-isiBesar')
-      // Update the modal's hidden input field with the barangId
+
       var modalBarangIdInput = tambahJumlahModal.querySelector('#barangId');
       modalBarangIdInput.value = barangId;
       
-      // Populate the satuan dropdown
       var satuanSelect = tambahJumlahModal.querySelector('#satuan');
-      satuanSelect.innerHTML = '';  // Clear previous options
+      satuanSelect.innerHTML = '';  
       
-      // Add Satuan Kecil if available
       if (satuanKecil) {
         var optionKecil = document.createElement('option');
         optionKecil.value = 'kecil';
@@ -191,7 +180,6 @@
         satuanSelect.appendChild(optionKecil);
       }
       
-      // Add Satuan Besar if available
       if (satuanBesar) {
         var optionBesar = document.createElement('option');
         optionBesar.value = 'besar';
@@ -200,6 +188,7 @@
       }
     });
 
+    // untuk buka modal gambar
     document.addEventListener('DOMContentLoaded', function() {
         const imageModal = document.getElementById('imageModal');
         const modalImage = document.getElementById('modalImage');
@@ -210,12 +199,10 @@
                 const imageSrc = this.getAttribute('data-image');
                 const imageTitle = this.getAttribute('data-title');
                 
-                // Set the image source and title dynamically
                 modalImage.src = imageSrc;
                 modalTitle.textContent = imageTitle;
             });
         });
     });
-    // let table = new DataTable('#tableBarang');
 </script>
 @endsection

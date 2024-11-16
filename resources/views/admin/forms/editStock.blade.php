@@ -8,8 +8,7 @@
   </button>
 </div>
 <br>
-<!-- Button trigger kategori -->
-<!-- ISI PAGE -->
+
 <div class="container d-flex" id="insertBarang" style="background-color:rgb(233, 237, 242)">
 
 <div class="collapse border border-primary p-2 mx-3 my-2" id="insertKategori" style="background-color:rgb(233, 237, 242)">
@@ -44,7 +43,6 @@
       <td style="width: 100px;">
         <div class="container d-flex-inline flex-row"></div>
         <button type="button" class="btn btn-success edit-item" id="edit-item" data-item-id="{{$k->id}}"><i class="fa-regular fa-pen-to-square"></i></button>
-        {{-- <a href="#" data-method="DELETE" data-confirm="Yakin hapus kategori ini ?" class="btn btn-danger btn-xs pull-right delete"><i class="fa-regular fa-trash-can"></i></a> --}}
       </td>
     </tr>
     @endforeach
@@ -53,7 +51,6 @@
 </div>
 
 <!-- ISI Data barang -->
-
 <div class="col my-1 mx-2">
   <div class="my-2">
     <label for="formFile" class="form-label">Gambar yang ada</label>
@@ -61,8 +58,6 @@
         @foreach ($pictures as $picture)
             <div class="img-thumbnail d-inline-block position-relative" style="width: 100px; height: 100px;">
                 <img src="{{ asset('images/uploads/'.$picture->fileName) }}" alt="{{ $picture->fileName }}" style="width: 100%; height: 100%; object-fit: cover;">
-                
-                <!-- Separate form to delete each image -->
                 <form action="{{ url('/dashboard/barang/delete-image', $picture->id) }}" method="POST" class="position-absolute top-0 end-0">
                     @csrf
                     @method('DELETE')
@@ -74,9 +69,8 @@
   </div>
     <form class="row g-3" action="{{ url('/dashboard/barang/edit', $product->id) }}" method="POST" enctype="multipart/form-data">
       @csrf
-      @method('PUT') <!-- Since this is an edit, use PUT method -->
+      @method('PUT') 
       
-      <!-- Product Thumbnail Image -->
       <div class="mb-3 d-flex">
           <img id="frame" src="{{ asset('images/uploads/'.$product->fotoPromosi)}}" width="100px" height="100px" class="img-thumbnail mt-1" />
           <div class="container-fluid">
@@ -88,14 +82,12 @@
           </div>
       </div>
 
-      <!-- Upload New Images -->
       <div class="mb-3">
           <label for="formFile" class="form-label">Upload Gambar Baru</label>
           <input class="form-control" type="file" id="images" name="images[]" multiple>
           <div id="frames"></div>
       </div>
 
-      <!-- Product Name -->
       <div class="col-md-4">
           <label for="inputNamaBarang" class="form-label">Nama Barang</label>
           <input type="text" class="form-control @error('inputNamaBarang') is-invalid @enderror" id="inputNamaBarang" name="inputNamaBarang" value="{{ $product->namaBarang }}">
@@ -104,7 +96,6 @@
           @enderror
       </div>
 
-      <!-- Product Category -->
       <div class="col-md-3">
           <label for="inputKategori" class="form-label">Kategori</label>
           <select class="form-select" id="inputKategori" name="inputKategori">
@@ -114,7 +105,6 @@
           </select>
       </div>
 
-      <!-- Product Description -->
       <div class="col-md-4">
           <label for="inputDeskripsi" class="form-label">Deskripsi</label>
           <textarea class="form-control @error('inputDeskripsi') is-invalid @enderror" id="inputDeskripsi" name="inputDeskripsi" rows="5">{{ $product->deskripsi }}</textarea>
@@ -123,7 +113,6 @@
           @enderror
       </div>
 
-      <!-- Quantity Fields -->
       <div class="col-md-2">
           <label for="inputJumlahKecil" class="form-label">Jumlah terkecil</label>
           <input type="number" min="0" class="form-control @error('inputJumlahKecil') is-invalid @enderror" id="inputJumlahKecil" name="inputJumlahKecil" value="{{ $product->totalQuantity }}">
@@ -156,7 +145,6 @@
           @enderror
       </div>
 
-      <!-- Pricing Fields -->
       <div class="d-flex flex-row">
           <div class="col-md-2 me-3">
               <label for="inputHargaKecil" class="form-label">Harga jumlah terkecil</label>
@@ -175,7 +163,6 @@
           </div>
       </div>
 
-      <!-- Submit Button -->
       <div class="col-12">
           <button type="submit" class="btn btn-primary">Update</button>
       </div>
@@ -183,8 +170,7 @@
 </div>
     
 </div>
-
-<!-- Edit Category Modal -->
+{{--Modal edit kategori --}}
 <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -218,78 +204,62 @@ $(document).ready(function(){
         }
     });
 
-    $('#thumbnail').change(function preview() {
-    frame.src=URL.createObjectURL(event.target.files[0]);
+    $('#thumbnail').change(function preview(event) {
+      const frame = document.getElementById('frame');
+      frame.src = URL.createObjectURL(event.target.files[0]);
     });
     
     $('#tableKategori').dataTable(
 
     );
 
-    $('#exampleModalCenter').on('shown.bs.modal', function () {
-      $('#myInput').trigger('focus')
-    })
-
     $.ajaxSetup({
-    headers: {
-      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      }
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
     });
-    // When edit button is clicked
-  $('.edit-item').on('click', function(){
-    var categoryId = $(this).data('item-id');
-    var categoryName = $(this).closest('tr').find('.namaKategori').text();
 
-    // Fill the modal with the data
-    $('#categoryId').val(categoryId);
-    $('#categoryName').val(categoryName);
+    $(document).on('click', '.edit-item', function () {
+        var categoryId = $(this).data('item-id');
+        var categoryName = $(this).closest('tr').find('.namaKategori').text();
 
-    // Clear previous error messages
-    $('#editCategoryForm .error-message').remove();
+        $('#categoryId').val(categoryId);
+        $('#categoryName').val(categoryName);
 
-    // Open the modal
-    $('#editCategoryModal').modal('show');
-    // var myModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
-    // myModal.show();
-  });
+        $('#editCategoryForm .error-message').remove();
+        $('#editCategoryModal').modal('show');
+    });
 
-  // Handle form submission
   $('#editCategoryForm').on('submit', function(e){
     e.preventDefault();
 
     var formData = $(this).serialize();
 
     $.ajax({
-      url: '/dashboard/barang/new/kategori/update-category', // Change this to your update URL
+      url: '/dashboard/barang/new/kategori/update-category', 
       type: 'POST',
       data: formData,
       success: function(response) {
-        // Close the modal
         var myModalEl = document.getElementById('editCategoryModal');
         var modal = bootstrap.Modal.getInstance(myModalEl);
         modal.hide();
 
-        // Optionally, update the category name in the table
         $('button[data-item-id="' + response.id + '"]').closest('tr').find('.namaKategori').text(response.nama_category);
-
-        // Optionally, show a success message
         
-        alert('Kategori berhasil diperbarui!');
-
-          // Refresh the category select dropdown
-          refreshCategoryDropdown();
+        refreshCategoryDropdown();
       },
       error: function(response) {
-        // Display error message
         var errorMessage = response.responseJSON ? response.responseJSON.error : 'An unexpected error occurred.';
         var errorElement = $('<div class="error-message alert alert-danger mt-2"></div>').text(errorMessage);
         $('#editCategoryForm').prepend(errorElement);
       }
     });
   });
-  function refreshCategoryDropdown() {
+  
+});
+function refreshCategoryDropdown() {
     $.ajax({
-      url: '/dashboard/barang/new/get-categories', // Change this to your URL to fetch categories
+      url: '/dashboard/barang/new/get-categories', 
       type: 'GET',
       success: function(response) {
         var select = $('#inputKategori');
@@ -303,6 +273,5 @@ $(document).ready(function(){
       }
     });
   }
-});
 </script>
 @endsection

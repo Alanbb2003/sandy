@@ -22,12 +22,8 @@
             @foreach ($transaksi as $htrans)
             <tr>
               <td>{{ $htrans->kodeTrans }}</td>
-    
-              <!-- Display the user's first and last name -->
               <td>{{ $htrans->user->firstName }} {{ $htrans->user->lastName }}</td>
-          
               <td>{{ \Carbon\Carbon::parse($htrans->tanggalPembelian)->format('d-m-Y H:i:s') }}</td> 
-
               <td>
                 <button type="button" class="btn btn-info" 
                     data-id="{{ $htrans->id }}"
@@ -41,9 +37,7 @@
                     Detail
                 </button>
               </td>
-
               <td>Rp{{ number_format($htrans->totalPembelian, 2, ',', '.') }}</td>
-              
               <td>
                   @if($htrans->buktiPembayaran)
                     <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
@@ -221,7 +215,6 @@
         order: [[0, 'desc']]
     });
 
-    // detail transaksi
     $('#detailModal').on('show.bs.modal', function(event) {
         const button = $(event.relatedTarget);
 
@@ -257,7 +250,6 @@
         });
     });
 
-    // modal konfirmasi
     document.querySelectorAll('.acceptTrans').forEach(button=>{
         button.addEventListener('click',function(){
             const transactionId = button.getAttribute('data-id');
@@ -267,7 +259,7 @@
             document.getElementById('kodetransaksiShow').textContent = transactionKode;
         })
     });
-    // modal batal
+
     document.querySelectorAll('.denyTrans').forEach(button=>{
         button.addEventListener('click',function(){
             const transactionId = button.getAttribute('data-id');
@@ -278,7 +270,6 @@
         })
     });
 
-    // modal bukti
     const imageModal = document.getElementById('imageModal');
     const modalImage = document.getElementById('modalImage');
     const modalTitle = document.getElementById('imageModalLabel');

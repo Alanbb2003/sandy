@@ -109,10 +109,6 @@ class ReportController extends Controller
     public function laporanMembership(Request $request){
         $query = Membership::with(['user', 'points']);
 
-        // if ($request->filled('statusMembership')) {
-        //     $query->where('statusMembership', $request->statusMembership);
-        // }
-
         if ($request->filled('tanggalMulai_min') && $request->filled('tanggalMulai_max')) {
             $query->whereBetween(DB::raw('DATE(tanggalDaftar)'), [
                 $request->tanggalMulai_min, 
@@ -169,47 +165,45 @@ class ReportController extends Controller
         ]);
     }
 
-    public function laporanPenjualan(Request $request){
-        $startDate = $request->get('start_date');
-        $endDate = $request->get('end_date');
+    public function laporanPenjualan(Request $request)
+    {
+        $query = Dtrans::with(['product:id,namaBarang'])
+            ->whereHas('htrans', function ($query) use ($request) {
+                $query->where('status', 3);
 
-        $startDateFormatted = $startDate ? Carbon::parse($startDate)->format('d/m/Y') : '';
-        $endDateFormatted = $endDate ? Carbon::parse($endDate)->format('d/m/Y') : '';
-
-        $salesPerProduct = Dtrans::with('product')
-        ->whereHas('htrans', function ($query) use ($startDate, $endDate) {
-            $query->where('status', 3);
-            
-            if ($startDate && $endDate) {
-                $query->whereBetween('tanggalPembelian', [$startDate, $endDate]);
-            }
-        })
-        ->select(
-            'fkProductID',
-            'satuanBarang as unit',
-            DB::raw('SUM(totalJumlah) as total_quantity_sold'),
-            DB::raw('SUM(totalJumlah * hargaSatuan) as total_income')
-        )
-        ->groupBy('fkProductID', 'unit') 
-        ->with('product:id,namaBarang')
-        ->get()
-        ->groupBy('product.namaBarang');
+                if ($request->filled('start_date') && $request->filled('end_date')) {
+                    $query->whereBetween(DB::raw('DATE(tanggalPembelian)'), [
+                        $request->start_date, 
+                        $request->end_date
+                    ]);
+                } elseif ($request->filled('start_date')) {
+                    $query->where('tanggalPembelian', '>=', $request->start_date);
+                } elseif ($request->filled('end_date')) {
+                    $query->where('tanggalPembelian', '<=', $request->end_date);
+                }
+            });
+    
+        $salesPerProduct = $query
+            ->select(
+                'fkProductID',
+                'satuanBarang as unit',
+                DB::raw('SUM(totalJumlah) as total_quantity_sold'),
+                DB::raw('SUM(totalJumlah * hargaSatuan) as total_income')
+            )
+            ->groupBy('fkProductID', 'unit')
+            ->get()
+            ->groupBy('product.namaBarang');
+    
+        $startDateFormatted = $request->filled('start_date') 
+            ? Carbon::parse($request->start_date)->format('d/m/Y') 
+            : null;
+    
+        $endDateFormatted = $request->filled('end_date') 
+            ? Carbon::parse($request->end_date)->format('d/m/Y') 
+            : null;
+    
         return view('admin.laporan.laporanPenjualan', compact('salesPerProduct', 'startDateFormatted', 'endDateFormatted'));
     }
-    
-    // public function laporanAktif(){
-    //     $customers = User::where('role', '!=', 1)
-    //     ->with(['wishlists.product', 'htrans.dtrans.product.category'])
-    //     ->get()
-    //     ->map(function ($user) {
-    //         $completedTransactions = $user->htrans->where('status', 3);
-    //         $user->total_completed_transactions = $completedTransactions->count();
-    //         $user->total_transaction_amount = $completedTransactions->sum('totalPembelian');
-    //         $user->newest_transaction_date = $completedTransactions->max('tanggalPembelian');
-    //         return $user;
-    //     });
-    //     return view('admin.laporan.laporanAktif', compact('customers'));
-    // }
     public function laporanAktif(Request $request){
         $query = User::where('role', '!=', 1)->with(['htrans.dtrans.product']);
 

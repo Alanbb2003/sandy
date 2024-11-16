@@ -48,7 +48,7 @@
         </div>
     </div>
 </div>
-<!-- Single Modal for Customer Details -->
+<!-- Detail pelanggan -->
 <div class="modal fade" id="customerDetailModal" tabindex="-1" aria-labelledby="customerDetailModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -111,7 +111,7 @@
   </div>
 </div>
 
-<!-- Modal for Sending Custom Email -->
+<!-- modal kirim email -->
 <div class="modal fade" id="sendEmailModal" tabindex="-1" aria-labelledby="sendEmailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">

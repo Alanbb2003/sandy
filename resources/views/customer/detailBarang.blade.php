@@ -215,7 +215,6 @@
             var tooltip = new bootstrap.Tooltip(tooltipTriggerEl);
             
             tooltipTriggerEl.addEventListener('click', function () {
-                // Hide tooltip after clicking
                 tooltip.hide();
             });
             
@@ -250,7 +249,6 @@
         })
         .then(response => response.json())
         .then(data => {
-            // Update the button based on the response
             if (data.in_wishlist) {
                 button.innerHTML = '<i class="fa-solid fa-heart"></i>';
             } else {

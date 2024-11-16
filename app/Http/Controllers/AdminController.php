@@ -31,7 +31,6 @@ class AdminController extends Controller
     }
     
     public function adminManageStock(){
-        // $barang = Products::all();
         $barang = Products::join('category','product.fk_kategori','=','category.id')
         ->select('product.*','category.nama_category as category')
         ->get();
@@ -242,11 +241,13 @@ class AdminController extends Controller
             $category->nama_category = strtoupper($request->input('categoryName')) ;
             $category->slugKategori = Str::slug($request->input('categoryName'));
             $category->save();
+            alert()->success('Success!','Berhasil menambahkan kategori');
             return response()->json([
                 'id' => $category->id,
                 'nama_category' => strtoupper($category->nama_category) 
             ]);
         } catch (\Exception $e) {
+            alert()->error('Error', 'Terjadi kesalahan saat memperbarui kategori.');
             return response()->json(['error' => 'Failed to update category. Please try again.'], 500);
         }
     }

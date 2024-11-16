@@ -72,13 +72,6 @@
 @endsection
 @section('script')
 <script>
-    //  $(document).ready(function(){
-    //     $('#tabelPenjualan').dataTable({
-    //         language: {
-    //         emptyTable: "No data available in table"
-    //     },
-    //     responsive: true
-    //     } );
-    // });
+
 </script>
 @endsection

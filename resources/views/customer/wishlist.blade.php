@@ -6,21 +6,14 @@
     <div class="col-sm-12 p-1 d-flex flex-wrap">
         @foreach ($WishlistItems as $wishlistItem)
         <div class="card mb-4 p-1 mx-2 d-flex flex-column" style="width: 180px; min-height: 320px;">
-            <!-- Product Image -->
             <a target="_blank" href="{{ asset('images/uploads/' . $wishlistItem->product->fotoPromosi) }}">
                 <img class="card-img-top thumbnail" src="{{ asset('images/uploads/' . $wishlistItem->product->fotoPromosi) }}" alt="Gambar Barang" loading="lazy">
             </a>
             <div class="card-body d-flex flex-column justify-content-between">
-                <!-- Product Name -->
                 <h5 class="card-title">{{ $wishlistItem->product->namaBarang }}</h5>
-                <!-- Product Price -->
                 <p class="card-text">Rp.{{ number_format($wishlistItem->product->hargaKecil, 0, ',', '.') }}</p>
-               
-              
                 <div class="mt-auto d-flex justify-content-between align-items-center">
-                        <!-- Product Detail Link -->
                     <a href="{{ url('/product/' . $wishlistItem->product->slugBarang) }}" class="btn btn-primary me-2 w-75">Detail</a>
-                        <!-- Wishlist Toggle Button --> 
                     <button class="wishlist-toggle btn" data-product-id="{{ $wishlistItem->product->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Wishlist">
                         @if(Auth::check())
                             @if(Auth::user()->wishlists->contains('fkProductID', $wishlistItem->product->id))

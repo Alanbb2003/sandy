@@ -69,7 +69,6 @@
         </table>
     </div>
 
-    <!-- Open Transaction Modal Button -->
     <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#selectTransactionModal">
         Select Transaction
     </button>

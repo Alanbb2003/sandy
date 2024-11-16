@@ -111,8 +111,6 @@
     <div class="card shadow-sm">
         <div class="card-body">
             <h4 class="card-title text-center mb-4">Profile</h4>
-
-            <!-- Profile Picture Display and Upload Form -->
             <div class="text-center mb-4">
                 @if($user->picture)
                     <img src="{{ asset('storage/' . $user->picture) }}" alt="Profile Picture" class="rounded-circle" width="100" height="100" id="frame">
@@ -123,9 +121,6 @@
 
             <form action="{{ route('user.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-
-                <!-- Profile Picture Upload -->
-                
                 <div class="form-group mb-3">
                     <label for="profilePicture">Upload Profile Picture</label>
                     <input type="file" class="form-control @error('profilePicture') is-invalid @enderror" 
@@ -195,7 +190,7 @@
         </div>
     </div>
 
-    <!-- Change Password Section -->
+    <!-- Ubah password -->
     <div class="card shadow-sm mt-5">
         <div class="card-body">
             <h4 class="card-title text-center mb-4">Ubah Password</h4>

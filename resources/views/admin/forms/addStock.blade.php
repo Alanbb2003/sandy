@@ -1,14 +1,12 @@
 @extends('layouts.appAdmin')
 @section('content')
-
-<!-- Button trigger kategori -->
 <div class="mx-5 my-3 card">
   <button class="btn btn-primary" type="button" data-bs-toggle="collapse" href="#insertKategori" data-bs-target="#insertKategori" aria-expanded="false" aria-controls="insertKategori">
     Tambah Kategori
   </button>
 </div>
 <br>
-<!-- ISI PAGE -->
+
 <div class="container d-flex" id="insertBarang" style="background-color:rgb(233, 237, 242)">
 
 <div class="collapse border border-primary p-2 mx-3 my-2" id="insertKategori" style="background-color:rgb(233, 237, 242)">
@@ -51,103 +49,6 @@
 </div>
 
 <!-- ISI Data barang -->
-    {{-- <form class="row g-3" action="{{url('/dashboard/barang/new') }}" method="POST" enctype="multipart/form-data">
-      @csrf
-      <div class="mb-3 d-flex">
-        <img id="frame" src="" width="100px" height="100px" class="img-thumbnail mt-1"/>
-        <div class="container-fluid">
-          <label for="thumbnail" class="form-label">Foto produk promosi</label>
-          <input class="form-control" type="file" id="thumbnail" name="thumbnail">
-          @error('thumbnail')
-          <div class="alert alert-danger">{{ $message }}</div>
-          @enderror
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <label for="formFile" class="form-label">Gambar</label>
-        <input class="form-control" type="file" id="images" name="images[]" multiple>
-        <div id="frames"></div>
-      </div>
-
-      <div class="col-md-4">
-        <label for="inputNamaBarang" class="form-label">Nama Barang</label>
-        <input type="text" class="form-control  @error('inputNamaBarang') is-invalid @enderror" id="inputNamaBarang" name="inputNamaBarang">
-        @error('inputNamaBarang')
-        <div class="alert alert-danger">{{ $message }}</div>
-        @enderror
-      </div>
-    
-      <div class="col-md-3">
-        <label for="" class="form-label">Kategori</label>
-        <select class="form-select" id="inputKategori" name="inputKategori" placeholder="select Kategori..." >
-          @foreach ($kategori as $k)
-            <option value="{{$k->id}}">{{$k->nama_category}}</option>
-          @endforeach
-        </select>
-      </div>
-
-      <div class="col-md-4">
-        <label for="inputDeskripsi" class="form-label">Deskripsi</label>
-        <textarea class="form-control  @error('inputDeskripsi') is-invalid @enderror" id="inputDeskripsi" name="inputDeskripsi" rows="5" cols="40" placeholder="Enter your text here..." required></textarea>
-      </div>
-      @error('inputDeskripsi')
-      <div class="alert alert-danger">{{ $message }}</div>
-      @enderror
-      
-      <div class="col-md-2">
-          <label for="inputJumlah" class="form-label">jumlah terkecil</label>
-          <input type="number" min="0" class="form-control  @error('inputJumlahKecil') is-invalid @enderror" id="inputJumlahKecil" name="inputJumlahKecil">
-          @error('inputJumlahKecil')
-          <div class="alert alert-danger">{{ $message }}</div>
-          @enderror
-      </div>
-      
-      <div class="col-md-2">
-        <label for="inputJumlah" class="form-label">Satuan terkecil</label>
-        <input type="text" class="form-control  @error('inputSatuanKecil') is-invalid @enderror" id="inputSatuanKecil" name="inputSatuanKecil">
-        @error('inputSatuanKecil')
-        <div class="alert alert-danger">{{ $message }}</div>
-        @enderror
-      </div>
-
-      <div class="col-md-2">
-        <label for="inputJumlah" class="form-label">jumlah terkecil dalam -></label>
-        <input type="number" min="0" class="form-control  @error('inputJumlahBesar') is-invalid @enderror" id="inputJumlahBesar" name="inputJumlahBesar">
-        @error('inputJumlahBesar')
-        <div class="alert alert-danger">{{ $message }}</div>
-        @enderror
-      </div>
-    
-      <div class="col-md-2">
-        <label for="inputJumlah" class="form-label">Satuan terbesar</label>
-        <input type="text" class="form-control  @error('inputSatuanBesar') is-invalid @enderror" id="inputSatuanBesar" name="inputSatuanBesar">
-        @error('inputSatuanBesar')
-        <div class="alert alert-danger">{{ $message }}</div>
-        @enderror
-      </div>
-      <div class="d-flex flex-row">
-        <div class="col-md-2 me-3">
-          <label for="inputJumlah" class="form-label"> Harga jumlah terkecil</label>
-          Rp.<input type="number" min="0" class="form-control  @error('inputHargaKecil') is-invalid @enderror" id="inputHargaKecil" name="inputHargaKecil">
-          @error('inputHargaKecil')
-          <div class="alert alert-danger">{{ $message }}</div>
-          @enderror
-        </div>
-  
-        <div class="col-md-2">
-            <label for="inputJumlah" class="form-label">Harga jumlah terbesar</label>
-            Rp.<input type="number" min="0" class="form-control  @error('inputHargaBesar') is-invalid @enderror" id="inputHargaBesar" name="inputHargaBesar">
-            @error('inputHargaBesar')
-            <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
-        </div>
-      </div>
-     
-      <div class="col-12">
-        <button type="submit" class="btn btn-primary">Tambah</button>
-      </div>
-    </form> --}}
     <form class="container py-3" action="{{url('/dashboard/barang/new') }}" method="POST" enctype="multipart/form-data">
       @csrf
       <div class="row mb-3 align-items-center">
@@ -270,7 +171,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="editCategoryForm">
+        <form id="editCategoryForm" action="{{route('category.update') }}">
+          @csrf
           <div class="form-group">
             <label for="categoryName">Nama Kategori</label>
             <input type="text" class="form-control" id="categoryName" name="categoryName" required>
@@ -294,75 +196,63 @@ $(document).ready(function(){
             $("#frames").append('<img src="'+window.URL.createObjectURL(this.files[i])+'" width="120px" height="120px" class="img-thumbnail mt-1"/>');
         }
     });
-    $('#thumbnail').change(function preview() {
-    frame.src=URL.createObjectURL(event.target.files[0]);
-    });
+    $('#thumbnail').change(function preview(event) {
+      const frame = document.getElementById('frame');
+      frame.src = URL.createObjectURL(event.target.files[0]);
+   });
     
     $('#tableKategori').dataTable(
 
     );
-
-    $('#exampleModalCenter').on('shown.bs.modal', function () {
-      $('#myInput').trigger('focus')
-    })
 
     $.ajaxSetup({
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
     });
-    // When edit button is clicked
-  $('.edit-item').on('click', function(){
-    var categoryId = $(this).data('item-id');
-    var categoryName = $(this).closest('tr').find('.namaKategori').text();
 
-    // Fill the modal with the data
-    $('#categoryId').val(categoryId);
-    $('#categoryName').val(categoryName);
+    $(document).on('click', '.edit-item', function () {
+        var categoryId = $(this).data('item-id');
+        var categoryName = $(this).closest('tr').find('.namaKategori').text();
 
-    // Clear previous error messages
-    $('#editCategoryForm .error-message').remove();
-    $('#editCategoryModal').modal('show');
-    // var myModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
-    // myModal.show();
-  });
+        $('#categoryId').val(categoryId);
+        $('#categoryName').val(categoryName);
 
-  // Handle form submission
+        $('#editCategoryForm .error-message').remove();
+        $('#editCategoryModal').modal('show');
+    });
+
+
   $('#editCategoryForm').on('submit', function(e){
     e.preventDefault();
 
     var formData = $(this).serialize();
 
     $.ajax({
-      url: '/dashboard/barang/new/kategori/update-category', // Change this to your update URL
+      url: '/dashboard/barang/new/kategori/update-category',
       type: 'POST',
       data: formData,
       success: function(response) {
-        // Close the modal
         var myModalEl = document.getElementById('editCategoryModal');
         var modal = bootstrap.Modal.getInstance(myModalEl);
         modal.hide();
 
-        // Optionally, update the category name in the table
         $('button[data-item-id="' + response.id + '"]').closest('tr').find('.namaKategori').text(response.nama_category);
 
-        // Optionally, show a success message
-        alert('Kategori berhasil diperbarui!');
-
-          // Refresh the category select dropdown
-          refreshCategoryDropdown();
+        refreshCategoryDropdown();
       },
       error: function(response) {
-        // Display error message
         var errorMessage = response.responseJSON ? response.responseJSON.error : 'An unexpected error occurred.';
         var errorElement = $('<div class="error-message alert alert-danger mt-2"></div>').text(errorMessage);
         $('#editCategoryForm').prepend(errorElement);
       }
     });
   });
-  function refreshCategoryDropdown() {
+  
+});
+function refreshCategoryDropdown() {
     $.ajax({
-      url: '/dashboard/barang/new/get-categories', // Change this to your URL to fetch categories
+      url: '/dashboard/barang/new/get-categories',
       type: 'GET',
       success: function(response) {
         var select = $('#inputKategori');
@@ -376,6 +266,5 @@ $(document).ready(function(){
       }
     });
   }
-});
 </script>
 @endsection

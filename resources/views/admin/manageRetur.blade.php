@@ -44,8 +44,6 @@
               <td>{{ $retur->tanggalRetur }}</td>
               <td>{{ $retur->TipePengembalian}}</td>
               <td>{{ $retur->alasanRetur }}</td>
-
-              <!-- Improved Status Display -->
               <td>
                   @switch($retur->status)
                       @case(0)
@@ -61,8 +59,6 @@
                           <span class="badge bg-secondary">Unknown</span>
                   @endswitch
               </td>
-      
-              <!-- Conditional Buttons -->
               <td>
                   @if($retur->status == 0)
                       <div class="d-grid gap-2">
@@ -79,7 +75,7 @@
     </table>
 </div>
 
-<!-- Single Modal to show product images -->
+<!-- Modal gambar-->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -94,7 +90,7 @@
     </div>
 </div>
 
-<!-- Confirm Modal -->
+<!-- Modal konfirmasi -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <form method="POST" action="{{ route('admin.confirmRetur') }}">
@@ -117,7 +113,7 @@
   </div>
 </div>
 
-<!-- Reject Modal -->
+<!-- modal tolak -->
 <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <form method="POST" action="{{ route('admin.rejectRetur') }}">
@@ -149,6 +145,7 @@
           pageLength:10
         } );
     });
+
     document.addEventListener('DOMContentLoaded', function() {
         const imageModal = document.getElementById('imageModal');
         const modalImage = document.getElementById('modalImage');
@@ -158,14 +155,12 @@
             item.addEventListener('click', function() {
                 const imageSrc = this.getAttribute('data-image');
                 const imageTitle = this.getAttribute('data-title');
-                
-                // Set the image source and title dynamically
                 modalImage.src = imageSrc;
                 modalTitle.textContent = imageTitle;
             });
         });
     });
-    // Pass returID to Confirm Modal
+
     document.getElementById('confirmModal').addEventListener('show.bs.modal', function (event) {
         var button = event.relatedTarget;
         var returID = button.getAttribute('data-id');
@@ -173,7 +168,6 @@
         modal.querySelector('#confirmReturID').value = returID;
     });
 
-    // Pass returID to Reject Modal
     document.getElementById('rejectModal').addEventListener('show.bs.modal', function (event) {
         var button = event.relatedTarget;
         var returID = button.getAttribute('data-id');

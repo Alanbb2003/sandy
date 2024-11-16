@@ -16,7 +16,6 @@
                         @endif
                         {{ Auth::user()->name }}
                         <br>
-                        {{-- {{$msg}} --}}
                         {{ __('You are logged in!') }}
                     </div>
                 </div>
@@ -55,7 +54,7 @@
                 </div>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdminModal">Add New
                     Admin</button>
-                <!-- Password Change Form -->
+                <!--Form ubah password!-->
                 <hr>
                 <h5>Change Password</h5>
                 <form action="{{ url('/dashboard/changePasswordAdmin') }}" method="POST">

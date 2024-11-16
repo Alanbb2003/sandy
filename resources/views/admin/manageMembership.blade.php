@@ -34,7 +34,7 @@
     </div>
 </div>
 
-<!-- Add Member Modal -->
+<!-- Modal tambah member -->
 <div class="modal fade" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -65,7 +65,7 @@
     </div>
 </div>
 
-<!-- Point History Modal -->
+<!-- Modal poin history -->
 <div class="modal fade" id="pointHistoryModal" tabindex="-1" aria-labelledby="pointHistoryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -83,7 +83,7 @@
                         </tr>
                     </thead>
                     <tbody id="pointHistoryBody">
-                        <!-- Point history will be populated here -->
+
                     </tbody>
                 </table>
             </div>
@@ -97,7 +97,6 @@
 $(document).ready(function() {
     $('#membershipTable').DataTable();
 
-    // Show point history in modal
     $('.view-points-btn').on('click', function() {
         const member = JSON.parse($(this).attr('data-member'));
         const pointHistoryBody = $('#pointHistoryBody');
