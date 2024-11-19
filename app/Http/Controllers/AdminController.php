@@ -27,7 +27,8 @@ class AdminController extends Controller
     //
     //view
     public function adminHome(){
-        return view('admin.homeAdmin',["msg"=>"I am admin role"]);
+        $admins = User::where('role', 1)->get();
+        return view('admin.homeAdmin',["msg"=>"I am admin role"],compact('admins'));
     }
     
     public function adminManageStock(){
@@ -114,6 +115,21 @@ class AdminController extends Controller
 
 
     //function
+    
+    public function deleteAdmin(Request $request)
+    {
+        $admin = User::findOrFail($request->admin_id);
+    
+        if ($admin->id === Auth::id()) {
+            alert()->error('error!','Tidak bisa menghapus akun sendiri');
+            return back();
+        }
+    
+        $admin->delete();
+        alert()->success('Success!','Akun admin berhasil dihapus');
+        return back();
+    }
+
     public function deleteImage($id){
        // Find the image by ID in the picture table
         $picture = Pictures::findOrFail($id);
@@ -205,12 +221,12 @@ class AdminController extends Controller
              }
          }
          DB::commit();
-        alert()->success('Success!','Berhasil menambahkan produk');
+        alert()->success('Success!','Berhasil menambahkan barang');
         return back();
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error adding product: ' . $e->getMessage());
-            alert()->error('Error!', 'Something went wrong. Please try again.');
+            alert()->error('Error!', 'Gagal menambah barang.');
             return back();
         }
     }
@@ -228,6 +244,7 @@ class AdminController extends Controller
             alert()->success('Success!','Berhasil menambahkan kategori');
             return back();
         } catch (\Exception $e) {
+            alert()->error('Error!','Gagal menambah kategori');
             return $e->getMessage();
         }
     }
@@ -241,7 +258,7 @@ class AdminController extends Controller
             $category->nama_category = strtoupper($request->input('categoryName')) ;
             $category->slugKategori = Str::slug($request->input('categoryName'));
             $category->save();
-            alert()->success('Success!','Berhasil menambahkan kategori');
+            alert()->success('Success!','Berhasil mengubah kategori');
             return response()->json([
                 'id' => $category->id,
                 'nama_category' => strtoupper($category->nama_category) 

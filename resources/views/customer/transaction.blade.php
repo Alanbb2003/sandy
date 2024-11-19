@@ -46,7 +46,7 @@
                 <td>{{$k->kodeTrans}}</td>
                 <td>{{$k->namaPembeli}}</td> 
                 <td>{{$k->addressSnapshot}}</td>
-                <td>{{ \Carbon\Carbon::parse($k->tanggalPembelian)->format('d-m-Y H:i:s') }}</td> 
+                <td>{{ \Carbon\Carbon::parse($k->tanggalPembelian)->format('d-m-Y') }}</td> 
                 <td>Rp. {{ number_format($k->totalPembelian, 2, ",", ".") }}</td>
                 <td>
                     @switch($k->status)
@@ -120,7 +120,7 @@
                 <td>
                     <button type="button" class="btn btn-info btn-sm my-1" style="width: 120px"
                             data-id="{{ $k->id }}"
-                            data-tanggal="{{ \Carbon\Carbon::parse($k->tanggalPembelian)->format('d-m-Y H:i:s') }}"
+                            data-tanggal="{{ \Carbon\Carbon::parse($k->tanggalPembelian)->format('d-m-Y') }}"
                             data-diskon="Rp{{ number_format($k->discount, 2, ',', '.') }}"
                             data-total="Rp{{ number_format($k->totalPembelian, 2, ',', '.') }}"
                             data-transaksi='@json($k->dtrans)'

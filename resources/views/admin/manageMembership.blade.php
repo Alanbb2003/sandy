@@ -21,7 +21,7 @@
                     @foreach($members as $member)
                     <tr>
                         <td>{{ $member->user->firstName }} {{ $member->user->lastName }}</td>
-                        <td>{{$member->tanggalDaftar}}</td>
+                        <td>{{ \Carbon\Carbon::parse($member->tanggalDaftar)->format('d-m-Y')}}</td>
                         <td>{{ number_format($member->total_points, 0, ',', '.') }}</td>
                         <td>
                             <button class="btn btn-info view-points-btn" data-member="{{ json_encode($member) }}" data-bs-toggle="modal" data-bs-target="#pointHistoryModal">View Point History</button>

@@ -41,7 +41,7 @@
               <td>{{ $retur->jumlahBarangRetur }} {{ $retur->satuanBarangRetur }}</td>
               <td>Rp.{{ number_format($retur->hargaPerBarang, 2) }}</td>
               <td>Rp.{{ number_format($retur->subTotal, 2) }}</td>
-              <td>{{ $retur->tanggalRetur }}</td>
+              <td>{{ \Carbon\Carbon::parse($retur->tanggalRetur )->format('d-m-Y')}}</td>
               <td>{{ $retur->TipePengembalian}}</td>
               <td>{{ $retur->alasanRetur }}</td>
               <td>

@@ -108,6 +108,46 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Change Email</button>
                 </form>
+<br>
+ <!-- Delete Admin Form -->
+ <h5>Delete Admin Account</h5>
+ <form id="deleteAdminForm" action="{{ route('admin.delete') }}" method="POST">
+     @csrf
+     <div class="mb-3">
+         <label for="admin_to_delete" class="form-label">Select Admin to Delete</label>
+         <select name="admin_id" id="admin_to_delete" class="form-control" required>
+             <option value="" disabled selected>-- Select Admin --</option>
+             @foreach ($admins as $admin)
+                 @if ($admin->id !== Auth::id())
+                     <option value="{{ $admin->id }}">{{ $admin->name }} ({{ $admin->email }})</option>
+                 @endif
+             @endforeach
+         </select>
+     </div>
+     <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+         data-bs-target="#confirmDeleteAdminModal">Delete Admin</button>
+ </form>
+
+ <!-- Confirm Delete Modal -->
+ <div class="modal fade" id="confirmDeleteAdminModal" tabindex="-1" aria-labelledby="confirmDeleteAdminModalLabel"
+     aria-hidden="true">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <h5 class="modal-title" id="confirmDeleteAdminModalLabel">Konfirmasi penghapusan akun admin</h5>
+                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+             <div class="modal-body">
+                Apakah yakin melakukan penghapusan akun admin ini, akun akan hilang selamanya.
+             </div>
+             <div class="modal-footer">
+                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                 <button type="submit" form="deleteAdminForm" class="btn btn-danger">Confirm Delete</button>
+             </div>
+         </div>
+     </div>
+ </div>
+
             </div>
         </div>
     </div>

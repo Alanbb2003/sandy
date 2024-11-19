@@ -2,7 +2,7 @@
 @section('content')
 <div class="mx-5 my-3 card">
   <button class="btn btn-primary" type="button" data-bs-toggle="collapse" href="#insertKategori" data-bs-target="#insertKategori" aria-expanded="false" aria-controls="insertKategori">
-    Tambah Kategori
+    Tambah Dan Ubah Kategori
   </button>
 </div>
 <br>

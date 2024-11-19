@@ -85,7 +85,8 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::post('/changePasswordAdmin', [AdminController::class, 'changePassword'])->name('admin.changePassword');        
         Route::post('/changeEmailAdmin', [AdminController::class, 'changeEmail'])->name('admin.changeEmail');        
         Route::post('/adminAdd', [AdminController::class, 'addAdmin'])->name('admin.add');
-
+        Route::post('/admin/delete', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
+        
         Route::get('/barang',[AdminController::class,'adminManageStock']);
         //add new barang
         Route::get('/barang/new',[AdminController::class,'adminBarangNew']);

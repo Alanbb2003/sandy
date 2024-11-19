@@ -17,7 +17,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('check:birthdays')->dailyAt('12:00');
-        $schedule->command('email:send-survey')->dailyAt('12:00');;
+        $schedule->command('email:send-survey')->dailyAt('12:00');
+        $schedule->command('check:low-stock')->daily();
     }
 
     /**

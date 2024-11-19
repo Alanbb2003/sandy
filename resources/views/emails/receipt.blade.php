@@ -1,5 +1,5 @@
 <h2>Terima kasih atas pembelian Anda!</h2>
-<p>Jika Anda memiliki pertanyaan tentang pesanan, Anda dapat mengirim email kepada kami di tokosandyofficial@gmail.com. </p>
+<p>Jika Anda memiliki pertanyaan tentang pesanan, Anda dapat mengirim email kepada kami di info@tokosandy.com. </p>
 <p>Pesanan Anda akan diproses. Berikut adalah detailnya:</p>
 
 <p><strong>ID Transaksi:</strong> {{ $htrans->kodeTrans }}</p>

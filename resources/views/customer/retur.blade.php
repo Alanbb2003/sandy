@@ -45,7 +45,7 @@
                         <td>
                             {{ 'Rp. ' . number_format($retur->subTotal, 0, ',', '.') }}
                         </td>
-                        <td>{{ $retur->tanggalRetur }}</td>
+                        <td>{{ \Carbon\Carbon::parse($retur->tanggalRetur )->format('d-m-Y')}}</td>
                         <td>{{$retur->TipePengembalian}}</td>
                         <td>{{ $retur->alasanRetur }}</td>
                         <td>
@@ -158,7 +158,7 @@
                             @foreach ($transactions as $transaction)
                                 <tr>
                                     <td>{{ $transaction->kodeTrans }}</td>
-                                    <td>{{ $transaction->tanggalPembelian }}</td>
+                                    <td>{{ \Carbon\Carbon::parse( $transaction->tanggalPembelian)->format('d-m-Y')}}</td>
                                     <td>Rp. {{ number_format($transaction->totalPembelian, 2, ",", ".") }}</td>
                                     <td>
                                         <button class="btn btn-info" onclick="loadTransactionItems({{ $transaction->id }})">Select</button>

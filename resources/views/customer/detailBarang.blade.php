@@ -178,8 +178,7 @@
                     <p>Rp. {{ number_format($barang->hargaBesar, 2, ",", ".") }} per {{ $barang->satuanBesar }}</p>
                 @endif
             </div>
-
-            @if (Auth::check() && Auth::user()->role == 'user')
+            
                 <form action="{{ url('/cart/add') }}" method="POST" class="bg-light p-3 rounded shadow-sm">
                     @csrf
                     <input type="hidden" id="IDbarang" name="IDbarang" value="{{ $barang->id }}">
@@ -201,7 +200,6 @@
 
                     <button type="submit" class="btn btn-primary w-100">Tambah ke Keranjang</button>
                 </form>
-            @endif
         </div>
     </div>
 </div>
