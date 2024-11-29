@@ -26,10 +26,10 @@
                     @csrf
                     <div class="d-flex align-items-center mb-3 pb-1">
                       <i class="fas fa-cubes fa-2x me-3" style="color: #ff6219;"></i>
-                      <span class="h1 fw-bold mb-0">Sandy Store</span>
+                      <span class="h1 fw-bold mb-0">TokoSandy</span>
                     </div>
 
-                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign up your account</h5>
+                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Buat akun anda</h5>
 
                  
                     <div class="form-floating mb-4">
@@ -99,7 +99,7 @@
 
                     <div class="form-floating mb-4">
                         <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password" placeholder="Confirm Password">
-                        <label for="password-confirm" class="form-label">Confirm Password</label>
+                        <label for="password-confirm" class="form-label">Konfirmasi Password</label>
                     </div>
 
 
@@ -107,8 +107,8 @@
                       <button class="btn btn-primary btn-lg btn-block" type="submit">Register</button>
                     </div>
 
-                    <p class="mb-5 pb-lg-2" style="color: #393f81;">have an account ? <a href="{{url('/login')}}"
-                        style="color: #393f81;">Login here</a></p>
+                    <p class="mb-5 pb-lg-2" style="color: #393f81;">Punya akun ? <a href="{{url('/login')}}"
+                        style="color: #393f81;">Masuk disini</a></p>
                   </form>
                 </div>
               </div>

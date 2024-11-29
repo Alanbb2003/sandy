@@ -1,110 +1,7 @@
-{{-- @extends('layouts.app') --}}
+
 @extends(Auth::guest() ? 'layouts.app' : (Auth::user()->role == 'user' ? 'layouts.app' : 'layouts.appAdmin'))
 
 @section('content')
-
-{{-- <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-6">
-            <!-- Main Carousel with reduced height -->
-            <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <!-- Main promotion image -->
-                    <div class="carousel-item active">
-                        <img class="d-block w-100 main-carousel-image" src="{{ asset('images/uploads/'.$barang->fotoPromosi) }}" alt="Gambar Barang">
-                    </div>
-                    <!-- Other product images -->
-                    @foreach ($pic as $index => $p)
-                    <div class="carousel-item">
-                        <img class="d-block w-100 main-carousel-image" src="{{ asset('images/uploads/'.$p->fileName) }}" alt="Gambar Barang">
-                    </div>
-                    @endforeach
-                </div>
-                <!-- Carousel controls -->
-                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
-
-            <!-- Thumbnails Row -->
-            <div class="row mt-3">
-                <!-- Thumbnail for the main image -->
-                <div class="col-3">
-                    <img class="img-thumbnail thumbnail-image" src="{{ asset('images/uploads/'.$barang->fotoPromosi) }}" alt="Gambar Barang" data-bs-target="#productCarousel" data-bs-slide-to="0">
-                </div>
-                <!-- Thumbnails for other images -->
-                @foreach ($pic as $index => $p)
-                <div class="col-3">
-                    <img class="img-thumbnail thumbnail-image" src="{{ asset('images/uploads/'.$p->fileName) }}" alt="Gambar Barang" data-bs-target="#productCarousel" data-bs-slide-to="{{ $index + 1 }}">
-                </div>
-                @endforeach
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <!-- Product Information and Wishlist -->
-            <div class="row">
-                <div class="col">
-                    <h3>{{ $barang->namaBarang }}</h3>
-                </div>
-                <div class="col">
-                    @if (Auth::check() && Auth::user()->role == 'user')
-                        <button class="wishlist-toggle btn" data-product-id="{{ $barang->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Wishlist">
-                            @if(Auth::user()->wishlists->contains('fkProductID', $barang->id))
-                                <i class="fa-solid fa-heart"></i> 
-                            @else
-                                <i class="fa-regular fa-heart"></i>
-                            @endif
-                        </button>
-                    @elseif (Auth::guest())
-                        <button class="wishlist-toggle btn" data-product-id="{{ $barang->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Wishlist">
-                            <i class="fa-regular fa-heart"></i> 
-                        </button>
-                    @endif
-                </div>
-            </div>
-            <div class="row mt-3">
-                <h5>Deskripsi:</h5>
-                <p>{!! nl2br(e($barang->deskripsi)) !!}</p>
-            </div>
-            <h5>Price:</h5>
-            <p>Rp.{{ $barang->hargaKecil }} per 1 {{$barang->satuanTerkecil}}</p>
-            @if($barang->satuanBesar && $barang->hargaBesar)
-            <p>Rp.{{ $barang->hargaBesar }} per 1 {{$barang->satuanBesar}}</p>
-            @endif
-
-            <div>
-                <!-- Add to cart form -->
-                @if (Auth::check() && Auth::user()->role == 'user')
-                <form action="{{ url('/cart/add') }}" method="POST">
-                    @csrf
-                    <input type="hidden" id="IDbarang" name="IDbarang" value="{{ $barang->id }}">
-
-                    <label for="quantity_{{ $barang->id }}">Quantity:</label>
-                    <input type="number" id="quantity_{{ $barang->id }}" name="quantity" min="1" value="1" class="form-control">
-
-                    <label for="unit_{{ $barang->id }}">Unit:</label>
-                    <select id="unit_{{ $barang->id }}" name="unit" class="form-control">
-                        <option value="small">{{ $barang->satuanTerkecil }}</option>
-                        @if($barang->satuanBesar)
-                        <option value="big">{{ $barang->satuanBesar }}</option>
-                        @endif
-                    </select>
-                    <div class="col-12 mt-4">
-                        <button type="submit" class="btn btn-primary">Tambah ke keranjang</button>
-                    </div>
-                </form>
-                @endif
-            </div>
-        </div>
-    </div>
-</div> --}}
-
 
 <div class="container mt-5">
     <div class="mb-3">
@@ -179,27 +76,33 @@
                 @endif
             </div>
             
-                <form action="{{ url('/cart/add') }}" method="POST" class="bg-light p-3 rounded shadow-sm">
-                    @csrf
-                    <input type="hidden" id="IDbarang" name="IDbarang" value="{{ $barang->id }}">
+            @if($barang->Status == 2)
+            <div class="alert alert-danger">
+                <strong>Produk sedang tidak tersedia.</strong>
+            </div>
+        @else
+            <form action="{{ url('/cart/add') }}" method="POST" class="bg-light p-3 rounded shadow-sm">
+                @csrf
+                <input type="hidden" id="IDbarang" name="IDbarang" value="{{ $barang->id }}">
 
-                    <div class="mb-3">
-                        <label for="quantity_{{ $barang->id }}" class="form-label">Jumlah:</label>
-                        <input type="number" id="quantity_{{ $barang->id }}" name="quantity" min="1" value="1" class="form-control">
-                    </div>
+                <div class="mb-3">
+                    <label for="quantity_{{ $barang->id }}" class="form-label">Jumlah:</label>
+                    <input type="number" id="quantity_{{ $barang->id }}" name="quantity" min="1" value="1" class="form-control">
+                </div>
 
-                    <div class="mb-3">
-                        <label for="unit_{{ $barang->id }}" class="form-label">Satuan:</label>
-                        <select id="unit_{{ $barang->id }}" name="unit" class="form-select">
-                            <option value="small">{{ $barang->satuanTerkecil }}</option>
-                            @if($barang->satuanBesar)
-                                <option value="big">{{ $barang->satuanBesar }}</option>
-                            @endif
-                        </select>
-                    </div>
+                <div class="mb-3">
+                    <label for="unit_{{ $barang->id }}" class="form-label">Satuan:</label>
+                    <select id="unit_{{ $barang->id }}" name="unit" class="form-select">
+                        <option value="small">{{ $barang->satuanTerkecil }}</option>
+                        @if($barang->satuanBesar)
+                            <option value="big">{{ $barang->satuanBesar }}</option>
+                        @endif
+                    </select>
+                </div>
 
-                    <button type="submit" class="btn btn-primary w-100">Tambah ke Keranjang</button>
-                </form>
+                <button type="submit" class="btn btn-primary w-100">Tambah ke Keranjang</button>
+            </form>
+        @endif
         </div>
     </div>
 </div>

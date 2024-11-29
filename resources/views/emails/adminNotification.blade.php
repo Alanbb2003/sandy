@@ -1,9 +1,8 @@
-<h2>Terima kasih atas pembelian Anda!</h2>
-<p>Jika Anda memiliki pertanyaan tentang pesanan, Anda dapat mengirim email kepada kami di info@tokosandy.com atau hubungi melalui WhatsApp +62 812-3031-5748</p>
-<p>Pesanan Anda akan diproses. Berikut adalah detailnya:</p>
-
-<p><strong>ID Transaksi:</strong> {{ $htrans->kodeTrans }}</p>
-<p><strong>Alamat:</strong> {{ $htrans->addressSnapshot }}</p>
+<h1>Transaksi baru masuk</h1>
+<p><strong>Transaction Code:</strong> {{ $htrans->kodeTrans }}</p>
+<p><strong>Buyer:</strong> {{ $htrans->namaPembeli }}</p>
+<p><strong>Total Payment:</strong> {{ number_format($htrans->totalPembelian, 2) }}</p>
+<p><strong>Items:</strong></p>
 <table style="width:100%; border-collapse: collapse; border: 1px solid #ddd;">
     <thead>
       <tr style="background-color: #f2f2f2;">
@@ -30,7 +29,3 @@
       </tr>
     </tfoot>
 </table>
-<p><strong>Total:</strong> Rp.{{ number_format($htrans->totalPembelian, 2, ",", ".") }}</p>
-{{-- <strong>Mohon menuggu email konfirmasi pesanan sebelum melakukan pembayaran</strong> --}}
-<p>silahkan melakukan pembayaran ke <strong>BRI 71810 1000 129538 Hansen Bulain</strong> dan mengirim bukti pembayaran melalui menu transaksi di website</p>
-<p>Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi kami!</p>

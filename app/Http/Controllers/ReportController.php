@@ -7,6 +7,7 @@ use App\Models\Dtrans;
 use App\Models\Htrans;
 use App\Models\Membership;
 use App\Models\Products;
+use App\Models\retur;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -244,4 +245,32 @@ class ReportController extends Controller
 
         return view('admin.laporan.laporanAktif', compact('customers'));
     }
+    public function laporanRetur(Request $request){
+        $query = retur::with(['dtrans.product', 'htrans']);
+       if ($request->filled('start_date') && $request->filled('end_date')) {
+                   $query->whereBetween(DB::raw('DATE(tanggalRetur)'), [
+                       $request->start_date, 
+                       $request->end_date
+                   ]);
+               } elseif ($request->filled('start_date')) {
+                   $query->whereDate('tanggalRetur', '>=', $request->start_date);
+               } elseif ($request->filled('end_date')) {
+                   $query->whereDate('tanggalRetur', '<=', $request->end_date);
+               }
+
+
+       if ($request->has('status')) {
+           $query->where('status', $request->status);
+       }
+
+       $returns = $query->get();
+       $startDateFormatted = $request->filled('start_date') 
+       ? Carbon::parse($request->start_date)->format('d/m/Y') 
+       : null;
+
+       $endDateFormatted = $request->filled('end_date') 
+       ? Carbon::parse($request->end_date)->format('d/m/Y') 
+       : null;
+       return view('admin.laporan.laporanRetur', compact('returns','startDateFormatted', 'endDateFormatted'));
+   }
 }

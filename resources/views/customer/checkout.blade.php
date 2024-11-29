@@ -3,43 +3,47 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col">
+        <!-- Checkout Form -->
+        <div class="col-lg-6 col-md-12 mb-4">
             <h2>Checkout</h2>
             <hr>
             <form action="{{ url('/checkout') }}" method="POST">
                 @csrf
-                <div>
-                    <div>
-                          
-                        <select name="inputAddress" id="address  @error('inputAddress') is-invalid @enderror" class="form-select" aria-label="Select Address">
-                            <option value="" disabled selected>-- Pilih Alamat --</option>
-                            @if ($address->isEmpty())
-                                <option value="none">Belum ada alamat</option>
-                            @else
-                                @foreach ($address as $a)
-                                    <option value="{{ $a->id }}">
-                                        {{ $a->namaDepan }} {{ $a->namaBelakang }}, {{ $a->noHP }}, {{ $a->detailAlamat }}, {{ $a->kota }}, {{ $a->provinsi }}, {{ $a->kodePos }}
-                                    </option>
-                                @endforeach
-                            @endif
-                        </select>
-                        @error('inputAddress')
-                        <div class="alert alert-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div>
-                        <a href="{{ url('/address') }}">Tambah Alamat</a>
-                    </div>
+
+                <!-- Address Selection -->
+                <div class="mb-3">
+                    <label for="inputAddress" class="form-label">Pilih Alamat</label>
+                    <select name="inputAddress" id="inputAddress" 
+                        class="form-select @error('inputAddress') is-invalid @enderror" 
+                        aria-label="Select Address">
+                        <option value="" disabled selected>-- Pilih Alamat --</option>
+                        @if ($address->isEmpty())
+                            <option value="none">Belum ada alamat</option>
+                        @else
+                            @foreach ($address as $a)
+                                <option value="{{ $a->id }}">
+                                    {{ $a->namaDepan }} {{ $a->namaBelakang }}, {{ $a->noHP }}, {{ $a->detailAlamat }}, {{ $a->kota }}, {{ $a->provinsi }}, {{ $a->kodePos }}
+                                </option>
+                            @endforeach
+                        @endif
+                    </select>
+                    @error('inputAddress')
+                        <div class="alert alert-danger mt-2">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <a href="{{ url('/address') }}">Tambah Alamat</a>
                 </div>
 
                 <hr>
 
-                <div>
-                    <h3>Biaya dan promosi</h3>
-                    <div class="row">
+                <!-- Promotions and Points -->
+                <div class="mb-4">
+                    <h3>Biaya dan Promosi</h3>
+                    <div class="mb-3">
                         <h6>Poin Saya</h6>
-                        <h6>Total Poin: {{ $currentPoints }}</h6>
-                        <div class="mb-3 mx-3 form-check">
+                        <p>Total Poin: {{ $currentPoints }}</p>
+                        <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="usePoin" name="usePoin" 
                                 @if (!$memberstatus || $currentPoints < 1000) disabled @endif 
                                 data-toggle="tooltip" 
@@ -54,50 +58,52 @@
                     @endif
                 </div>
 
-                <div class="col-12">
-                    <p>pembayaran dilakukan ke <strong>BRI 71810 1000 129538 Hansen Bulain</strong> </p>
-                    <button type="submit" class="btn btn-primary">Buat Pesanan</button>
+                <!-- Payment and Submit -->
+                <div class="mb-4">
+                    <p>Pembayaran dilakukan ke <strong>BRI 71810 1000 129538 Hansen Bulain</strong></p>
+                    <button type="submit" class="btn btn-primary w-100">Buat Pesanan</button>
                 </div>
             </form>
         </div>
 
-        <div class="col">
+        <!-- Summary Section -->
+        <div class="col-lg-6 col-md-12">
             <div>
                 <h4>Ringkasan</h4>
                 <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h3>Total:</h3>
-                        <h3 id="totalAmountDisplay"> Rp.{{ number_format($totalAmmount, 2, ",", ".") }} </h3>
-                        <h3 id="totalAfterPointsDisplay" style="display: none; margin-left: 5px">  Rp.{{ number_format($totalAmmount, 2, ",", ".") }}</h3>
-                    </div>
-                   
-                   
+                    <h5>Total:</h5>
+                    <h5 id="totalAmountDisplay">Rp.{{ number_format($totalAmmount, 2, ",", ".") }}</h5>
+                    <h5 id="totalAfterPointsDisplay" style="display: none; margin-left: 5px;">
+                        Rp.{{ number_format($totalAmmount, 2, ",", ".") }}
+                    </h5>
                 </div>
-                <div style="max-height: 300px; overflow-y: auto; overflow-x: hidden;">
+
+                <!-- Cart Items -->
+                <div class="mt-3" style="max-height: 300px; overflow-y: auto;overflow-x: hidden;">
                     @if(session('cart'))
                         @foreach(session('cart') as $id => $details)
-                        <div class="row">
-                            <div class="col-2 me-4">
-                                <img src="{{ asset('images/uploads/' . $details['image']) }}" width="50" height="50" class="thumbnailSmall" />
-                            </div>
-                            
-                            <div class="col">
-                                <p>{{ $details['name'] }}</p>
-                                <div class="row justify-content-center">
-                                    <p>QTY: {{ $details['quantity'] }} {{ $details['unit'] }}</p>
+                            <div class="row align-items-center mb-3">
+                                <div class="col-3">
+                                    <img src="{{ asset('images/uploads/' . $details['image']) }}" 
+                                        class="img-fluid rounded" 
+                                        alt="{{ $details['name'] }}">
                                 </div>
-                                <p>Subtotal: Rp. {{ number_format($details['price'] * $details['quantity'], 2, ",", ".") }}</p>
+                                <div class="col-9">
+                                    <p class="mb-1"><strong>{{ $details['name'] }}</strong></p>
+                                    <p class="mb-1">QTY: {{ $details['quantity'] }} {{ $details['unit'] }}</p>
+                                    <p class="mb-1">Subtotal: Rp. {{ number_format($details['price'] * $details['quantity'], 2, ",", ".") }}</p>
+                                </div>
                             </div>
-                        </div>
-                        <hr>
+                            <hr>
                         @endforeach
+                    @else
+                        <p>Keranjang kosong.</p>
                     @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 @endsection
 
 @section('script')

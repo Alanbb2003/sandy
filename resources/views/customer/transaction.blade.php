@@ -51,16 +51,16 @@
                 <td>
                     @switch($k->status)
                         @case(0)
-                            <span class="badge bg-warning text-dark">Menunggu Konfirmasi</span>
+                            <span class="badge bg-warning text-dark">Menunggu Pembayaran</span>
                             @break
                         @case(1)
-                            <span class="badge bg-warning text-dark">Menunggu pembayaran</span>
-                            @break
-                        @case(2)
                             <span class="badge bg-warning text-dark">Pesanan sedang diproses</span>
                             @break
+                        @case(2)
+                            <span class="badge bg-warning text-dark">Pesanan dikirim</span>
+                            @break
                         @case(3)
-                            <span class="badge bg-success">Transaksi Berhasil</span>
+                            <span class="badge bg-success">Pesanan Selesai</span>
                             @break
                         @case(4)
                             <span class="badge bg-danger">Pesanan dibatalkan Pembeli.</span>
@@ -84,7 +84,7 @@
                         <p>{{$k->alasanBatal}}</p>
                     </div>
                     @else
-                        @if ($k->status == 1)
+                        @if ($k->status == 0)
                             <form method="POST" action="{{ route('uploadBuktiPembayaran') }}" enctype="multipart/form-data">
                                 @csrf
                                 <input type="hidden" name="transaction_id" value="{{ $k->id }}">
@@ -102,16 +102,12 @@
                                     </div>
                                 </div>
                             </form>
-                        @elseif ($k->status == 0)
-                        <div class="text-center">
-                            <span class="badge bg-warning text-dark">Menunggu Konfirmasi</span>
-                        </div>
                         @else
                             <div class="text-center">
                                 <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
-                                data-image="{{ asset('storage/' . $k->buktiPembayaran)}}" 
-                                data-title="{{ $k->kodeTrans }}">
-                                <img src="{{asset('storage/' . $k->buktiPembayaran) }}" alt="Product Image" style="width: 100px; height: auto;">
+                                    data-image="{{ asset('images/bukti/' . $k->buktiPembayaran) }}" 
+                                    data-title="{{ $k->kodeTrans }}">
+                                    <img src="{{ asset('images/bukti/' . $k->buktiPembayaran) }}" alt="Product Image" style="width: 100px; height: auto;">
                                 </a>
                             </div>
                         @endif

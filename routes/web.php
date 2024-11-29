@@ -122,6 +122,7 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::get('/laporan/Pendapatan', [ReportController::class, 'laporanPendapatan'])->name('laporan.pendapatan');
         Route::get('/laporan/Penjualan', [ReportController::class, 'laporanPenjualan'])->name('laporan.penjualan');
         Route::get('/laporan/Aktif', [ReportController::class, 'laporanAktif'])->name('laporan.Aktif');
+        Route::get('/laporan/retur', [ReportController::class, 'laporanRetur'])->name('laporan.retur');
     });
 });
 

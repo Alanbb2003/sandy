@@ -369,14 +369,7 @@ class AdminController extends Controller
         $transactionId = $request->input('transaction_id'); 
         $transaksi = Htrans::with(['dtrans.product', 'user'])->where('id', $transactionId)->firstOrFail();
         
-        if ($transaksi->status == 0) {
-            $transaksi->status = 1;
-            $transaksi->save();
-            Mail::to($transaksi->user->email)->send(new OrderAcceptedMail($transaksi->user, $transaksi));
-            alert()->success('Success!', 'Transaksi diterima');
-            return redirect()->back();
-
-        }else{
+        if ($transaksi->status == 1) {
             $transactionAmount = $transaksi->totalPembelian + $transaksi->discount;
             $pointsEarned = floor($transactionAmount / 500);
             
@@ -417,7 +410,7 @@ class AdminController extends Controller
                     $product->save();
                 }
             }
-                $transaksi->status = 3;
+                $transaksi->status = 2;
                 $transaksi->save();
             
                 Mail::to($transaksi->user->email)->send(new OrderAcceptedMail($transaksi->user, $transaksi));
@@ -431,6 +424,12 @@ class AdminController extends Controller
                 alert()->error('Error!', 'Gagal konfirmasi transaksi');
                 return back()->withErrors(['error' => 'Failed to add product']);
             }
+        }else{
+            $transaksi->status = 3;
+            $transaksi->save();
+            // Mail::to($transaksi->user->email)->send(new OrderAcceptedMail($transaksi->user, $transaksi));
+            alert()->success('Success!', 'Transaksi diterima');
+            return redirect()->back();
         }
     }
 

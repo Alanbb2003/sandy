@@ -37,7 +37,7 @@
                                 Detail
                             </button>
                             <button class="btn btn-sm btn-secondary email-btn" data-customer="{{ json_encode($c) }}" data-bs-toggle="modal" data-bs-target="#sendEmailModal">
-                                Send Email
+                                Kirim Email
                             </button>
                         </td>
                     </tr>
@@ -53,19 +53,19 @@
   <div class="modal-dialog modal-lg">
       <div class="modal-content">
           <div class="modal-header">
-              <h5 class="modal-title" id="customerDetailModalLabel">Customer Details</h5>
+              <h5 class="modal-title" id="customerDetailModalLabel">Detail Pelanggan</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
               <p><strong>Email:</strong> <span id="modal-email"></span></p>
               <p><strong>Phone:</strong> <span id="modal-phone"></span></p>
-              <p><strong>Birthdate:</strong> <span id="modal-birthdate"></span></p>
+              <p><strong>Tanggal Lahir:</strong> <span id="modal-birthdate"></span></p>
               <h4>Wishlist</h4>
               <table class="table table-bordered">
                   <thead>
                       <tr>
-                          <th>Product Name</th>
-                          <th>Price</th>
+                          <th>Nama Produk</th>
+                          <th>Harga</th>
                       </tr>
                   </thead>
                   <tbody id="modal-wishlist">
@@ -77,8 +77,8 @@
                   <thead>
                       <tr>
                           <th>Kode Transaksi</th>
-                          <th>Date</th>
-                          <th>Total Amount</th>
+                          <th>Tanggal Transaksi</th>
+                          <th>Total</th>
                           <th>Status</th>
                           <th>Action</th> 
                       </tr>
@@ -88,13 +88,13 @@
                   </tbody>
               </table>
               <div id="dtrans-details" class="mt-3" style="display:none;">
-                  <h5>Transaction Details</h5>
+                  <h5>Detail Transaksi</h5>
                   <table class="table table-bordered" id="dtrans-table">
                       <thead>
                           <tr>
-                              <th>Product Name</th>
-                              <th>Quantity</th>
-                              <th>Price</th>
+                              <th>Nama Produk</th>
+                              <th>Jumlah</th>
+                              <th>Harga</th>
                               <th>Subtotal</th>
                           </tr>
                       </thead>
@@ -104,7 +104,7 @@
                   </table>
               </div>
 
-              <h4>Most Bought Category</h4>
+              <h4>Kategori paling banyak dibeli</h4>
               <p id="modal-most-bought-category"></p>
           </div>
       </div>
@@ -116,7 +116,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="sendEmailModalLabel">Send Custom Email</h5>
+          <h5 class="modal-title" id="sendEmailModalLabel">Kirim Email</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form id="sendEmailForm" action="{{ route('admin.customer.email') }}" method="POST">
@@ -134,7 +134,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-primary">Send Email</button>
+            <button type="submit" class="btn btn-primary">Kirim Email</button>
           </div>
         </form>
       </div>
@@ -194,13 +194,13 @@ $(document).ready(function(){
                   const statusText = (() => {
                       switch (transaction.status) {
                           case 0:
-                              return 'Menunggu Konfirmasi';
-                          case 1:
                               return 'Menunggu Pembayaran';
+                          case 1:
+                              return 'Pesanan sedang diproses';
                           case 2:
-                              return 'Pesanan Sedang Diproses';
+                              return 'Pesanan dikirim';
                           case 3:
-                              return 'Transaksi Berhasil';
+                              return 'Pesanan Selesai';
                           case 4:
                               return 'Pesanan Dibatalkan Pembeli';
                           case 5:

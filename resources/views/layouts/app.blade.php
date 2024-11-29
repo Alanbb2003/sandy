@@ -29,265 +29,119 @@
 </head>
 <body>
     <div id="app">
-        {{-- <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+      <!-- Main Navigation Bar -->
+    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url('/') }}">
+                {{ config('app.name', 'Laravel') }}
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-                        @guest
-                        <nav class="navbar">
-                            <div class="container-fluid">
-                              <form class="d-flex" role="search">
-                                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                                <button class="btn btn-outline-success" type="submit">Search</button>
-                              </form>
-                            </div>
-                        </nav>
-                        @else
-                            @if (Auth::user()->role == 'admin')
-                            <nav class="navbar navbar-expand-lg ">
-                                  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                                    <div class="navbar-nav">
-                                      <a class="nav-link" href="#">Home</a>
-                                      <a class="nav-link" href="{{ url('/dashboard/barang') }}">Barang</a>
-                                      <a class="nav-link" href="#">Pelanggan</a>
-                                      <a class="nav-link" href="#">Disabled</a>
-                                    </div>
-                                  </div>
-                              </nav>
-                            @elseif (Auth::user()->role == 'user')
-                            <nav class="navbar">
-                                <div class="container-fluid">
-                                  <form class="d-flex" role="search">
-                                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                                    <button class="btn btn-outline-success" type="submit">Search</button>
-                                  </form>
-                                </div>
-                            </nav>
-                            @endif
-                        @endguest
-                    </ul>
-
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
-                        <!-- Authentication Links -->
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                            @endif
-
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
-                                </a>
-
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest
-                    </ul>
-                </div>
-            </div>
-        </nav> --}}
-
-        {{-- <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-        
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-                        @guest
-                            <form class="d-flex" role="search">
-                                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                                <button class="btn btn-outline-success" type="submit">Search</button>
-                            </form>
-                        @else
-                            @if (Auth::user()->role == 'admin')
-                                <a class="nav-link" href="#">Home</a>
-                                <a class="nav-link" href="{{ url('/dashboard/barang') }}">Barang</a>
-                                <a class="nav-link" href="#">Pelanggan</a>
-                                <a class="nav-link" href="#">Disabled</a>
-                            @elseif (Auth::user()->role == 'user')
-                                <form class="d-flex" role="search">
-                                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                                    <button class="btn btn-outline-success" type="submit">Search</button>
-                                </form>
-                            @endif
-                        @endguest
-                    </ul>
-        
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                            @endif
-        
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{ Auth::user()->name }}
-                                </a>
-        
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('logout') }}"
-                                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                            {{ __('Logout') }}
-                                        </a>
-                                    </li>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </ul>
-                            </li>
-                        @endguest
-                    </ul>
-                </div>
-            </div>
-        </nav> --}}
-
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-        
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-                        <a href="{{ url('/membership') }}" class="mt-2 mx-1">
-                            <i class="fa-regular fa-address-card"> Membership</i>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <!-- Left Side Of Navbar -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a href="{{ url('/membership') }}" class="nav-link">
+                            <i class="fa-regular fa-address-card"></i> Membership
                         </a>
-                    </ul>
-        
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
-                        <a href="{{ url('/cart') }}" class="btn mt-2 mx-1 position-relative">
-                            <i class="fa-solid fa-cart-shopping fa-lg">
-                                                           
-                            </i>
+                    </li>
+                </ul>
+
+                <!-- Right Side Of Navbar -->
+                <ul class="navbar-nav ms-auto d-flex align-items-center">
+                    <!-- Cart Icon -->
+                    <li class="nav-item">
+                        <a href="{{ url('/cart') }}" class="btn position-relative mx-1">
+                            <i class="fa-solid fa-cart-shopping fa-lg"></i>
                             @if(session('cart'))
-                            @php
-                                $cartItems = session()->get('cart', []);
-                                $items_in_cart = 0;
-                                foreach ($cartItems as $item) {
-                                    $items_in_cart += $item['quantity'];
-                                }
-                            @endphp
+                                @php
+                                    $cartItems = session()->get('cart', []);
+                                    $items_in_cart = array_sum(array_column($cartItems, 'quantity'));
+                                @endphp
                                 <span class="position-absolute top-0 start-100 translate-middle badge bg-danger">
-                                {{$items_in_cart}}
-                                <span class="visually-hidden">items in cart</span>
-                                </span>   
+                                    {{ $items_in_cart }}
+                                    <span class="visually-hidden">items in cart</span>
+                                </span>
                             @endif
                         </a>
-                        
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item mt-2 mx-1 position-relative">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                            @endif
-        
-                            @if (Route::has('register mt-2 mx-1 position-relative'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                        <a href="{{ url('/wishlist') }}" class="btn mt-2 mx-1 position-relative">
-                            <i class="fa-solid fa-heart"></i>
-                        </a>
-                        <li class="nav-item mt-2 mx-1 position-relative d-flex align-items-center">
-                            <a class="nav-link d-flex align-items-center" href="{{ url('/profile') }}" role="button">
+                    </li>
+
+                    @guest
+                        @if (Route::has('login'))
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                            </li>
+                        @endif
+                        <!--@if (Route::has('register'))-->
+                        <!--    <li class="nav-item">-->
+                        <!--        <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>-->
+                        <!--    </li>-->
+                        <!--@endif-->
+                    @else
+                        <!-- Wishlist Icon -->
+                        <li class="nav-item">
+                            <a href="{{ url('/wishlist') }}" class="btn mx-1">
+                                <i class="fa-solid fa-heart"></i>
+                            </a>
+                        </li>
+
+                        <!-- User Profile Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 @if(Auth::user()->picture)
-                                    <!-- Display profile picture if available -->
-                                    <img src="{{ asset('storage/' .Auth::user()->picture) }}" alt="Profile Picture" class="rounded-circle me-2" width="30" height="30">
+                                    <img src="{{ asset('storage/' . Auth::user()->picture) }}" alt="Profile Picture" class="rounded-circle me-2" width="30" height="30">
                                 @else
-                                    <!-- Display default icon if no profile picture -->
                                     <i class="fa-solid fa-user fa-lg me-2"></i>
                                 @endif
                                 {{ Auth::user()->name }}
                             </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{{ url('/profile') }}">Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url('/wishlist') }}">Wishlist</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        {{ __('Logout') }}
+                                    </a>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
+                                </li>
+                            </ul>
                         </li>
-                            <li class="nav-item mt-2 mx-1 position-relative">
-                                <a class="nav-link" href="{{ route('logout') }}"
-                                   onclick="event.preventDefault();
-                                                document.getElementById('logout-form').submit();">
-                                    {{ __('Logout') }}
-                                </a>
-        
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
-                            </li>
-                        @endguest
-                    </ul>
-                </div>
+                    @endguest
+                </ul>
             </div>
-        </nav>
-        
-        <!-- Secondary Navigation Bar -->
-        <nav class="navbar navbar-expand-md navbar-light bg-light" style="padding: 0.25rem 1rem;">
-            <div class="container">
-                <div class="d-flex justify-content-end w-100">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/wishlist') }}">Wishlist</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/transaction') }}">Transactions</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/retur') }}">Retur</a>
-                        </li>
-                        <li class="nav-item mx-2">
-                            <a class="nav-link" href="{{ url('/profile') }}">Profile</a>
-                        </li>
-                    </ul>
-                </div>
+        </div>
+    </nav>
+
+    <!-- Secondary Navigation Bar -->
+    <nav class="navbar navbar-expand-md navbar-light bg-light" style="padding: 0.25rem 1rem;">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#secondaryNav" aria-controls="secondaryNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="secondaryNav">
+                <ul class="navbar-nav w-100 justify-content-end">
+                    <!--<li class="nav-item">-->
+                    <!--    <a class="nav-link" href="{{ url('/wishlist') }}">Wishlist</a>-->
+                    <!--</li>-->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url('/transaction') }}">Transactions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url('/retur') }}">Retur</a>
+                    </li>
+                    <!--<li class="nav-item">-->
+                    <!--    <a class="nav-link" href="{{ url('/profile') }}">Profile</a>-->
+                    <!--</li>-->
+                </ul>
             </div>
-        </nav>
+        </div>
+    </nav>
+
         <main class="py-4">
             @include('sweetalert::alert')
             @yield('content')

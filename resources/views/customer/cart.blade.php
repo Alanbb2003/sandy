@@ -2,45 +2,65 @@
 
 @section('content')
 <div class="container">
-    <h2>Your Cart</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Quantity</th>
-                <th>Unit</th>
-                <th>Price</th>
-                <th>Total</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if(session('cart'))
-                @foreach(session('cart') as $id => $details)
+    <h2 class="text-center">Your Cart</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Gambar</th>
+                    <th>Nama Barang</th>
+                    <th>Jumlah</th>
+                    <th>Satuan</th>
+                    <th>Harga</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(session('cart'))
+                    @foreach(session('cart') as $id => $details)
+                        <tr>
+                            <td>
+                                <img src="{{ asset('images/uploads/'.$details['image']) }}" 
+                                     class="img-thumbnail" 
+                                     style="width: 50px; height: auto;" 
+                                     alt="Product Image" />
+                            </td>
+                            <td>{{ $details['name'] }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="{{ url('/cart/addOne/'.$id) }}" class="btn btn-sm btn-success me-1">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </a>
+                                    <span>{{ $details['quantity'] }}</span>
+                                    <a href="{{ url('/cart/removeOne/'.$id) }}" class="btn btn-sm btn-danger ms-1">
+                                        <i class="fa-solid fa-minus"></i>
+                                    </a>
+                                </div>
+                            </td>
+                            <td>{{ $details['unit'] }}</td>
+                            <td>Rp.{{ number_format($details['price'], 0, ',', '.') }}</td>
+                            <td>Rp.{{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }}</td>
+                            <td>
+                                <a href="{{ url('/cart/remove/'.$id) }}" class="btn btn-sm btn-danger">
+                                    Remove
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                @else
                     <tr>
-                        <td><img src="{{ asset('images/uploads/'.$details['image'] )}}" width="50" height="50" class="img-thumbnail" /></td>
-                        <td>{{ $details['name'] }}</td>
-                        <td>
-                            <a href="{{url('/cart/addOne/'.$id )}}" class="btn nodecor mb-2"><i class="fa-solid fa-plus"></i></a>
-                            {{ $details['quantity'] }}
-                            <a href="{{url('/cart/removeOne/'.$id )}}" class="btn nodecor mb-2"><i class="fa-solid fa-minus"></i></a>
-                        </td>
-                        <td>{{ $details['unit'] }}</td>
-                        <td>Rp.{{ number_format($details['price'], 0, ',', '.') }}</td>
-                        <td>Rp.{{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }}</td>
-                        <td>
-                            <a class="btn btn-danger remove-from-cart nodecor" href="{{url('/cart/remove/'.$id )}}">Remove</a>
-                        </td>
+                        <td colspan="7" class="text-center">Your cart is empty.</td>
                     </tr>
-                @endforeach
-            @endif
-        </tbody>
-    </table>
-    <h3>Total:</h3>
-    <h3 id="totalAmountDisplay"> Rp.{{ number_format($totalAmmount, 2, ",", ".") }} </h3>
-    <div class="mt-1">
-        <a href="{{url('/checkout' )}}" class="btn btn-primary nodecor">Checkout</a>
+                @endif
+            </tbody>
+        </table>
+    </div>
+
+    <div class="text-end mt-3">
+        <h3>Total:</h3>
+        <h3 id="totalAmountDisplay">Rp.{{ number_format($totalAmmount, 2, ',', '.') }}</h3>
+        <a href="{{ url('/checkout') }}" class="btn btn-primary mt-2">Checkout</a>
     </div>
 </div>
 @endsection

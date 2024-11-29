@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminNotificationMail;
 use App\Mail\ReceiptMail;
 use App\Models\Alamat;
 use App\Models\Category;
@@ -356,7 +357,12 @@ class UserController extends Controller
             ->join('product', 'dtrans.fkProductID', '=', 'product.id')  
             ->select('dtrans.*', 'product.namaBarang', 'product.fotoPromosi')
             ->get();
-                // $cartItems
+             // Notify Admins
+             $adminEmails = User::where('role', 1)->pluck('email')->toArray(); 
+             foreach ($adminEmails as $adminEmail) {
+                 Mail::to($adminEmail)->send(new AdminNotificationMail($htrans, $dtransItems));
+             }
+
             Mail::to($userEmail)->send(new ReceiptMail($htrans, $dtransItems));
 
             DB::commit();
@@ -397,7 +403,7 @@ class UserController extends Controller
 
         $this->convertToWebP($request->file('buktiPembayaran'), $outputWebPPath);
         $transaction->buktiPembayaran = $webpPath;
-        $transaction->status=2;
+        $transaction->status=1;
         $transaction->save();
         toast("Berhasil upload bukti",'info');
         return redirect()->back();

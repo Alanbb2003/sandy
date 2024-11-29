@@ -70,11 +70,11 @@
                                     <div class="col-12">
                                         <label for="status" class="form-label"><strong>Status</strong></label>
                                         <select name="status" id="status" class="form-select">
-                                            <option value="">All Statuses</option>
-                                            <option value="0" {{ request('status') == 1 ? 'selected' : '' }}>Menunggu konfirmasi</option>
-                                            <option value="1" {{ request('status') == 1 ? 'selected' : '' }}>Menunggu pembayaran</option>
-                                            <option value="2" {{ request('status') == 2 ? 'selected' : '' }}>Pesanan sedang diproses</option>
-                                            <option value="3" {{ request('status') == 3 ? 'selected' : '' }}>Transaksi Berhasil</option>
+                                            <option value="">Semua</option>
+                                            <option value="0" {{ request('status') == 0 ? 'selected' : '' }}>Menunggu Pembayaran</option>
+                                            <option value="1" {{ request('status') == 1 ? 'selected' : '' }}>Pesanan sedang diproses</option>
+                                            <option value="2" {{ request('status') == 2 ? 'selected' : '' }}>Pesanan dikirim</option>
+                                            <option value="3" {{ request('status') == 3 ? 'selected' : '' }}>Pesanan Selesai</option>
                                             <option value="4" {{ request('status') == 4 ? 'selected' : '' }}>Pesanan dibatalkan Pembeli</option>
                                             <option value="5" {{ request('status') == 5 ? 'selected' : '' }}>Pesanan dibatalkan Penjual</option>
                                         </select>
@@ -123,16 +123,16 @@
                     <td class="text-center">
                         @switch($order->status)
                             @case(0)
-                                <span class="badge bg-warning text-dark">Menunggu konfirmasi</span>
+                                <span class="badge bg-warning text-dark">Menunggu Pembayaran</span>
                                 @break
                             @case(1)
-                                <span class="badge bg-warning text-dark">Menunggu pembayaran</span>
-                                @break
-                            @case(2)
                                 <span class="badge bg-warning text-dark">Pesanan sedang diproses</span>
                                 @break
+                            @case(2)
+                                <span class="badge bg-warning text-dark">Pesanan dikirim</span>
+                                @break
                             @case(3)
-                                <span class="badge bg-success">Transaksi Berhasil</span>
+                                <span class="badge bg-success">Pesanan Selesai</span>
                                 @break
                             @case(4)
                                 <span class="badge bg-danger">Pesanan dibatalkan Pembeli.</span>

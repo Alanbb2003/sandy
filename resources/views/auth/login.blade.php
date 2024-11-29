@@ -84,10 +84,10 @@
                     @csrf
                     <div class="d-flex align-items-center mb-3 pb-1">
                       <i class="fa fa-user fa-2x me-3" style="color: #ff6219;"></i>
-                      <span class="h1 fw-bold mb-0">Sandy store</span>
+                      <span class="h1 fw-bold mb-0">TokoSandy</span>
                     </div>
   
-                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h5>
+                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Masuk ke akun anda</h5>
 
                     <div class="form-floating mb-4">
                         <input type="email" id="email" name="email" class="form-control form-control-lg @error('email') is-invalid @enderror" placeholder="email" value="{{old('email')}}"required autocomplete="email" autofocus/>

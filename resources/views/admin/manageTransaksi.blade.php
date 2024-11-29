@@ -40,10 +40,10 @@
               <td>Rp{{ number_format($htrans->totalPembelian, 2, ',', '.') }}</td>
               <td>
                   @if($htrans->buktiPembayaran)
-                    <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
-                        data-image="{{ asset('storage/' . $htrans->buktiPembayaran)}}" 
+                   <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
+                        data-image="{{ asset('images/bukti/' . $htrans->buktiPembayaran) }}" 
                         data-title="{{ $htrans->kodeTrans }}">
-                        <img src="{{asset('storage/' . $htrans->buktiPembayaran) }}" alt="Product Image" style="width: 100px; height: auto;">
+                        <img src="{{ asset('images/bukti/' . $htrans->buktiPembayaran) }}" alt="Product Image" style="width: 100px; height: auto;">
                     </a>
                   @else
                       Belum ada
@@ -52,16 +52,16 @@
               <td>
                 @switch($htrans->status)
                     @case(0)
-                        <span class="badge bg-warning text-dark">Menunggu Konfirmasi</span>
+                        <span class="badge bg-warning text-dark">Menunggu Pembayaran</span>
                         @break
                     @case(1)
-                        <span class="badge bg-warning text-dark">Menunggu pembayaran</span>
-                        @break
-                    @case(2)
                         <span class="badge bg-warning text-dark">Pesanan sedang diproses</span>
                         @break
+                    @case(2)
+                        <span class="badge bg-warning text-dark">Pesanan dikirim</span>
+                        @break
                     @case(3)
-                        <span class="badge bg-success">Transaksi Berhasil</span>
+                        <span class="badge bg-success">Pesanan Selesai</span>
                         @break
                     @case(4)
                         <span class="badge bg-danger">Pesanan dibatalkan Pembeli.</span>
@@ -74,13 +74,17 @@
                 @endswitch
               </td>
               <td>
-                  @if ($htrans->status == 0 || $htrans->status == 2)
+                  @if ($htrans->status == 1 || $htrans->status == 2)
                   <a href="#" class="btn btn-info btn-sm my-1 acceptTrans" style="width: 120px" 
                       data-bs-toggle="modal" 
                       data-bs-target="#acceptTransactionModal" 
                       data-id="{{ $htrans->id }}"
                       data-kode="{{$htrans->kodeTrans}}">
-                    <i class="fa fa-check"></i> Terima
+                      @if($htrans->status == 1)
+                      <i class="fa fa-check"></i> Kirim
+                        @elseif($htrans->status == 2)
+                            <i class="fa fa-check"></i> Selesaikan
+                        @endif
                   </a>
                   @endif
 
@@ -147,20 +151,20 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="acceptModalLabel">Confirm Transaction Acceptance</h5>
+            <h5 class="modal-title" id="acceptModalLabel">Konfirmasi penerimaan</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             yakin menerima transaksi <strong id="kodetransaksiShow"></strong>?
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
             
             <!-- Form to trigger accept transaction -->
             <form id="acceptTransactionForm" method="POST" action="{{ route('admin.acceptTransaction') }}">
               @csrf
               <input type="hidden" name="transaction_id" id="transactionId">
-              <button type="submit" class="btn btn-primary">Yes, Accept</button>
+              <button type="submit" class="btn btn-primary">Yakin</button>
             </form>
           </div>
         </div>

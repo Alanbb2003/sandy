@@ -3,146 +3,140 @@
 @section('content')
 <div class="container">
   <div class="row">
-    <div class="col">
+    <div class="col-12">
       <div class="my-3 card">
-        <a href="{{url("/dashboard/barang/new")}}" class="btn btn-primary" type="button">
-          Input barang baru
+        <a href="{{ url('/dashboard/barang/new') }}" class="btn btn-primary" type="button">
+          Input Barang Baru
         </a>
       </div>
     </div>
   </div>
-  
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-md-11">
-      <div class="card-header"> <h4>Manage Barang</h4> </div>
+  <div class="col-md-11">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="text-center">Manage Barang</h4>
+      </div>
       <div class="card-body">
-          <table class="display responsive nowrap" id="tableBarang" style="width:100%">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered display nowrap" id="tableBarang" style="width:100%">
             <thead>
               <tr>
                 <th>ID</th>
                 <th>Thumbnail</th>
                 <th data-priority="1">Nama Barang</th>
-                <th>kategori</th>
+                <th>Kategori</th>
                 <th data-priority="3">Jumlah</th>
-                <th>Harga</th>
+                <th>Harga Kecil / Harga Besar</th>
                 <th data-priority="2">Action</th>
               </tr>
             </thead>
             <tbody>
-            @foreach ($barang as $k)
-            <tr>
-              <td>{{$k->id}}</td>
-              <td>
-                @if($k->fotoPromosi)
-                <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
-                    data-image="{{ asset('images/uploads/'.$k->fotoPromosi) }}" 
-                    data-title="{{ $k->namaBarang }}">
-                    <img src="{{asset('images/uploads/'.$k->fotoPromosi) }}" alt="Product Image" style="width: 100px; height: auto;">
-                </a>
-                @else
-                    No image available
-                @endif
-              </td>
-              <td>
-                <a href="{{ url('/product/' . $k->slugBarang ) }}" class="nodecor">{{$k->namaBarang}}</a>
-              </td> 
-              <td>{{$k->category}}</td>
-              <td>{{$k->totalQuantity}} {{$k-> satuanTerkecil}} 
-                @if($k->satuanBesar)
-                    / {{ round($k->totalQuantity / $k->isiSatuanBesar) }} {{$k->satuanBesar}}
-                @endif
-                
-              </td> 
-              <td> Rp.{{ number_format($k->hargaKecil, 0, ',', '.') }}
-                @if($k->satuanBesar)
-                  / {{ number_format($k->hargaBesar, 0, ',', '.') }}
-                @endif
-              </td>
-              <td>
-                <div class="col mb-1">
-                  <!-- Button for Tambah Jumlah -->
-                  <div class="row px-2 mb-2">
-                    <button type="button" class="btn btn-primary w-100" 
+              @foreach ($barang as $k)
+              <tr>
+                <td>{{ $k->id }}</td>
+                <td>
+                  @if($k->fotoPromosi)
+                  <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
+                     data-image="{{ asset('images/uploads/'.$k->fotoPromosi) }}" 
+                     data-title="{{ $k->namaBarang }}">
+                    <img src="{{ asset('images/uploads/'.$k->fotoPromosi) }}" alt="Product Image" style="width: 100px; height: auto;">
+                  </a>
+                  @else
+                  No image available
+                  @endif
+                </td>
+                <td>
+                  <a href="{{ url('/product/' . $k->slugBarang) }}" class="nodecor">{{ $k->namaBarang }}</a>
+                </td>
+                <td>{{ $k->category }}</td>
+                <td>
+                  {{ $k->totalQuantity }} {{ $k->satuanTerkecil }}
+                  @if($k->satuanBesar)
+                  / {{ round($k->totalQuantity / $k->isiSatuanBesar) }} {{ $k->satuanBesar }} <p>(isi {{$k->isiSatuanBesar}} {{$k->satuanTerkecil}})</p>
+                  @endif
+                </td>
+                <td>
+                  Rp.{{ number_format($k->hargaKecil, 0, ',', '.') }}
+                  @if($k->satuanBesar)
+                  / Rp. {{ number_format($k->hargaBesar, 0, ',', '.') }}
+                  @endif
+                </td>
+                <td>
+                  <div class="d-flex flex-column">
+                    <button type="button" class="btn btn-primary mb-2" 
                             data-bs-toggle="modal" 
                             data-bs-target="#tambahJumlahModal" 
                             data-id="{{ $k->id }}" 
                             data-satuan-kecil="{{ $k->satuanTerkecil }}" 
                             data-satuan-besar="{{ $k->satuanBesar }}"
-                            data-isibesar="{{$k->isiSatuanBesar}}">
+                            data-isibesar="{{ $k->isiSatuanBesar }}">
                       Tambah Jumlah
                     </button>
-                  </div>
-                
-                  <div class="row px-2 mb-2">
-                    <a href="{{ url('/dashboard/barang/edit/'.$k->id) }}" class="btn btn-primary w-100">
+                    <a href="{{ url('/dashboard/barang/edit/'.$k->id) }}" class="btn btn-secondary mb-2">
                       <i class="fa-regular fa-pen-to-square"></i> Edit
                     </a>
-                  </div>
-                
-                  <div class="row px-2">
-                    <a href="/dashboard/barang/toggle-status/{{$k->id}}" 
+                    <a href="/dashboard/barang/toggle-status/{{ $k->id }}" 
                       class="btn {{ $k->Status == 1 ? 'btn-danger' : 'btn-success' }}">
                       {{ $k->Status == 1 ? 'Disable' : 'Enable' }}
-                   </a>
+                    </a>
                   </div>
-                </div>
-              </td>
-            </tr>
-            @endforeach
+                </td>
+              </tr>
+              @endforeach
             </tbody>
           </table>
-      </div>
-    </div>
-
-    <!-- Modal gambar -->
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="imageModalLabel">Product Image</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body text-center">
-                  <img id="modalImage" src="" alt="Product Image" class="img-fluid">
-              </div>
-          </div>
-      </div>
-    </div>
-    <!-- Modal Tambah Jumlah -->
-    <div class="modal fade" id="tambahJumlahModal" tabindex="-1" aria-labelledby="tambahJumlahModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="tambahJumlahModalLabel">Tambah Jumlah Barang</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form action="{{ route('admin.TambahJumlah') }}" method="POST">
-            @csrf
-            <div class="modal-body">
-              <input type="hidden" id="barangId" name="barangId">
-              
-              <div class="mb-3">
-                <label for="satuan" class="form-label">Pilih Satuan</label>
-                <select class="form-select" id="satuan" name="satuan">
-
-                </select>
-              </div>
-    
-              <div class="mb-3">
-                <label for="amount" class="form-label">Jumlah</label>
-                <input type="number" class="form-control" id="amount" name="amount" placeholder="Masukkan jumlah" required>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-              <button type="submit" class="btn btn-primary">Simpan</button>
-            </div>
-          </form>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Modal Image -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">Product Image</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modalImage" src="" alt="Product Image" class="img-fluid">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Tambah Jumlah -->
+<div class="modal fade" id="tambahJumlahModal" tabindex="-1" aria-labelledby="tambahJumlahModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tambahJumlahModalLabel">Tambah Jumlah Barang</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{{ route('admin.TambahJumlah') }}" method="POST">
+        @csrf
+        <div class="modal-body">
+          <input type="hidden" id="barangId" name="barangId">
+          <div class="mb-3">
+            <label for="satuan" class="form-label">Pilih Satuan</label>
+            <select class="form-select" id="satuan" name="satuan"></select>
+          </div>
+          <div class="mb-3">
+            <label for="amount" class="form-label">Jumlah</label>
+            <input type="number" class="form-control" id="amount" name="amount" placeholder="Masukkan jumlah" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 @endsection
 
