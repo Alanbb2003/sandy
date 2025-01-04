@@ -103,7 +103,7 @@
                 <div class="col my-2">
                     <div class="row">{{$a->namaDepan}} {{$a->namaBelakang}}</div>
                     <div class="row">{{$a->noHP}}</div>
-                    <div class="row">{{$a->detailAlamat}}, {{$a->provinsi}}, {{$a->kota}}, {{$a->kecamatan}}, {{$a->kelurahan}}</div>
+                    <div class="row">{{$a->detailAlamat}},{{$a->kodePos}} ,{{$a->provinsi}}, {{$a->kota}}, {{$a->kecamatan}}, {{$a->kelurahan}}</div>
 
                     <button class="btn btn-info" onclick="editAddress({{ json_encode($a) }})">Edit</button>
                     <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" onclick="setDeleteId({{ $a->id }})">Delete</button>
@@ -141,7 +141,16 @@
               <label for="editNoHp" class="form-label">Nomor Telefon</label>
               <input type="text" class="form-control" id="editNoHp" name="editNoHp" required>
             </div>
-  
+            
+            <div class="mb-1">
+                <label for="editDetail" class="form-label">Detail Alamat</label>
+                <input id="editDetail" type="text" name="editDetail" class="form-control @error('editDetail') is-invalid @enderror"  value="{{ old('editDetail') }}" required autocomplete="editDetail" autofocus placeholder="Detail Alamat">
+                @error('editDetail')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
+            </div>
             <!-- Provinsi -->
             <div class="mb-3">
               <label for="editProvinsi" class="form-label">Provinsi</label>
@@ -287,7 +296,8 @@ selectKecamatan.addEventListener('change',(e)=>{
     document.getElementById('editNamaBelakang').value = address.namaBelakang;
     document.getElementById('editNoHp').value = address.noHP;
     document.getElementById('editKodePos').value = address.kodePos;
-
+    document.getElementById('editDetail').value= address.detailAlamat;
+    
     var modal = new bootstrap.Modal(document.getElementById('editAddressModal'));
     modal.show();
     }

@@ -52,15 +52,14 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdminModal">Add New
-                    Admin</button>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdminModal">Tambah Admin Baru</button>
                 <!--Form ubah password!-->
                 <hr>
-                <h5>Change Password</h5>
+                <h5>Ganti Password</h5>
                 <form action="{{ url('/dashboard/changePasswordAdmin') }}" method="POST">
                     @csrf
                     <div class="mb-3">
-                        <label for="current_password" class="form-label">Current Password</label>
+                        <label for="current_password" class="form-label">Password Sekarang</label>
                         <input type="password" name="current_password" id="current_password"
                             class="form-control @error('current_password') is-invalid @enderror" required>
                         @error('current_password')
@@ -70,7 +69,7 @@
                         @enderror
                     </div>
                     <div class="mb-3">
-                        <label for="new_password" class="form-label">New Password</label>
+                        <label for="new_password" class="form-label">Password Baru</label>
                         <input type="password" name="new_password" id="new_password"
                             class="form-control @error('new_password') is-invalid @enderror" required>
                         @error('new_password')
@@ -80,24 +79,24 @@
                         @enderror
                     </div>
                     <div class="mb-3">
-                        <label for="new_password_confirmation" class="form-label">Confirm New Password</label>
+                        <label for="new_password_confirmation" class="form-label">Konfirmasi Password Baru</label>
                         <input type="password" name="new_password_confirmation" id="new_password_confirmation"
                             class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Change Password</button>
+                    <button type="submit" class="btn btn-primary">Ubah Password</button>
                 </form>
 
                 <hr>
-                <h5>Change Email</h5>
+                <h5>Ganti Email</h5>
                 <form action="{{route('admin.changeEmail') }}" method="POST">
                     @csrf
                     <div class="mb-3">
-                        <label for="current_email" class="form-label">Current Email</label>
+                        <label for="current_email" class="form-label">Email Sekarang</label>
                         <input type="email" name="current_email" id="current_email" class="form-control"
                             value="{{ Auth::user()->email }}" disabled>
                     </div>
                     <div class="mb-3">
-                        <label for="new_email" class="form-label">New Email</label>
+                        <label for="new_email" class="form-label">Email Baru</label>
                         <input type="email" name="new_email" id="new_email"
                             class="form-control @error('new_email') is-invalid @enderror" required>
                         @error('new_email')
@@ -106,15 +105,15 @@
                             </span>
                         @enderror
                     </div>
-                    <button type="submit" class="btn btn-primary">Change Email</button>
+                    <button type="submit" class="btn btn-primary">Ganti Email</button>
                 </form>
 <br>
  <!-- Delete Admin Form -->
- <h5>Delete Admin Account</h5>
+ <h5>Hapus Akun Admin</h5>
  <form id="deleteAdminForm" action="{{ route('admin.delete') }}" method="POST">
      @csrf
      <div class="mb-3">
-         <label for="admin_to_delete" class="form-label">Select Admin to Delete</label>
+         <label for="admin_to_delete" class="form-label">Pilih admin untuk dihapus</label>
          <select name="admin_id" id="admin_to_delete" class="form-control" required>
              <option value="" disabled selected>-- Select Admin --</option>
              @foreach ($admins as $admin)
@@ -125,7 +124,7 @@
          </select>
      </div>
      <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-         data-bs-target="#confirmDeleteAdminModal">Delete Admin</button>
+         data-bs-target="#confirmDeleteAdminModal">Hapus Admin</button>
  </form>
 
  <!-- Confirm Delete Modal -->

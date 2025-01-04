@@ -81,8 +81,8 @@
   
           <div class="col-md-6">
               <label for="inputKategori" class="form-label">Kategori</label>
-              <select class="form-select" id="inputKategori" name="inputKategori">
-                  <option selected disabled>Pilih Kategori...</option>
+              <select class="form-select" id="inputKategori" name="inputKategori" required>
+                  <option selected disabled value="">Pilih Kategori...</option>
                   @foreach ($kategori as $k)
                       <option value="{{$k->id}}">{{$k->nama_category}}</option>
                   @endforeach

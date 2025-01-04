@@ -90,8 +90,9 @@
                                 </div>
                                 <div class="col-9">
                                     <p class="mb-1"><strong>{{ $details['name'] }}</strong></p>
-                                    <p class="mb-1">QTY: {{ $details['quantity'] }} {{ $details['unit'] }}</p>
-                                    <p class="mb-1">Subtotal: Rp. {{ number_format($details['price'] * $details['quantity'], 2, ",", ".") }}</p>
+                                    <p class="mb-1">Harga: Rp.{{number_format( $details['price']), 2,",","." }}</p>
+                                    <p class="mb-1">QTY: {{$details['quantity']}} {{ $details['unit'] }}</p>
+                                    <p class="mb-1">Subtotal: Rp.{{ number_format($details['price'] * $details['quantity'], 2, ",", ".") }}</p>
                                 </div>
                             </div>
                             <hr>

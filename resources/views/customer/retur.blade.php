@@ -6,7 +6,7 @@
 
     <div class="text-end mb-3">
         <button class="btn btn-outline-warning fw-bold px-4 py-2" data-bs-toggle="modal" data-bs-target="#returnPolicyModal">
-            View Return Policy
+            Lihat Kebijakan Pengembalian
         </button>
     </div>
     
@@ -240,18 +240,18 @@
                         </div>
 
                         <!-- Bank Details -->
-                        <div id="bankDetails">
-                            <h6 class="text-muted">Bank Details</h6>
-                            <div class="mb-3">
-                                <label for="bankName" class="form-label">Nama Bank</label>
-                                <input type="text" class="form-control" name="bankName" id="bankName">
-                            </div>
+                        <!--<div id="bankDetails">-->
+                        <!--    <h6 class="text-muted">Bank Details</h6>-->
+                        <!--    <div class="mb-3">-->
+                        <!--        <label for="bankName" class="form-label">Nama Bank</label>-->
+                        <!--        <input type="text" class="form-control" name="bankName" id="bankName">-->
+                        <!--    </div>-->
 
-                            <div class="mb-3">
-                                <label for="accountNumber" class="form-label">Nomor Akun</label>
-                                <input type="text" class="form-control" name="accountNumber" id="accountNumber" placeholder="e.g., 1234567890 John Doe">
-                            </div>
-                        </div>
+                        <!--    <div class="mb-3">-->
+                        <!--        <label for="accountNumber" class="form-label">Nomor Akun</label>-->
+                        <!--        <input type="text" class="form-control" name="accountNumber" id="accountNumber" placeholder="e.g., 1234567890 John Doe">-->
+                        <!--    </div>-->
+                        <!--</div>-->
 
                         <input type="hidden" name="selectedItemsData" id="selectedItemsData">
                     </div>

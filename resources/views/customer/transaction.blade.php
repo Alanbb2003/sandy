@@ -205,7 +205,12 @@
                     @csrf
                     <div class="mb-3">
                         <label for="inputAlasan" class="form-label">Alasan Pembatalan</label>
-                        <textarea class="form-control @error('inputAlasan') is-invalid @enderror" id="inputAlasan" name="inputAlasan" rows="5" placeholder="Enter your text here..." required></textarea>
+                        <select class="form-select @error('inputAlasan') is-invalid @enderror" id="inputAlasan" name="inputAlasan" required>
+                            <option value="" disabled selected>Pilih alasan pembatalan</option>
+                            <option value="Saya berubah pikiran">Saya berubah pikiran</option>
+                            <option value="Ada kesalahan dalam pemesanan">Ada kesalahan dalam pemesanan</option>
+                            <option value="Harga lebih murah di tempat lain">Harga lebih murah di tempat lain</option>
+                        </select>
                     </div>
                     <input type="hidden" id="transactionToCancel" name="transactionID">
                     <div class="d-flex justify-content-end">

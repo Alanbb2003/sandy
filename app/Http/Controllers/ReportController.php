@@ -7,8 +7,8 @@ use App\Models\Dtrans;
 use App\Models\Htrans;
 use App\Models\Membership;
 use App\Models\Products;
-use App\Models\retur;
 use App\Models\User;
+use App\Models\retur;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,27 +27,27 @@ class ReportController extends Controller
         if ($request->filled('price_min_small') && $request->filled('price_max_small')) {
             $query->whereBetween('hargaKecil', [$request->price_min_small, $request->price_max_small]);
         } elseif ($request->filled('price_min_small')) {
-            $query->whereDate('hargaKecil', '>=', $request->price_min_small);
+            $query->where('hargaKecil', '>=', $request->price_min_small);
         } elseif ($request->filled('price_max_small')) {
-            $query->whereDate('hargaKecil', '<=', $request->price_max_small);
+            $query->where('hargaKecil', '<=', $request->price_max_small);
         }
 
 
         if ($request->filled('price_min_big') && $request->filled('price_min_big')) {
             $query->whereBetween('hargaBesar', [$request->price_min_big, $request->price_max_big]);
         } elseif ($request->filled('price_min_big')) {
-            $query->whereDate('hargaBesar', '>=', $request->price_min_big);
+            $query->where('hargaBesar', '>=', $request->price_min_big);
         } elseif ($request->filled('price_min_big')) {
-            $query->whereDate('hargaBesar', '<=', $request->price_max_big);
+            $query->where('hargaBesar', '<=', $request->price_max_big);
         }
 
         
         if ($request->filled('stok_min') && $request->filled('stok_max')) {
             $query->whereBetween('totalQuantity', [$request->stok_min, $request->stok_max]);
         } elseif ($request->filled('stok_min')) {
-            $query->whereDate('totalQuantity', '>=', $request->stok_min);
+            $query->where('totalQuantity', '>=', $request->stok_min);
         } elseif ($request->filled('stok_max')) {
-            $query->whereDate('totalQuantity', '<=', $request->stok_max);
+            $query->where('totalQuantity', '<=', $request->stok_max);
         }
 
         if ($request->filled('stok_min_big')) {
@@ -166,8 +166,7 @@ class ReportController extends Controller
         ]);
     }
 
-    public function laporanPenjualan(Request $request)
-    {
+    public function laporanPenjualan(Request $request){
         $query = Dtrans::with(['product:id,namaBarang'])
             ->whereHas('htrans', function ($query) use ($request) {
                 $query->where('status', 3);
@@ -245,6 +244,7 @@ class ReportController extends Controller
 
         return view('admin.laporan.laporanAktif', compact('customers'));
     }
+    
     public function laporanRetur(Request $request){
         $query = retur::with(['dtrans.product', 'htrans']);
        if ($request->filled('start_date') && $request->filled('end_date')) {
@@ -272,5 +272,5 @@ class ReportController extends Controller
        ? Carbon::parse($request->end_date)->format('d/m/Y') 
        : null;
        return view('admin.laporan.laporanRetur', compact('returns','startDateFormatted', 'endDateFormatted'));
-   }
+    }
 }

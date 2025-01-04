@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\CustomerEmail;
 use App\Mail\NewProductNotification;
 use App\Mail\OrderAcceptedMail;
+use App\Mail\ReturAcceptedMail;
 use App\Models\Category;
 use App\Models\Htrans;
 use App\Models\Membership;
@@ -31,12 +32,53 @@ class AdminController extends Controller
         return view('admin.homeAdmin',["msg"=>"I am admin role"],compact('admins'));
     }
     
-    public function adminManageStock(){
-        $barang = Products::join('category','product.fk_kategori','=','category.id')
-        ->select('product.*','category.nama_category as category')
-        ->get();
-        $kategori = Category::all();
-        return view('admin.manageStock',compact('barang','kategori'));
+    public function adminManageStock(Request $request){
+        $categories = Category::all();
+        $query = Products::with('category');
+    
+        if ($request->filled('name')) {
+            $query->where('namaBarang', 'LIKE', '%' . $request->name . '%');
+        }
+
+        if ($request->filled('price_min_small') && $request->filled('price_max_small')) {
+            $query->whereBetween('hargaKecil', [$request->price_min_small, $request->price_max_small]);
+        } elseif ($request->filled('price_min_small')) {
+            $query->where('hargaKecil', '>=', $request->price_min_small);
+        } elseif ($request->filled('price_max_small')) {
+            $query->where('hargaKecil', '<=', $request->price_max_small);
+        }
+
+
+        if ($request->filled('price_min_big') && $request->filled('price_min_big')) {
+            $query->whereBetween('hargaBesar', [$request->price_min_big, $request->price_max_big]);
+        } elseif ($request->filled('price_min_big')) {
+            $query->where('hargaBesar', '>=', $request->price_min_big);
+        } elseif ($request->filled('price_min_big')) {
+            $query->where('hargaBesar', '<=', $request->price_max_big);
+        }
+
+        
+        if ($request->filled('stok_min') && $request->filled('stok_max')) {
+            $query->whereBetween('totalQuantity', [$request->stok_min, $request->stok_max]);
+        } elseif ($request->filled('stok_min')) {
+            $query->where('totalQuantity', '>=', $request->stok_min);
+        } elseif ($request->filled('stok_max')) {
+            $query->where('totalQuantity', '<=', $request->stok_max);
+        }
+
+        if ($request->filled('stok_min_big')) {
+            $query->whereRaw('totalQuantity / isiSatuanBesar >= ?', [$request->stok_min_big]);
+        }
+        if ($request->filled('stok_max_big')) {
+            $query->whereRaw('totalQuantity / isiSatuanBesar <= ?', [$request->stok_max_big]);
+        }
+    
+        if ($request->filled('category')) {
+            $query->where('fk_kategori', $request->category);
+        }
+    
+        $products = $query->get();
+        return view('admin.manageStock',compact('products','categories'));
     }
 
     public function adminBarangNew(){
@@ -63,10 +105,45 @@ class AdminController extends Controller
         return view('admin.manageMembership', compact('members', 'users'));
     }
 
-    public function adminTransaksi(){
-        $transaksi = Htrans::with(['dtrans.product', 'user'])
-                    ->orderBy('id', 'desc')
-                    ->get();
+    public function adminTransaksi(Request $request){
+        $query = Htrans::with(['dtrans.product', 'user'])
+                    ->orderBy('id', 'desc');
+        if ($request->filled('kodeTrans')) {
+            $query->where('kodeTrans', 'LIKE', '%' . $request->kodeTrans . '%');
+        }
+
+        if ($request->filled('namaPembeli')) {
+            $query->where('namaPembeli', 'LIKE', '%' . $request->namaPembeli . '%');
+        }
+    
+        if ($request->filled('alamatPembelian')) {
+            $query->where('alamatPembelian', 'LIKE', '%' . $request->alamatPembelian . '%');
+        }
+    
+        if ($request->filled('salesHeaderDate_start') && $request->filled('salesHeaderDate_end')) {
+            $query->whereBetween(DB::raw('DATE(tanggalPembelian)'), [
+                $request->salesHeaderDate_start, 
+                $request->salesHeaderDate_end
+            ]);
+        } elseif ($request->filled('salesHeaderDate_start')) {
+            $query->whereDate('tanggalPembelian', '>=', $request->salesHeaderDate_start);
+        } elseif ($request->filled('salesHeaderDate_end')) {
+            $query->whereDate('tanggalPembelian', '<=', $request->salesHeaderDate_end);
+        }
+    
+        if ($request->filled('total_min') && $request->filled('total_max')) {
+            $query->whereBetween('totalPembelian', [$request->total_min, $request->total_max]);
+        } elseif ($request->filled('total_min')) {
+            $query->where('totalPembelian', '>=', $request->total_min);
+        } elseif ($request->filled('total_max')) {
+            $query->where('totalPembelian', '<=', $request->total_max);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+    
+        $transaksi = $query->get();
         
         return view('admin.manageTransaksi', compact('transaksi'));
     }
@@ -154,7 +231,8 @@ class AdminController extends Controller
             'inputNamaBarang'=>'required',
             'inputJumlahKecil'=>'required|numeric|min:0|not_in:0',
             'inputSatuanKecil'=>'required',
-            'inputHargaKecil'=>'required|numeric|min:0|not_in:0'
+            'inputHargaKecil'=>'required|numeric|min:0|not_in:0',
+            'inputKategori'=>'required'
         ]);
 
         
@@ -222,11 +300,11 @@ class AdminController extends Controller
          }
          DB::commit();
         alert()->success('Success!','Berhasil menambahkan barang');
-        return back();
+        return redirect('/dashboard/barang'); 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error adding product: ' . $e->getMessage());
-            alert()->error('Error!', 'Gagal menambah barang.');
+            alert()->error('Error!', $e->getMessage());
             return back();
         }
     }
@@ -344,7 +422,7 @@ class AdminController extends Controller
                 $fileName = time() . rand(1, 99) . '.webp'; 
 
                 $imagePath = public_path('images/uploads/' . $fileName);
-
+                
                 $this->convertToWebP($image, $imagePath);
 
                 Pictures::create([
@@ -360,7 +438,7 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error adding product: ' . $e->getMessage());
-            alert()->error('Error!', 'Something went wrong. Please try again.');
+            alert()->error('Error!', $e->getMessage());
             return back();
         }
     }
@@ -424,8 +502,10 @@ class AdminController extends Controller
                 alert()->error('Error!', 'Gagal konfirmasi transaksi');
                 return back()->withErrors(['error' => 'Failed to add product']);
             }
+           
+
         }else{
-            $transaksi->status = 3;
+           $transaksi->status = 3;
             $transaksi->save();
             // Mail::to($transaksi->user->email)->send(new OrderAcceptedMail($transaksi->user, $transaksi));
             alert()->success('Success!', 'Transaksi diterima');
@@ -446,8 +526,9 @@ class AdminController extends Controller
         }
     
         $order->status = 5; 
-        $order->save();
         $order->alasanBatal = $request->input('inputAlasan');
+        $order->save();
+        
         alert()->success('Success!', 'Transaksi Ditolak');
         return redirect()->back();
     }
@@ -486,6 +567,10 @@ class AdminController extends Controller
         if ($retur) {
             $retur->status = 1; 
             $retur->save();
+              $user = User::find($retur->fkUserID);
+                if ($user) {
+                    Mail::to($user->email)->send(new ReturAcceptedMail($retur));
+                }
             alert()->success('Success!','Berhasil Konfirmasi retur');
             return redirect()->back();
         }
@@ -624,30 +709,46 @@ class AdminController extends Controller
      */
     private function convertToWebP($file, $outputWebPPath)
     {
-        $extension = $file->extension();
-        switch ($extension) {
-            case 'jpeg':
-            case 'jpg':
-                $image = imagecreatefromjpeg($file->getPathname());
-                break;
-            case 'png':
-                $image = imagecreatefrompng($file->getPathname());
-                break;
-            case 'gif':
-                $image = imagecreatefromgif($file->getPathname());
-                break;
-            case 'webp':
-                $file->move(dirname($outputWebPPath), basename($outputWebPPath));
-                return;
-            default:
-                alert()->error('Error!', 'Unsupported image format');
-                return back();
-        }
+$extension = $file->extension();
+    $image = null;
 
-        // Convert to WebP and save
-        imagewebp($image, $outputWebPPath, 75); 
+    switch ($extension) {
+        case 'jpeg':
+        case 'jpg':
+            $image = imagecreatefromjpeg($file->getPathname());
+            break;
+        case 'png':
+            $image = imagecreatefrompng($file->getPathname());
+            break;
+        case 'gif':
+            $image = imagecreatefromgif($file->getPathname());
+            break;
+        case 'webp':
+            $file->move(dirname($outputWebPPath), basename($outputWebPPath));
+            return;
+        default:
+            alert()->error('Error!', 'Unsupported image format');
+            return back();
+    }
 
-        // Free memory
-        imagedestroy($image);
+    if (!$image) {
+        alert()->error('Error!', 'Image creation failed');
+        return back();
+    }
+
+    // Ensure the image is in true color
+    $trueColorImage = imagecreatetruecolor(imagesx($image), imagesy($image));
+    imagealphablending($trueColorImage, false);
+    imagesavealpha($trueColorImage, true);
+
+    // Copy the original image into the true color image
+    imagecopy($trueColorImage, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
+
+    // Convert to WebP and save
+    imagewebp($trueColorImage, $outputWebPPath, 75);
+
+    // Free memory
+    imagedestroy($image);
+    imagedestroy($trueColorImage);
     }
 }

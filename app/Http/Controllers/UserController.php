@@ -140,10 +140,12 @@ class UserController extends Controller
         $returns = retur::with(['dtrans.product', 'htrans']) 
         ->where('fkUserID', auth()->id())
         ->get();
-        $transactions = Htrans::with(['dtrans.product'])->where('fkUserID', auth()->id())
-        ->where('tanggalPembelian', '>=', now()->subWeeks(2))
-        ->get();
-
+        
+        $transactions = Htrans::with(['dtrans.product'])
+            ->where('fkUserID', auth()->id())
+            ->where('tanggalPembelian', '>=', now()->subWeeks(2))
+            ->where('status', 3) 
+            ->get();
         return view('customer.retur', compact('returns', 'transactions'));
     }
 
@@ -204,6 +206,7 @@ class UserController extends Controller
             'editNamaDepan' => 'required',
             'editNamaBelakang' => 'required',
             'editNoHp' => 'required',
+            'editDetail'=>'required',
             'editProvinsi' => 'required',
             'editKota' => 'required',
             'editKecamatan' => 'required',
@@ -213,6 +216,7 @@ class UserController extends Controller
         $address->namaDepan = $request->editNamaDepan;
         $address->namaBelakang = $request->editNamaBelakang;
         $address->noHP = $request->editNoHp;
+        $address->detailAlamat = $request->editDetail;
         $address->provinsi = $request->editProvinsi;
         $address->kota = $request->editKota;
         $address->kecamatan = $request->editKecamatan;
@@ -357,7 +361,7 @@ class UserController extends Controller
             ->join('product', 'dtrans.fkProductID', '=', 'product.id')  
             ->select('dtrans.*', 'product.namaBarang', 'product.fotoPromosi')
             ->get();
-             // Notify Admins
+            // Notify Admins
              $adminEmails = User::where('role', 1)->pluck('email')->toArray(); 
              foreach ($adminEmails as $adminEmail) {
                  Mail::to($adminEmail)->send(new AdminNotificationMail($htrans, $dtransItems));
@@ -368,7 +372,7 @@ class UserController extends Controller
             DB::commit();
 
             session()->forget('cart');
-            alert()->success('Berhasil melakukan pemesanan!', 'harap melakukan pembayaran');
+            alert()->success('Berhasil melakukan pemesanan!', 'harap melihat detail yang dikirim melalui email');
             return redirect('/');
 
         } catch (\Exception $e) {
@@ -382,30 +386,33 @@ class UserController extends Controller
         }
     }
     
-    public function uploadBuktiPembayaran(Request $request){
+    public function uploadBuktiPembayaran(Request $request)
+    {
         $request->validate([
-            'buktiPembayaran' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048', 
+            'buktiPembayaran' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'transaction_id' => 'required|exists:htrans,id',
         ]);
 
         $transaction = Htrans::where('id', $request->transaction_id)
-                            ->where('fkUserID', auth()->id())
-                            ->firstOrFail();
-
-        $webpDirectory = storage_path('app/public/bukti'); 
+            ->where('fkUserID', auth()->id())
+            ->firstOrFail();
+    
+        $webpDirectory = public_path('images/bukti'); 
         $webpFileName = $transaction->kodeTrans . '.' . uniqid() . '.webp';
-        $webpPath = 'bukti/' . $webpFileName;
-        $outputWebPPath = storage_path('app/public/' . $webpPath);
-
+        $outputWebPPath = public_path('images/bukti/' . $webpFileName); 
+   
         if (!File::exists($webpDirectory)) {
-            File::makeDirectory($webpDirectory, 0755, true);
+            File::makeDirectory($webpDirectory, 0755, true); 
         }
 
         $this->convertToWebP($request->file('buktiPembayaran'), $outputWebPPath);
-        $transaction->buktiPembayaran = $webpPath;
-        $transaction->status=1;
+
+        $transaction->buktiPembayaran = $webpFileName;
+        $transaction->status = 1;
         $transaction->save();
-        toast("Berhasil upload bukti",'info');
+
+        toast("Berhasil upload bukti", 'info');
+
         return redirect()->back();
     }
 
@@ -445,8 +452,8 @@ class UserController extends Controller
                 'hargaPerBarang' => $selectedItem['price'],
                 'subtotal' => $selectedItem['quantity'] * $selectedItem['price'],
                 'TipePengembalian'=>$request->returnType,
-                'bankName' => $request->bankName,
-                'accountNumber' => $request->accountNumber,
+                // 'bankName' => $request->bankName,
+                // 'accountNumber' => $request->accountNumber,
                 'status' => 0, 
             ]);
             alert()->success('Success!', 'Berhasil mengajukan retur.');
@@ -550,12 +557,14 @@ class UserController extends Controller
         $profile_picture = null;
         if ($request->hasFile('profilePicture')) {
             $webpFileName =  uniqid() . '.webp';
-            $webpPath = 'photos/' . $webpFileName;
-            $outputWebPPath = storage_path('app/public/' . $webpPath);
+            $outputWebPPath =public_path('images/photos/' . $webpFileName); 
             $this->convertToWebP($request->file('profilePicture'), $outputWebPPath);
-            $profile_picture = $webpPath;
+            $profile_picture = $webpFileName;
             if ($oldProfilePicture) {
-                Storage::delete('public/photos/' . $oldProfilePicture);
+                $oldFilePath = public_path('photos/' . $oldProfilePicture);
+                if (file_exists($oldFilePath)) {
+                    unlink($oldFilePath); // Deletes the file directly from public directory
+                }
             }
         }
 
@@ -585,16 +594,17 @@ class UserController extends Controller
         
     }
 
- /**
+    /**
      * Convert an image to WebP format using GD library.
      *
      * @param \Illuminate\Http\UploadedFile $file
      * @param string $outputWebPPath Path where the WebP image will be saved
      * @return void
      */
-    private function convertToWebP($file, $outputWebPPath)
-    {
-        $extension = $file->extension();
+    private function convertToWebP($file, $outputWebPPath){
+    $extension = $file->extension();
+        $image = null;
+    
         switch ($extension) {
             case 'jpeg':
             case 'jpg':
@@ -607,19 +617,32 @@ class UserController extends Controller
                 $image = imagecreatefromgif($file->getPathname());
                 break;
             case 'webp':
-                // If the file is already a WebP image, move it directly without conversion
                 $file->move(dirname($outputWebPPath), basename($outputWebPPath));
                 return;
             default:
                 alert()->error('Error!', 'Unsupported image format');
                 return back();
         }
-
+    
+        if (!$image) {
+            alert()->error('Error!', 'Image creation failed');
+            return back();
+        }
+    
+        // Ensure the image is in true color
+        $trueColorImage = imagecreatetruecolor(imagesx($image), imagesy($image));
+        imagealphablending($trueColorImage, false);
+        imagesavealpha($trueColorImage, true);
+    
+        // Copy the original image into the true color image
+        imagecopy($trueColorImage, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
+    
         // Convert to WebP and save
-        imagewebp($image, $outputWebPPath, 75); // 80 is the quality setting for WEBP (0-100)
-
+        imagewebp($trueColorImage, $outputWebPPath, 75);
+    
         // Free memory
         imagedestroy($image);
+        imagedestroy($trueColorImage);
     }
 
 }

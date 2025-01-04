@@ -1,8 +1,6 @@
-
 @extends(Auth::guest() ? 'layouts.app' : (Auth::user()->role == 'user' ? 'layouts.app' : 'layouts.appAdmin'))
 
 @section('content')
-
 <div class="container mt-5">
     <div class="mb-3">
         @if (Auth::check() && Auth::user()->role == 'admin')
@@ -76,33 +74,33 @@
                 @endif
             </div>
             
-            @if($barang->Status == 2)
-            <div class="alert alert-danger">
-                <strong>Produk sedang tidak tersedia.</strong>
-            </div>
-        @else
-            <form action="{{ url('/cart/add') }}" method="POST" class="bg-light p-3 rounded shadow-sm">
-                @csrf
-                <input type="hidden" id="IDbarang" name="IDbarang" value="{{ $barang->id }}">
-
-                <div class="mb-3">
-                    <label for="quantity_{{ $barang->id }}" class="form-label">Jumlah:</label>
-                    <input type="number" id="quantity_{{ $barang->id }}" name="quantity" min="1" value="1" class="form-control">
+               @if($barang->Status == 2)
+                <div class="alert alert-danger">
+                    <strong>Produk sedang tidak tersedia.</strong>
                 </div>
+            @else
+                <form action="{{ url('/cart/add') }}" method="POST" class="bg-light p-3 rounded shadow-sm">
+                    @csrf
+                    <input type="hidden" id="IDbarang" name="IDbarang" value="{{ $barang->id }}">
 
-                <div class="mb-3">
-                    <label for="unit_{{ $barang->id }}" class="form-label">Satuan:</label>
-                    <select id="unit_{{ $barang->id }}" name="unit" class="form-select">
-                        <option value="small">{{ $barang->satuanTerkecil }}</option>
-                        @if($barang->satuanBesar)
-                            <option value="big">{{ $barang->satuanBesar }}</option>
-                        @endif
-                    </select>
-                </div>
+                    <div class="mb-3">
+                        <label for="quantity_{{ $barang->id }}" class="form-label">Jumlah:</label>
+                        <input type="number" id="quantity_{{ $barang->id }}" name="quantity" min="1" value="1" class="form-control">
+                    </div>
 
-                <button type="submit" class="btn btn-primary w-100">Tambah ke Keranjang</button>
-            </form>
-        @endif
+                    <div class="mb-3">
+                        <label for="unit_{{ $barang->id }}" class="form-label">Satuan:</label>
+                        <select id="unit_{{ $barang->id }}" name="unit" class="form-select">
+                            <option value="small">{{ $barang->satuanTerkecil }}</option>
+                            @if($barang->satuanBesar)
+                                <option value="big">{{ $barang->satuanBesar }}</option>
+                            @endif
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Tambah ke Keranjang</button>
+                </form>
+            @endif
         </div>
     </div>
 </div>

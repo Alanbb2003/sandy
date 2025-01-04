@@ -25,12 +25,17 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     {{-- <link href="https://cdn.datatables.net/v/dt/dt-2.0.3/b-3.0.1/b-colvis-3.0.1/b-html5-3.0.1/fc-5.0.0/r-3.0.0/sb-1.7.0/sp-2.3.0/datatables.min.css" rel="stylesheet"> --}}
     <link href="{{asset('style.css')}}" rel="stylesheet">
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        body{
+        background-color: #e3e3e3; 
+    }
+    </style>
 </head>
 <body>
     <div id="app">
       <!-- Main Navigation Bar -->
-    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+    <nav class="navbar navbar-expand-md navbar-light bg-info shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">
                 {{ config('app.name', 'Laravel') }}
@@ -91,7 +96,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 @if(Auth::user()->picture)
-                                    <img src="{{ asset('storage/' . Auth::user()->picture) }}" alt="Profile Picture" class="rounded-circle me-2" width="30" height="30">
+                                    <img src="{{ asset('images/photos/' . Auth::user()->picture) }}" alt="Profile Picture" class="rounded-circle me-2" width="30" height="30">
                                 @else
                                     <i class="fa-solid fa-user fa-lg me-2"></i>
                                 @endif
@@ -100,6 +105,10 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="{{ url('/profile') }}">Profile</a></li>
                                 <li><a class="dropdown-item" href="{{ url('/wishlist') }}">Wishlist</a></li>
+                                <li><a class="dropdown-item" href="{{ url('/transaction') }}">Riwayat Transaksi</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url('/retur') }}">Retur</a>
+                                </li>
                                 <li>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -118,29 +127,29 @@
     </nav>
 
     <!-- Secondary Navigation Bar -->
-    <nav class="navbar navbar-expand-md navbar-light bg-light" style="padding: 0.25rem 1rem;">
-        <div class="container">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#secondaryNav" aria-controls="secondaryNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="secondaryNav">
-                <ul class="navbar-nav w-100 justify-content-end">
-                    <!--<li class="nav-item">-->
-                    <!--    <a class="nav-link" href="{{ url('/wishlist') }}">Wishlist</a>-->
-                    <!--</li>-->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/transaction') }}">Transactions</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/retur') }}">Retur</a>
-                    </li>
-                    <!--<li class="nav-item">-->
-                    <!--    <a class="nav-link" href="{{ url('/profile') }}">Profile</a>-->
-                    <!--</li>-->
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <!--<nav class="navbar navbar-expand-md navbar-light bg-light" style="padding: 0.25rem 1rem;">-->
+    <!--    <div class="container">-->
+    <!--        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#secondaryNav" aria-controls="secondaryNav" aria-expanded="false" aria-label="Toggle navigation">-->
+    <!--            <span class="navbar-toggler-icon"></span>-->
+    <!--        </button>-->
+    <!--        <div class="collapse navbar-collapse" id="secondaryNav">-->
+    <!--            <ul class="navbar-nav w-100 justify-content-end">-->
+    <!--                <li class="nav-item">-->
+    <!--                    <a class="nav-link" href="{{ url('/wishlist') }}">Wishlist</a>-->
+    <!--                </li>-->
+    <!--                <li class="nav-item">-->
+    <!--                    <a class="nav-link" href="{{ url('/transaction') }}">Transactions</a>-->
+    <!--                </li>-->
+    <!--                <li class="nav-item">-->
+    <!--                    <a class="nav-link" href="{{ url('/retur') }}">Retur</a>-->
+    <!--                </li>-->
+    <!--                <li class="nav-item">-->
+    <!--                    <a class="nav-link" href="{{ url('/profile') }}">Profile</a>-->
+    <!--                </li>-->
+    <!--            </ul>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--</nav>-->
 
         <main class="py-4">
             @include('sweetalert::alert')

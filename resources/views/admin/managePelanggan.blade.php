@@ -192,7 +192,7 @@ $(document).ready(function(){
                   })();
 
                   const statusText = (() => {
-                      switch (transaction.status) {
+                       switch (transaction.status) {
                           case 0:
                               return 'Menunggu Pembayaran';
                           case 1:

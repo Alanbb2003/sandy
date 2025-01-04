@@ -1,4 +1,3 @@
-
 <h1>Halo, {{ $user->name }}!</h1>
 
 <p>Pesanan anda dengan kode <strong>{{ $transaction->kodeTrans }}</strong> sudah diterima, dan akan dikirim.</p>

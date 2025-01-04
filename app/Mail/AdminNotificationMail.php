@@ -33,6 +33,6 @@ class AdminNotificationMail extends Mailable
                         'htrans' => $this->htrans,
                         'dtransItems' => $this->dtransItems,
                     ])
-                    ->subject('New Transaction Notification');
+                    ->subject('Notifikasi Transaksi Baru');
     }
 }

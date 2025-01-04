@@ -37,7 +37,7 @@
                       No image available
                   @endif
               </td>
-              <td>{{ $retur->user->firstName }} {{ $retur->user->lastName }} ({{ $retur->user->email }}) (<strong>{{ $retur->bankName }} {{ $retur->accountNumber }}</strong>)</td>
+              <td>{{ $retur->user->firstName }} {{ $retur->user->lastName }} ({{ $retur->user->email }}) </td>
               <td>{{ $retur->jumlahBarangRetur }} {{ $retur->satuanBarangRetur }}</td>
               <td>Rp.{{ number_format($retur->hargaPerBarang, 2) }}</td>
               <td>Rp.{{ number_format($retur->subTotal, 2) }}</td>

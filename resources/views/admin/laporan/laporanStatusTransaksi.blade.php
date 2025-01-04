@@ -70,7 +70,7 @@
                                     <div class="col-12">
                                         <label for="status" class="form-label"><strong>Status</strong></label>
                                         <select name="status" id="status" class="form-select">
-                                            <option value="">Semua</option>
+                                             <option value="">Semua</option>
                                             <option value="0" {{ request('status') == 0 ? 'selected' : '' }}>Menunggu Pembayaran</option>
                                             <option value="1" {{ request('status') == 1 ? 'selected' : '' }}>Pesanan sedang diproses</option>
                                             <option value="2" {{ request('status') == 2 ? 'selected' : '' }}>Pesanan dikirim</option>
