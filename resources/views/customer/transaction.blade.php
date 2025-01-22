@@ -26,7 +26,7 @@
         <button type="submit" class="btn btn-primary">Search</button>
     </form>
 
-    <table class="table" id="tabelTransaksi">
+    {{-- <table class="table" id="tabelTransaksi">
         <thead>
             <tr>
                 <th>Kode Transaksi</th>
@@ -63,10 +63,16 @@
                             <span class="badge bg-success">Pesanan Selesai</span>
                             @break
                         @case(4)
+                            <div>
                             <span class="badge bg-danger">Pesanan dibatalkan Pembeli.</span>
+                            <p>{{$k->alasanBatal}}</p>
+                            </div>
                             @break
                         @case(5)
+                            <div>
                             <span class="badge bg-danger">Pesanan dibatalkan Penjual.</span>
+                            <p>{{$k->alasanBatal}}</p>
+                            </div>
                             @break
                         @default
                             <span class="badge bg-secondary">Unknown</span>
@@ -130,6 +136,148 @@
                     data-bs-target="#cancelConfirmationModal" 
                     data-id = "{{$k->id}}"
                     data-kode = "{{$k->kodeTrans}}">
+                        Batalkan
+                    </button>
+                    @endif
+                </td>
+                </tr>
+                @endforeach
+            @endif
+        </tbody>
+    </table> --}}
+    <table class="table" id="tabelTransaksi">
+        <thead>
+            <tr>
+                <th>Kode Transaksi</th>
+                <th>Nama Pembeli</th>
+                <th>Alamat Pengiriman</th>
+                <th>Tanggal Pembelian</th>
+                <th>Total</th>
+                <th>Metode Pembayaran</th>
+                <th>Status</th>
+                <th>Pembayaran</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if($htransRecords)
+                @foreach ($htransRecords as $k)
+                <tr>
+                <td>{{$k->kodeTrans}}</td>
+                <td>{{$k->namaPembeli}}</td> 
+                <td>{{$k->addressSnapshot}}</td>
+                <td>{{ \Carbon\Carbon::parse($k->tanggalPembelian)->format('d-m-Y') }}</td> 
+                <td>Rp. {{ number_format($k->totalPembelian, 2, ",", ".") }}</td>
+                <td>
+                    @switch($k->metodePembayaran)
+                        @case("midtrans")
+                            Transaksi Online
+                            @break
+                        @case("manual")
+                            Upload Bukti Pembayaran
+                            @break
+                        @default
+                            
+                    @endswitch
+                </td>
+                <td>
+                    @switch($k->status)
+                        @case(0)
+                            <span class="badge bg-warning text-dark">Menunggu Pembayaran</span>
+                            @break
+                        @case(1)
+                            <span class="badge bg-warning text-dark">Pesanan sedang diproses</span>
+                            @break
+                        @case(2)
+                            <span class="badge bg-warning text-dark">Pesanan dikirim</span>
+                            @break
+                        @case(3)
+                            <span class="badge bg-success">Pesanan Selesai</span>
+                            @break
+                        @case(4)
+                            <div>
+                            <span class="badge bg-danger">Pesanan dibatalkan Pembeli.</span>
+                            <p>{{$k->alasanBatal}}</p>
+                            </div>
+                            @break
+                        @case(5)
+                            <div>
+                            <span class="badge bg-danger">Pesanan dibatalkan Penjual.</span>
+                            <p>{{$k->alasanBatal}}</p>
+                            </div>
+                            @break
+                        @default
+                            <span class="badge bg-secondary">Unknown</span>
+                    @endswitch
+                </td>
+                <td>
+                    @if ($k->metodePembayaran == "manual")
+                        @if ($k->status == 0)
+                        <form method="POST" action="{{ route('uploadBuktiPembayaran') }}" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="transaction_id" value="{{ $k->id }}">
+                
+                            <div class="card" style="width: 18rem;">
+                                <div class="card-body">
+                                    <h5 class="card-title">Upload Bukti Pembayaran</h5>
+                                    <p class="card-text">Silakan unggah bukti pembayaran setelah melakukan pembayaran ke <strong>BRI 71810 1000 129538 Hansen Bulain</strong>.</p>
+                
+                                    <div class="input-group mb-3">
+                                        <input type="file" class="form-control" id="buktiPembayaran" name="buktiPembayaran" accept="image/*" required>
+                                    </div>
+                
+                                    <button type="submit" class="btn btn-success w-100">Upload</button>
+                                </div>
+                            </div>
+                        </form>
+                    @else
+                        <div class="text-center">
+                            <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
+                                data-image="{{ asset('images/bukti/' . $k->buktiPembayaran) }}" 
+                                data-title="{{ $k->kodeTrans }}">
+                                <img src="{{ asset('images/bukti/' . $k->buktiPembayaran) }}" alt="Product Image" style="width: 100px; height: auto;">
+                            </a>
+                        </div>
+                    @endif
+                    @else
+                        @switch($k->midtrans_status)
+                        @case('pending')
+                            <span class="badge bg-warning">Pending</span><br>
+                            <button id="retry-payment-{{$k->kodeTrans}}" class="btn btn-primary btn-sm mt-2"
+                                data-snap-token="{{ $k->snap_token }}" 
+                                data-transaction-id="{{ $k->kodeTrans }}">Lanjutkan Pembayaran</button>
+                            @break
+                        @case('success')
+                            <span class="badge bg-success">Pembayaran Berhasil</span>
+                            @break
+                        @case('expire')
+                            <span class="badge bg-danger">Pembayaran Kadaluarsa</span>
+                            @break
+                        @case('cancelled')
+                            <span class="badge bg-danger">Pembayaran Dibatalkan</span>
+                            @break
+                        @default
+                            <span class="badge bg-secondary">Status Tidak Diketahui</span>
+                    @endswitch
+                    @endif
+                </td>
+                <td>
+                    <button type="button" class="btn btn-info btn-sm my-1" style="width: 120px"
+                            data-id="{{ $k->id }}"
+                            data-tanggal="{{ \Carbon\Carbon::parse($k->tanggalPembelian)->format('d-m-Y') }}"
+                            data-diskon="Rp{{ number_format($k->discount, 2, ',', '.') }}"
+                            data-total="Rp{{ number_format($k->totalPembelian, 2, ',', '.') }}"
+                            data-transaksi='@json($k->dtrans)'
+                            data-bs-toggle="modal" data-bs-target="#transactionDetailModal">
+                            Detail
+                    </button>
+    
+                    @if ($k->status == 1 || $k->status == 0)
+                    <button class="btn btn-danger btn-sm cancelbtn" style="width: 120px;" 
+                    data-bs-toggle="modal"
+                    data-bs-target="#cancelConfirmationModal" 
+                    data-id="{{$k->id}}"
+                    data-kode="{{$k->kodeTrans}}">
                         Batalkan
                     </button>
                     @endif
@@ -292,5 +440,66 @@
         });
     });
 });
+</script>
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+
+<script>
+    // Event listener for the "Lanjutkan Pembayaran" button
+    document.querySelectorAll('[id^="retry-payment-"]').forEach(button => {
+        button.addEventListener('click', function() {
+            // Get the snap_token from the data attribute
+            const snapToken = this.getAttribute('data-snap-token');
+            // Get the transaction ID from the data attribute
+            const transactionId = this.getAttribute('data-transaction-id');
+
+            // Check if snapToken exists
+            if (snapToken && transactionId) {
+                snap.pay(snapToken, {
+                    onSuccess: function(result) {
+                        // Send the result to the server to update the payment status
+                        updatePaymentStatus(result, 'success', transactionId);
+                    },
+                    onPending: function(result) {
+                        // Send the result to the server to update the payment status
+                        updatePaymentStatus(result, 'pending', transactionId);
+                    },
+                    onError: function(result) {
+                        // Send the result to the server to update the payment status
+                        updatePaymentStatus(result, 'failed', transactionId);
+                    },
+                });
+            } else {
+                alert("Snap token or Transaction ID not found.");
+            }
+        });
+    });
+
+    // Function to send the payment status to the backend
+    function updatePaymentStatus(result, status, transactionId) {
+        // Send the payment result to the backend to update the transaction status
+        $.ajax({
+            url: '{{ route('update-payment-status') }}', // Ensure this route is defined in web.php
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                transaction_id: transactionId, // Use dynamic transaction ID
+                status: status
+            },
+            success: function(response) {
+                console.log(response.success);
+                // You can redirect the user or handle success responses here
+                if (status === 'success') {
+                    window.location.href = '/payment-success';  // Redirect to a success page
+                } else if (status === 'pending') {
+                    window.location.href = '/payment-pending';  // Redirect to a pending page
+                } else {
+                    window.location.href = '/payment-failed';  // Redirect to a failed page
+                }
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    }
 </script>
 @endsection

@@ -93,111 +93,144 @@
 
 <div class="row justify-content-center">
     <div class="col-md-11">
-      <div class="card-header"><h4>Manage Transaksi</h4></div>
-      <div class="card-body">
-          <table class="display responsive nowrap" id="tabelTransaksi" style="width:100%">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nama Pembeli</th>
-                <th>Tanggal Pembelian</th>
-                <th>Detail</th>
-                <th>Total Transaksi</th>
-                <th>Bukti</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-            @foreach ($transaksi as $htrans)
-            <tr>
-              <td>{{ $htrans->kodeTrans }}</td>
-              <td>{{ $htrans->user->firstName }} {{ $htrans->user->lastName }}</td>
-              <td>{{ \Carbon\Carbon::parse($htrans->tanggalPembelian)->format('d-m-Y H:i:s') }}</td> 
-              <td>
-                <button type="button" class="btn btn-info" 
-                    data-id="{{ $htrans->id }}"
-                    data-nama="{{ $htrans->user->firstName }} {{ $htrans->user->lastName }}"
-                    data-tanggal="{{ \Carbon\Carbon::parse($htrans->tanggalPembelian)->format('d-m-Y H:i:s') }}"
-                    data-diskon="Rp{{ number_format($htrans->discount, 2, ',', '.') }}"
-                    data-total="Rp{{ number_format($htrans->totalPembelian, 2, ',', '.') }}"
-                    data-alamat="{{$htrans->addressSnapshot}}"
-                    data-transaksi='@json($htrans->dtrans)'
-                    data-bs-toggle="modal" data-bs-target="#detailModal">
-                    Detail
-                </button>
-              </td>
-              <td>Rp{{ number_format($htrans->totalPembelian, 2, ',', '.') }}</td>
-              <td>
-                  @if($htrans->buktiPembayaran)
-                   <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
-                        data-image="{{ asset('images/bukti/' . $htrans->buktiPembayaran) }}" 
-                        data-title="{{ $htrans->kodeTrans }}">
-                        <img src="{{ asset('images/bukti/' . $htrans->buktiPembayaran) }}" alt="Product Image" style="width: 100px; height: auto;">
-                    </a>
-                  @else
-                      Belum ada
-                  @endif
-              </td>
-              <td>
-                @switch($htrans->status)
-                    @case(0)
-                        <span class="badge bg-warning text-dark">Menunggu Pembayaran</span>
-                        @break
-                    @case(1)
-                        <span class="badge bg-warning text-dark">Pesanan sedang diproses</span>
-                        @break
-                    @case(2)
-                        <span class="badge bg-warning text-dark">Pesanan dikirim</span>
-                        @break
-                    @case(3)
-                        <span class="badge bg-success">Pesanan Selesai</span>
-                        @break
-                    @case(4)
-                        <div>
-                        <span class="badge bg-danger">Pesanan dibatalkan Pembeli.</span>
-                        <p>{{$htrans->alasanBatal}}</p>
-                        </div>
-                        @break
-                    @case(5)
-                        <div>
-                        <span class="badge bg-danger">Pesanan dibatalkan Penjual.</span>
-                        <p>{{$htrans->alasanBatal}}</p>
-                        </div>
-                        @break
-                    @default
-                        <span class="badge bg-secondary">Unknown</span>
-                @endswitch
-              </td>
-              <td>
-                  @if ($htrans->status == 1 || $htrans->status == 2)
-                  <a href="#" class="btn btn-info btn-sm my-1 acceptTrans" style="width: 120px" 
-                      data-bs-toggle="modal" 
-                      data-bs-target="#acceptTransactionModal" 
-                      data-id="{{ $htrans->id }}"
-                      data-kode="{{$htrans->kodeTrans}}">
-                    @if($htrans->status == 1)
-                      <i class="fa fa-check"></i> Kirim
-                        @elseif($htrans->status == 2)
-                            <i class="fa fa-check"></i> Selesaikan
-                        @endif
-                  </a>
-                  @endif
-
-                  @if ($htrans->status == 0 || $htrans->status ==1)
-                  <a href="#" class="btn btn-danger btn-sm my-1 denyTrans" style="width: 120px" 
-                      data-bs-toggle="modal" 
-                      data-bs-target="#cancelOrderModal" 
-                      data-id="{{ $htrans->id }}" 
-                      data-kode="{{$htrans->kodeTrans}}">
-                      <i class="fa fa-xmark"></i> Batalkan
-                  </a>
-                  @endif
-              </td>
-            @endforeach
-            </tbody>
-          </table>
-      </div>
+        <div class="card-header"><h4>Manage Transaksi</h4></div>
+        <div class="card-body">
+            <table class="display responsive nowrap" id="tabelTransaksi" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama Pembeli</th>
+                        <th>Tanggal</th>
+                        <th>Detail</th>
+                        <th>Total Transaksi</th>
+                        <th>Metode Pembayaran</th>
+                        <th>Pembayaran</th>
+                        <th>Status Transaksi</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($transaksi as $htrans)
+                    <tr>
+                        <td>{{ $htrans->kodeTrans }}</td>
+                        <td>{{ $htrans->user->firstName }} {{ $htrans->user->lastName }}</td>
+                        <td>{{ \Carbon\Carbon::parse($htrans->tanggalPembelian)->format('d-m-Y') }}</td> 
+                        <td>
+                            <button type="button" class="btn btn-info" 
+                                data-id="{{ $htrans->id }}"
+                                data-nama="{{ $htrans->user->firstName }} {{ $htrans->user->lastName }}"
+                                data-tanggal="{{ \Carbon\Carbon::parse($htrans->tanggalPembelian)->format('d-m-Y') }}"
+                                data-diskon="Rp{{ number_format($htrans->discount, 2, ',', '.') }}"
+                                data-total="Rp{{ number_format($htrans->totalPembelian, 2, ',', '.') }}"
+                                data-alamat="{{$htrans->addressSnapshot}}"
+                                data-transaksi='@json($htrans->dtrans)'
+                                data-bs-toggle="modal" data-bs-target="#detailModal">
+                                Detail
+                            </button>
+                        </td>
+                        <td>Rp{{ number_format($htrans->totalPembelian, 2, ',', '.') }}</td>
+                        <td>{{ $htrans->metodePembayaran }}</td>
+                        <td>
+                            @if ($htrans->metodePembayaran == "manual" || $htrans->metodePembayaran == null)
+                                @if($htrans->buktiPembayaran)
+                                <a href="#" class="openImageModal" data-bs-toggle="modal" data-bs-target="#imageModal" 
+                                        data-image="{{ asset('images/bukti/' . $htrans->buktiPembayaran) }}" 
+                                        data-title="{{ $htrans->kodeTrans }}">
+                                        <img src="{{ asset('images/bukti/' . $htrans->buktiPembayaran) }}" alt="Product Image" style="width: 100px; height: auto;">
+                                    </a>
+                                @else
+                                    Belum ada
+                                @endif
+                            @else
+                                @switch($htrans->midtrans_status)
+                                @case('pending')
+                                    <span class="badge bg-warning">Pending</span><br>
+                                    @break
+                                @case('success')
+                                    <span class="badge bg-success">Pembayaran Berhasil</span>
+                                    @break
+                                @case('expire')
+                                    <span class="badge bg-danger">Pembayaran Kadaluarsa</span>
+                                    @break
+                                @case('cancelled')
+                                    <span class="badge bg-danger">Pembayaran Dibatalkan</span>
+                                    @break
+                                @default
+                                    <span class="badge bg-secondary">Status Tidak Diketahui</span>
+                            @endswitch
+                            @endif
+                        </td>
+                        <td>
+                            @switch($htrans->status)
+                                @case(0)
+                                    <span class="badge bg-warning text-dark">Menunggu Pembayaran</span>
+                                    @break
+                                @case(1)
+                                    <span class="badge bg-warning text-dark">Pesanan sedang diproses</span>
+                                    @break
+                                @case(2)
+                                    <span class="badge bg-warning text-dark">Pesanan dikirim</span>
+                                    @break
+                                @case(3)
+                                    <span class="badge bg-success">Pesanan Selesai</span>
+                                    @foreach ($admins as $admin)
+                                        @if ($htrans->fkPenyelesaian == $admin->id)
+                                            <br><b>Penanggung Jawab: </b><p>{{$admin->name}}</p>
+                                        @endif
+                                    @endforeach
+                                    @break
+                                @case(4)
+                                    <div>
+                                        <span class="badge bg-danger">Pesanan dibatalkan Pembeli.</span>
+                                        <br><b>Alasan: </b> <p>{{$htrans->alasanBatal}}</p>
+                                    </div>
+                                    @break
+                                @case(5)
+                                    <div>
+                                        <span class="badge bg-danger">Pesanan dibatalkan Penjual.</span>
+                                        <br><b>Alasan: </b><p>{{$htrans->alasanBatal}}</p>
+                                        @foreach ($admins as $admin)
+                                            @if ($htrans->fkPenyelesaian == $admin->id)
+                                                <br><b>Penanggung Jawab: </b><p>{{$admin->name}}</p>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                    @break
+                                @default
+                                    <span class="badge bg-secondary">Unknown</span>
+                            @endswitch
+                        </td>
+                        <td>
+                            @if ($htrans->status == 1 || $htrans->status == 2)
+                            <a href="#" class="btn btn-info btn-sm my-1 acceptTrans" style="width: 120px" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#acceptTransactionModal" 
+                                data-id="{{ $htrans->id }}"
+                                data-kode="{{$htrans->kodeTrans}}">
+                                @if($htrans->status == 1)
+                                  <i class="fa fa-check"></i> Kirim
+                                    @elseif($htrans->status == 2)
+                                        <i class="fa fa-check"></i> Selesaikan
+                                    @endif
+                            </a>
+                            <br>
+                            @endif
+    
+                            @if ($htrans->status == 0 || $htrans->status ==1)
+                            <a href="#" class="btn btn-danger btn-sm my-1 denyTrans" style="width: 120px" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#cancelOrderModal" 
+                                data-id="{{ $htrans->id }}" 
+                                data-kode="{{$htrans->kodeTrans}}">
+                                <i class="fa fa-xmark"></i> Batalkan
+                            </a>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
     <!--Modal gambar bukti -->
     <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
@@ -350,52 +383,87 @@
         });
     });
 
-// Event delegation for accepting transactions
-document.getElementById('tabelTransaksi').addEventListener('click', function (event) {
-    if (event.target.closest('.acceptTrans')) {
-        const button = event.target.closest('.acceptTrans'); // Get the clicked button
-        const transactionId = button.getAttribute('data-id');
-        const transactionKode = button.getAttribute('data-kode');
+    // document.querySelectorAll('.acceptTrans').forEach(button=>{
+    //     button.addEventListener('click',function(){
+    //         const transactionId = button.getAttribute('data-id');
+    //         const transactionKode = button.getAttribute('data-kode');
 
-        // Update the modal content
-        document.getElementById('transactionId').value = transactionId;
-        document.getElementById('kodetransaksiShow').textContent = transactionKode;
+    //         document.getElementById('transactionId').value = transactionId;
+    //         document.getElementById('kodetransaksiShow').textContent = transactionKode;
+    //     })
+    // });
 
-        // Debugging logs
-        console.log('Transaction ID:', transactionId);
-        console.log('Transaction Code:', transactionKode);
-    }
-});
+    // document.querySelectorAll('.denyTrans').forEach(button=>{
+    //     button.addEventListener('click',function(){
+    //         const transactionId = button.getAttribute('data-id');
+    //         const transactionKode = button.getAttribute('data-kode');
 
-// Event delegation for denying transactions
-document.getElementById('tabelTransaksi').addEventListener('click', function (event) {
-    if (event.target.closest('.denyTrans')) {
-        const button = event.target.closest('.denyTrans'); // Get the clicked button
-        const transactionId = button.getAttribute('data-id');
-        const transactionKode = button.getAttribute('data-kode');
+    //         document.getElementById('transactionIdcancel').value = transactionId;
+    //         document.getElementById('showKode').textContent = transactionKode;
+    //     })
+    // });
 
-        // Update the modal content
-        document.getElementById('transactionIdcancel').value = transactionId;
-        document.getElementById('showKode').textContent = transactionKode;
+    // Event delegation for accepting transactions
+    document.getElementById('tabelTransaksi').addEventListener('click', function (event) {
+        if (event.target.closest('.acceptTrans')) {
+            const button = event.target.closest('.acceptTrans'); // Get the clicked button
+            const transactionId = button.getAttribute('data-id');
+            const transactionKode = button.getAttribute('data-kode');
+    
+            // Update the modal content
+            document.getElementById('transactionId').value = transactionId;
+            document.getElementById('kodetransaksiShow').textContent = transactionKode;
+    
+            // Debugging logs
+            console.log('Transaction ID:', transactionId);
+            console.log('Transaction Code:', transactionKode);
+        }
+    });
+    
+    // Event delegation for denying transactions
+    document.getElementById('tabelTransaksi').addEventListener('click', function (event) {
+        if (event.target.closest('.denyTrans')) {
+            const button = event.target.closest('.denyTrans'); // Get the clicked button
+            const transactionId = button.getAttribute('data-id');
+            const transactionKode = button.getAttribute('data-kode');
+    
+            // Update the modal content
+            document.getElementById('transactionIdcancel').value = transactionId;
+            document.getElementById('showKode').textContent = transactionKode;
+    
+            // Debugging logs
+            console.log('Transaction ID (Cancel):', transactionId);
+            console.log('Transaction Code (Cancel):', transactionKode);
+        }
+    });
 
-        // Debugging logs
-        console.log('Transaction ID (Cancel):', transactionId);
-        console.log('Transaction Code (Cancel):', transactionKode);
-    }
-});
+    // const imageModal = document.getElementById('imageModal');
+    // const modalImage = document.getElementById('modalImage');
+    // const modalTitle = document.getElementById('imageModalLabel');
 
+    // document.querySelectorAll('.openImageModal').forEach(item => {
+    //     item.addEventListener('click', function() {
+    //         const imageSrc = this.getAttribute('data-image');
+    //         const imageTitle = this.getAttribute('data-title');
+
+    //         modalImage.src = imageSrc;
+    //         modalTitle.textContent = "Transaksi " + imageTitle;
+    //     });
+    // });
     const imageModal = document.getElementById('imageModal');
     const modalImage = document.getElementById('modalImage');
     const modalTitle = document.getElementById('imageModalLabel');
-
-    document.querySelectorAll('.openImageModal').forEach(item => {
-        item.addEventListener('click', function() {
-            const imageSrc = this.getAttribute('data-image');
-            const imageTitle = this.getAttribute('data-title');
-
+    
+    // Use event delegation for dynamically loaded rows
+    document.addEventListener('click', function (e) {
+        if (e.target && e.target.closest('.openImageModal')) {
+            const target = e.target.closest('.openImageModal');
+            const imageSrc = target.getAttribute('data-image');
+            const imageTitle = target.getAttribute('data-title');
+    
             modalImage.src = imageSrc;
             modalTitle.textContent = "Transaksi " + imageTitle;
-        });
+        }
     });
 });
 </script>

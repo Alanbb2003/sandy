@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="p-4 bg-light rounded">
-                <h2 class="mb-3">Become a Member</h2>
+                <h2 class="mb-3">Ayo Menjadi Member</h2>
                 <p>Nikmati keuntungan eksklusif dengan bergabung dalam program keanggotaan kami.</p>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">

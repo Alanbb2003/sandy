@@ -63,10 +63,11 @@
                 @endif
             </div>
 
-            <p class="text-muted mt-3">{!! nl2br(e($barang->deskripsi)) !!}</p>
+            
 
  
-            <div class="mb-4">
+            <div class="mb-4 bg-light">
+                <p class="text-muted mt-3">{!! nl2br(e($barang->deskripsi)) !!}</p>
                 <h5>Harga:</h5>
                 <p>Rp. {{ number_format($barang->hargaKecil, 2, ",", ".") }} per {{ $barang->satuanTerkecil }}</p>
                 @if($barang->satuanBesar && $barang->hargaBesar)
