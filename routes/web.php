@@ -25,10 +25,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class,"welcome"])->name('home.main');
 Route::get("/product/{slug}",[HomeController::class,'showdetailBarang']);
 // Route::get('/product/search', [HomeController::class, 'searchProducts'])->name('product.search');
-Auth::routes([
-    'verify'=>true
-]);
-
+// Auth::routes([
+//     'verify'=>true
+// ]);
+Auth::routes();
 Route::prefix('/cart')->group(function() {
     Route::get('/', [CartController::class, 'view'])->name('cart.view');
     Route::post('/add', [CartController::class, 'add'])->name('cart.add');
@@ -50,7 +50,8 @@ Route::prefix('/cart')->group(function() {
 // });
 
 //user route
-Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
+// 'verified'
+Route::middleware(['auth', 'user-role:user'])->group(function() {
     Route::get('/checkout', [UserController::class, 'checkoutPage'])->name('checkout.page');
     Route::post('/checkout', [UserController::class, 'checkoutFunc'])->name('checkout.func');
     Route::get('/payment/{kodeTrans}', [UserController::class, 'showPaymentPage'])->name('midtrans.payment');
