@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
-
+use Midtrans\Notification;
 class UserController extends Controller
 {
     //
@@ -299,6 +299,7 @@ class UserController extends Controller
             $htrans->tanggalPembelian = $today;
             $htrans->totalPembelian = $totalPayment;
             $htrans->discount = 0; 
+            $htrans->metodePembayaran = $request->input('paymentMethod');
             $htrans->status = 0;
             $htrans->save();
 
@@ -318,7 +319,7 @@ class UserController extends Controller
                 if ($request->input('usePoin') && $currentPoints >= 1000) {
                     $pay = $totalPayment;
                     $totalPayment -= $currentPoints; 
-
+                    
                     if ($totalPayment < 0) {
                         $totalPayment = 0; 
                         $currentPoints = $pay;
@@ -341,7 +342,7 @@ class UserController extends Controller
             }
 
             $htrans->totalPembelian = $totalPayment;
-            $htrans->save(); 
+            
             
             //menambah ke dtrans
             foreach ($cartItems as $item) {
@@ -354,7 +355,8 @@ class UserController extends Controller
                 $dtrans->subtotal = $item['quantity'] * $item['price'];
                 $dtrans->save();
             }
-
+           
+           
             // kirim email
             $userEmail = Auth::user()->email; 
             $dtransItems = Dtrans::where('fkHtransID', $htrans->id)
@@ -369,12 +371,56 @@ class UserController extends Controller
 
             Mail::to($userEmail)->send(new ReceiptMail($htrans, $dtransItems));
 
+            if ($request->paymentMethod == 'midtrans') {
+                \Midtrans\Config::$serverKey = config('midtrans.server_key');
+                // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
+                \Midtrans\Config::$isProduction = false;
+                // Set sanitization on (default)
+                \Midtrans\Config::$isSanitized = true;
+                // Set 3DS transaction for credit card to true
+                \Midtrans\Config::$is3ds = true;
+    
+                $transactionDetails = [
+                    'order_id' => $newKode,
+                    'gross_amount' => $totalPayment,
+                ];
+                $itemDetails = [];
+                foreach ($cartItems as $item) {
+                    $itemDetails[] = [
+                        'id' => $item['productID'],
+                        'price' => $item['price'],
+                        'quantity' => $item['quantity'],
+                        'name' => $item['name'],
+                    ];
+                }
+               
+                $customerDetails = [
+                    'first_name'    => Auth::user()->firstName,
+                    'last_name'     => Auth::user()->lastName,
+                    'email'         => Auth::user()->email,
+                ];
+                $params = [
+                    'transaction_details' => $transactionDetails,
+                    'item_details' => $itemDetails,
+                    'customer_details' => $customerDetails,
+                ];
+                $snapToken = \Midtrans\Snap::getSnapToken($params);
+                $htrans->midtrans_status = "pending"; 
+                $htrans->snap_token = $snapToken;
+                $htrans->save(); 
+            }
             DB::commit();
 
             session()->forget('cart');
-            alert()->success('Berhasil melakukan pemesanan!', 'harap melihat detail yang dikirim melalui email');
-            return redirect('/');
-
+            
+            // return response()->json(['snapToken' => $snapToken, 'orderID' => $newKode]);
+            if($request->paymentMethod== "midtrans"){
+                return view('customer.payment', compact('snapToken', 'totalPayment', 'newKode'));
+            }else{
+                alert()->success('Berhasil melakukan pemesanan!', 'harap melihat detail yang dikirim melalui email');
+                return redirect('/');
+            }
+            // return view('customer.checkout', compact('snapToken','totalPayment'));            
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Checkout error: '.$e->getMessage(), [
@@ -384,6 +430,55 @@ class UserController extends Controller
             alert()->error('Error!', 'Something went wrong. Please try again.');
             return back();
         }
+    }
+    public function showPaymentPage($kodeTrans)
+    {
+        // Fetch necessary data (like snap token, total payment, etc.) from the database
+        $transaction = Htrans::where('kodeTrans', $kodeTrans)->first();
+
+        if (!$transaction) {
+            return redirect()->route('home')->with('error', 'Transaction not found.');
+        }
+
+        $totalPayment = $transaction->totalPembelian; // Example column for total payment
+        $snapToken = $transaction->snap_token; // Custom method to get Snap token
+
+        return view('customer.payment', compact('snapToken', 'totalPayment', 'kodeTrans'));
+    }
+    public function updatePaymentStatus(Request $request)
+    {
+        $transaction = Htrans::where('kodeTrans', $request->transaction_id)->first();
+
+        if (!$transaction) {
+            return response()->json(['error' => 'Transaction not found'], 404);
+        }
+
+        switch ($request->status) {
+            case 'success':
+                $transaction->status = 1;  // Update to "Payment Confirmed"
+                $transaction->midtrans_status = "success"; 
+                break;
+            case 'pending':
+                $transaction->status = 0;  // Update to "Waiting for payment"
+                $transaction->midtrans_status = "pending"; 
+                break;
+            case 'failed':
+                $transaction->status = 4;  // Update to "Payment Failed"
+                $transaction->alasanBatal= "Pembayaran Gagal";
+                $transaction->midtrans_status = "failed"; 
+                break;
+            case 'expired':
+                $transaction->status = 4;  // Update to "Payment Expired"
+                $transaction->alasanBatal= "Pembayaran Expired";
+                $transaction->midtrans_status = "expired"; 
+                break;
+            default:
+                return response()->json(['error' => 'Invalid status'], 400);
+        }
+
+        $transaction->save();
+
+        return response()->json(['success' => 'Payment status updated successfully']);
     }
     
     public function uploadBuktiPembayaran(Request $request)
@@ -477,6 +572,7 @@ class UserController extends Controller
         }
     
         $order->status = 4; 
+        $order->midtrans_status = "cancelled";
         $order->alasanBatal = $request->input('inputAlasan');
         $order->save();
         toast("Berhasil membatalkan pemesanan",'info');

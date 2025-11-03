@@ -10,10 +10,10 @@
     <table class="table table-bordered" id="tabelPoin">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Points</th>
-                <th>Transaction Type</th>
-                <th>Source</th>
+                <th>Tanggal</th>
+                <th>Poin</th>
+                <th>Tipe Transaksi</th>
+                <th>Sumber</th>
             </tr>
         </thead>
         <tbody>

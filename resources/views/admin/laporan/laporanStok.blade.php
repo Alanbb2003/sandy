@@ -4,9 +4,13 @@
  @include('admin.partialNav')
 @endsection
 @section('content')
+<h2 class="text-center mb-4">Laporan Stok Barang</h2>
+<div class = "card container">
+    <div>
+        <canvas id="stockChart"></canvas>
+    </div>
+</div>
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Laporan Stok Barang</h2>
-    
     <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -50,6 +54,12 @@
                                             <span class="input-group-text">to</span>
                                             <input type="number" name="price_max_small" class="form-control" placeholder="Max Price" value="{{ request('price_max_small') }}">
                                         </div>
+                                        @error('price_min_small')
+                                        <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                        @error('price_max_small')
+                                        <div class="text-danger">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="row-md-4">
@@ -59,15 +69,27 @@
                                             <span class="input-group-text">to</span>
                                             <input type="number" name="price_max_big" class="form-control" placeholder="Max Price" value="{{ request('price_max_big') }}">
                                         </div>
+                                        @error('price_min_big')
+                                        <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                        @error('price_max_big')
+                                        <div class="text-danger">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
-                                    <div class="row-md-4">
+                                     <div class="row-md-4">
                                         <label class="form-label"><strong>Stock Satuan Kecil</strong></label>
                                         <div class="input-group">
                                             <input type="number" name="stok_min" class="form-control" placeholder="Min Stock" value="{{ request('stok_min') }}">
                                             <span class="input-group-text">to</span>
                                             <input type="number" name="stok_max" class="form-control" placeholder="Max Stock" value="{{ request('stok_max') }}">
                                         </div>
+                                        @error('stok_min')
+                                            <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                            @error('stok_max')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
                                     </div>
 
                                     <div class="row-md-4">
@@ -77,6 +99,12 @@
                                             <span class="input-group-text">to</span>
                                             <input type="number" name="stok_max_big" class="form-control" placeholder="Max Stock" value="{{ request('stok_max_big') }}">
                                         </div>
+                                        @error('stok_min_big')
+                                        <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                        @error('stok_max_big')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
@@ -168,5 +196,88 @@
         responsive: true
         } );
     });
+    document.addEventListener('DOMContentLoaded', function () {
+    // Get stock data from the server-side
+    const stockData = @json($stockPerCategory);
+
+    // Extract category names (X-axis labels)
+    const labels = Object.keys(stockData);
+
+    // Prepare datasets for each satuan kecil
+    const satuanColors = {}; // Map to assign colors for each satuan kecil
+    const datasets = [];
+
+    // Loop through each category to extract satuan kecil data
+    labels.forEach(category => {
+        const satuanData = stockData[category];
+
+        // For each category, loop through each satuan kecil (unit size)
+        Object.keys(satuanData).forEach(satuan => {
+            // Assign a unique color to each satuan kecil
+            if (!satuanColors[satuan]) {
+                satuanColors[satuan] = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.7)`;
+            }
+
+            // Find or create a dataset for this satuan kecil
+            let dataset = datasets.find(d => d.label === satuan);
+            if (!dataset) {
+                dataset = {
+                    label: satuan,
+                    data: new Array(labels.length).fill(0), // Initialize with 0 for all categories
+                    backgroundColor: satuanColors[satuan],
+                    borderColor: satuanColors[satuan].replace('0.7', '1'),
+                    borderWidth: 1
+                };
+                datasets.push(dataset);
+            }
+
+            // Add the current category's stock to the dataset
+            const categoryIndex = labels.indexOf(category);
+            dataset.data[categoryIndex] = satuanData[satuan] || 0;
+        });
+    });
+
+    // Create the stacked bar chart
+    const ctx = document.getElementById('stockChart').getContext('2d');
+    const stockChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels, // Categories (category names) on X-axis
+            datasets: datasets // Stacked data for satuan kecil
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.dataset.label}: ${context.raw}`;
+                        }
+                    }
+                },
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'Category'  // X-axis title
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Total Stock'  // Y-axis title
+                    }
+                }
+            }
+        }
+    });
+});
 </script>
 @endsection

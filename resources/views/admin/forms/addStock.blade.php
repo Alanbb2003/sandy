@@ -14,7 +14,7 @@
   <form class="row g-3 mb-2" action="{{url('/dashboard/barang/new/kategori') }}" method="POST">
     @csrf
     <div class="col-md-5 form-floating">
-      <input type="text" class="form-control  @error('inputkategori') is-invalid @enderror" id="inputkategori" name="inputkategori" placeholder="nama kategori">
+      <input type="text" class="form-control  @error('inputkategori') is-invalid @enderror" id="inputkategori" name="inputkategori" placeholder="nama kategori" required>
       <label for="inputNamaKategori">Nama kategori</label>
     </div>
     @error('inputkategori')
@@ -57,7 +57,7 @@
           </div>
           <div class="col">
               <label for="thumbnail" class="form-label">Foto produk promosi</label>
-              <input class="form-control" type="file" id="thumbnail" name="thumbnail">
+              <input class="form-control" type="file" id="thumbnail" name="thumbnail" required>
               @error('thumbnail')
               <div class="alert alert-danger">{{ $message }}</div>
               @enderror
@@ -73,7 +73,7 @@
       <div class="row g-3">
           <div class="col-md-6">
               <label for="inputNamaBarang" class="form-label">Nama Barang</label>
-              <input type="text" class="form-control @error('inputNamaBarang') is-invalid @enderror" id="inputNamaBarang" name="inputNamaBarang">
+              <input type="text" class="form-control @error('inputNamaBarang') is-invalid @enderror" id="inputNamaBarang" name="inputNamaBarang" required>
               @error('inputNamaBarang')
               <div class="alert alert-danger">{{ $message }}</div>
               @enderror
@@ -101,7 +101,7 @@
       <div class="row g-3">
           <div class="col-md-3">
               <label for="inputJumlahKecil" class="form-label">Jumlah Terkecil</label>
-              <input type="number" min="0" class="form-control @error('inputJumlahKecil') is-invalid @enderror" id="inputJumlahKecil" name="inputJumlahKecil">
+              <input type="number" min="0" class="form-control @error('inputJumlahKecil') is-invalid @enderror" id="inputJumlahKecil" name="inputJumlahKecil" required>
               @error('inputJumlahKecil')
               <div class="alert alert-danger">{{ $message }}</div>
               @enderror
@@ -109,7 +109,7 @@
   
           <div class="col-md-3">
               <label for="inputSatuanKecil" class="form-label">Satuan Terkecil</label>
-              <input type="text" class="form-control @error('inputSatuanKecil') is-invalid @enderror" id="inputSatuanKecil" name="inputSatuanKecil">
+              <input type="text" class="form-control @error('inputSatuanKecil') is-invalid @enderror" id="inputSatuanKecil" name="inputSatuanKecil" required>
               @error('inputSatuanKecil')
               <div class="alert alert-danger">{{ $message }}</div>
               @enderror

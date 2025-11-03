@@ -10,7 +10,7 @@
         </button>
     </div>
     
-    <div class="table-responsive">
+    <div class="card px-2 py-2">
         <table class="table table-bordered table-hover" id="tabelRetur">
             <thead class="table-primary text-center">
                 <tr>
@@ -114,6 +114,7 @@
                         seperti jumlah, tipe, dan ukuran produk. Ketika pengajuan retur diterima, pelanggan dapat melakukan 
                         pengiriman barang yang biaya pengiriman ditanggung sendiri, dan pengiriman ulang akan dilakukan toko 
                         tanpa dikenakan biaya pengiriman.
+                        Batas waktu pengajuan adalah 1 minggu setelah pesanan selesai
                     </p>
                     
                     <p><strong>Metode dan Jangka Waktu Pengembalian Uang:</strong></p>
@@ -226,7 +227,7 @@
 
                         <div class="mb-3">
                             <label for="jumlahBarangRetur" class="form-label">Total Jumlah barang</label>
-                            <input type="number" class="form-control" name="jumlahBarangRetur" id="jumlahBarangRetur" disabled readonly>
+                            <input type="text" class="form-control" name="jumlahBarangRetur" id="jumlahBarangRetur" disabled readonly>
                         </div>
 
                         <!-- Return Type -->
@@ -238,20 +239,6 @@
                                 <option value="Pengembalian Barang">Pengembalian Barang</option>
                             </select>
                         </div>
-
-                        <!-- Bank Details -->
-                        <!--<div id="bankDetails">-->
-                        <!--    <h6 class="text-muted">Bank Details</h6>-->
-                        <!--    <div class="mb-3">-->
-                        <!--        <label for="bankName" class="form-label">Nama Bank</label>-->
-                        <!--        <input type="text" class="form-control" name="bankName" id="bankName">-->
-                        <!--    </div>-->
-
-                        <!--    <div class="mb-3">-->
-                        <!--        <label for="accountNumber" class="form-label">Nomor Akun</label>-->
-                        <!--        <input type="text" class="form-control" name="accountNumber" id="accountNumber" placeholder="e.g., 1234567890 John Doe">-->
-                        <!--    </div>-->
-                        <!--</div>-->
 
                         <input type="hidden" name="selectedItemsData" id="selectedItemsData">
                     </div>
@@ -281,118 +268,6 @@
 @endsection
 
 @section('script')
-{{-- <script>
-     $(document).ready(function() {
-        $('#tabelRetur').dataTable({
-            responsive: true,
-            order: [[0, 'desc']]
-        });
-    }); 
-    function loadTransactionItems(transactionId) {
-        $.ajax({
-            url: '/get-transaction-items/' + transactionId,
-            method: 'GET',
-            success: function(data) {
-                if (data.dtrans.length === 0) {
-                    alert('tidak ada barang dalam transaksi.');
-                    return;
-                }
-
-                document.getElementById('salesHeaderID').value = transactionId;
-
-                if (data.discount) {
-                    $('#discountAmount').text(`Rp. ${parseFloat(data.discount).toLocaleString('id-ID', {minimumFractionDigits: 2})}`);
-                    $('#transactionDiscount').show();
-                } else {
-                    $('#transactionDiscount').hide();
-                }
-
-                let itemsHtml = '';
-                data.dtrans.forEach(function(item) {
-                    itemsHtml += `
-                        <tr>
-                            <td>${item.product.namaBarang}</td>
-                            <td>${item.totalJumlah} ${item.satuanBarang}</td>
-                            <td>Rp.${parseFloat(item.hargaSatuan).toLocaleString('id-ID', {minimumFractionDigits: 2})}</td>
-                            <td>
-                                <input type="radio" name="itemRadio" class="item-radio" value="${item.id}" data-item-name="${item.product.namaBarang}" data-quantity="${item.totalJumlah}" data-price="${item.hargaSatuan}" data-unit="${item.satuanBarang}">
-                                <input type="number" class="form-control item-quantity" min="1" max="${item.totalJumlah}" value="1" style="width: 80px; display:inline;" disabled />
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                $('#transactionItemsBody').html(itemsHtml);
-                $('#transactionItems').show();
-                $('#confirmSelection').show();
-            },
-            error: function() {
-                alert('Failed to load transaction items. Please try again.');
-            }
-        });
-    }
-    $(document).on('change', '.item-radio', function() {
-        $('.item-quantity').prop('disabled', true);
-        $(this).closest('tr').find('.item-quantity').prop('disabled', false); 
-    });
-
-    function addTransactionItems() {
-        const selectedItem = document.querySelector('.item-radio:checked');
-        if (!selectedItem) {
-            alert('Please select an item.');
-            return;
-        }
-
-        const itemRow = selectedItem.closest('tr');
-        const itemQuantity = itemRow.querySelector('.item-quantity').value;
-        const itemName = selectedItem.getAttribute('data-item-name');
-        const itemUnit = selectedItem.getAttribute('data-unit');
-        const itemPrice = parseFloat(selectedItem.getAttribute('data-price'));
-
-        // Format item details
-        const formattedPrice = itemPrice.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
-        const selectedItemsHtml = `<p>${itemName} (Jumlah: ${itemQuantity} ${itemUnit}) (Harga per barang: ${formattedPrice})</p>`;
-
-        // Update selected item details in the form
-        document.getElementById('selectedItemsList').innerHTML = selectedItemsHtml;
-        document.getElementById('selectedItemsData').value = JSON.stringify({
-            id: selectedItem.value,
-            name: itemName,
-            quantity: itemQuantity,
-            price: itemPrice,
-            unit: itemUnit
-        });
-        document.getElementById('jumlahBarangRetur').value = itemQuantity;
-
-        // Enable the return form and show the modal
-        enableReturnForm();
-        const returnRequestModal = new bootstrap.Modal(document.getElementById('returnRequestModal'), { keyboard: false });
-        returnRequestModal.show();
-    }
-
-    // Enable the Return Form Inputs
-    function enableReturnForm() {
-        document.getElementById('fotoBarang').disabled = false;
-        document.getElementById('alasanRetur').disabled = false;
-        document.getElementById('jumlahBarangRetur').disabled = false;
-        document.getElementById('submitReturnRequest').disabled = false;
-    }
-
-    const imageModal = document.getElementById('imageModal');
-    const modalImage = document.getElementById('modalImage');
-    const modalTitle = document.getElementById('imageModalLabel');
-
-    document.querySelectorAll('.openImageModal').forEach(item => {
-        item.addEventListener('click', function() {
-            const imageSrc = this.getAttribute('data-image');
-            const imageTitle = this.getAttribute('data-title');
-            
-            modalImage.src = imageSrc;
-            modalTitle.textContent = "Retur " + imageTitle;
-        });
-    });
-
-</script> --}}
 
 <script>
     $(document).ready(function () {
@@ -429,9 +304,15 @@
                                 data-quantity="${item.totalJumlah}" 
                                 data-price="${item.hargaSatuan}" 
                                 data-unit="${item.satuanBarang}">
-                            <input type="number" class="form-control item-quantity" 
-                                min="1" max="${item.totalJumlah}" value="1" 
-                                style="width: 80px; display: inline;" disabled>
+                            <input type="number" 
+                                       class="form-control item-quantity" 
+                                       min="1" 
+                                       max="${item.totalJumlah}" 
+                                       value="1" 
+                                       style="width: 80px; display:inline;" 
+                                       disabled 
+                                       oninput="this.value = Math.max(Math.min(this.value, ${item.totalJumlah}), 1);"
+                                >
                         </td>
                     </tr>
                 `).join('');

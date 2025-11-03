@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReturController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -52,7 +53,21 @@ Route::prefix('/cart')->group(function() {
 Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
     Route::get('/checkout', [UserController::class, 'checkoutPage'])->name('checkout.page');
     Route::post('/checkout', [UserController::class, 'checkoutFunc'])->name('checkout.func');
+    Route::get('/payment/{kodeTrans}', [UserController::class, 'showPaymentPage'])->name('midtrans.payment');
+    Route::get('/payment-success', function () {
+        return view('customer.payment.payment-success');
+    });
     
+    Route::get('/payment-pending', function () {
+        return view('customer.payment.payment-pending');
+    });
+    Route::get('/payment-expired', function () {
+        return view('customer.payment.payment-failed');
+    });
+    Route::get('/payment-failed', function () {
+        return view('customer.payment.payment-failed');
+    });
+    Route::post('/update-payment-status', [UserController::class, 'updatePaymentStatus'])->name('update-payment-status');
     Route::get('/address', [UserController::class, 'addressPage'])->name('address.page');
     Route::post('/address/add', [UserController::class, 'addAlamat'])->name('address.add');
     Route::put('/address/edit', [UserController::class, 'updateAddress'])->name('address.edit');
@@ -67,10 +82,21 @@ Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
     Route::get('/transaction', [UserController::class, 'transactionPage'])->name('transaction.page');
     Route::post('/transaction/upload',[UserController::class,'uploadBuktiPembayaran'])->name('uploadBuktiPembayaran');
     Route::post('/transaction/cancel',[UserController::class,'cancelOrder'])->name('cancelOrder');
+    
+    Route::prefix('retur')->group(function () {
+        Route::get('/', [ReturController::class, 'index'])->name('retur.index');
+        Route::get('/getCompletedTransactions', [ReturController::class, 'getCompletedTransactions']);
+        Route::get('/getTransactionItems/{id}', [ReturController::class, 'getTransactionItems']);
+        Route::get('/create/{kodeTrans}', [ReturController::class, 'create'])->name('retur.returadd');
+        Route::post('/store', [ReturController::class, 'store'])->name('retur.store');
+        Route::get('/details/{hreturID}', [ReturController::class, 'getDetails']);
+        Route::post('/update-return-type/{returID}', [ReturController::class, 'updateReturnType']);
+        Route::post('/cancel/{id}', [ReturController::class, 'cancelRetur']);
+    });
 
-    Route::get('/retur', [UserController::class, 'showReturnHistory'])->name('retur.page');
-    Route::post('/retur/add', [UserController::class, 'addRetur'])->name('retur.store');
-    Route::get('/get-transaction-items/{id}', [UserController::class, 'getTransactionItems']);
+    // Route::get('/retur', [ReturController::class, 'showReturnHistory'])->name('retur.page');
+    // Route::post('/retur/add', [ReturController::class, 'addRetur'])->name('retur.store');
+    // Route::get('/get-transaction-items/{id}', [ReturController::class, 'getTransactionItems']);
 
     Route::get('/profile',[UserController::class,'profilePage']);
     Route::post('/profile/update', [UserController::class, 'updateUser'])->name('user.update');
@@ -110,6 +136,8 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::post('/pelanggan/email', [AdminController::class, 'sendCustomEmail'])->name('admin.customer.email');
 
         route::get('/retur',[AdminController::class,"adminRetur"])->name('admin.retur');
+        Route::get('/retur/details/{hreturID}', [AdminController::class, 'returDetails']);
+        Route::post('/update-return-type/{hreturID}', [AdminController::class, 'updateReturnType']);
         Route::post('/retur/confirm-retur', [AdminController::class, 'confirmRetur'])->name('admin.confirmRetur');
         Route::post('/retur/reject-retur', [AdminController::class, 'rejectRetur'])->name('admin.rejectRetur');
 
@@ -123,43 +151,8 @@ Route::middleware(['auth','user-role:admin'])->group(function(){
         Route::get('/laporan/Penjualan', [ReportController::class, 'laporanPenjualan'])->name('laporan.penjualan');
         Route::get('/laporan/Aktif', [ReportController::class, 'laporanAktif'])->name('laporan.Aktif');
         Route::get('/laporan/retur', [ReportController::class, 'laporanRetur'])->name('laporan.retur');
+        Route::get('/laporan/wishlist', [ReportController::class, 'laporanWishlist'])->name('laporan.wishlist');
     });
 });
 
 ///aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-
-// General Routes
-// Route::get('/', [HomeController::class,"welcome"])->name('home');
-// Route::get("/product/{slug}", [HomeController::class, 'showdetailBarang'])->name('product.details');
-
-// Auth::routes(['verify' => true]);
-
-// Route::get('/cart', [CartController::class, 'view'])->name('cart.view');
-// Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-// Route::post('/cart/addOne/{id}', [CartController::class, 'addOne']); // changed to POST
-// Route::post('/cart/removeOne/{id}', [CartController::class, 'removeOne']); // changed to POST
-// Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
-
-// Route::get('/checkout', [HomeController::class, "checkoutPage"])->middleware('verified');
-// Route::get('/address', [HomeController::class, "addressPage"])->name('address.page');
-// Route::post('/address/add', [UserController::class, "addAddress"])->middleware('verified');
-
-// // User Routes
-// Route::middleware(['auth', 'user-role:user'])->prefix('/home')->group(function () {
-//     Route::get('/', [HomeController::class, "welcome"])->name('user.home')->middleware('verified');
-//     Route::get('/checkout', [HomeController::class, "checkoutPage"])->middleware('verified');
-//     Route::get('/address', [HomeController::class, "addressPage"]);
-//     Route::post('/address/add', [UserController::class, "addAddress"])->middleware('verified');
-// });
-
-// // Admin Routes
-// Route::middleware(['auth', 'user-role:admin'])->prefix('/dashboard')->group(function () {
-//     Route::get('/', [HomeController::class, 'adminHome'])->name('admin.home');
-//     Route::get('/barang', [HomeController::class, 'adminManageStock'])->name('admin.manageStock');
-//     Route::get('/barang/new', [HomeController::class, 'adminBarangNew'])->name('admin.newBarang');
-//     Route::get('/barang/new/get-categories', [HomeController::class, 'getCategories'])->name('admin.getCategories');
-//     Route::post('/barang/new', [AdminController::class, 'addBarang'])->name('admin.addBarang');
-//     Route::post('/barang/new/kategori', [AdminController::class, "addKategori"])->name('admin.addKategori');
-//     Route::post('/barang/new/kategori/update-category', [AdminController::class, 'updateKategori'])->name('admin.updateKategori');
-// });
-// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

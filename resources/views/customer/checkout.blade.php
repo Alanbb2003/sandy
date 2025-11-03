@@ -36,6 +36,22 @@
                 </div>
 
                 <hr>
+                <div class="mb-4">
+                    <h3>Metode Pembayaran</h3>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="midtransPayment" value="midtrans" checked>
+                        <label class="form-check-label" for="midtrans">
+                            Gunakan Transaksi Online
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="uploadProof" value="manual">
+                        <label class="form-check-label" for="uploadProof">
+                            Upload Bukti Pembayaran
+                        </label>
+                    </div>
+                </div>
+                <hr>
 
                 <!-- Promotions and Points -->
                 <div class="mb-4">
@@ -60,8 +76,8 @@
 
                 <!-- Payment and Submit -->
                 <div class="mb-4">
-                    <p>Pembayaran dilakukan ke <strong>BRI 71810 1000 129538 Hansen Bulain</strong></p>
-                    <button type="submit" class="btn btn-primary w-100">Buat Pesanan</button>
+                    {{-- <p>Pembayaran dilakukan ke <strong>BRI 71810 1000 129538 Hansen Bulain</strong></p> --}}
+                    <button type="submit" class="btn btn-primary w-100" id="buatPesananButton">Buat Pesanan</button>
                 </div>
             </form>
         </div>
@@ -131,5 +147,42 @@
             document.getElementById('totalAfterPointsDisplay').style.display = 'none';
         }
     }
+</script>
+<script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
+
+<script>
+   $('#buatPesananButton').click(function() {
+    // Send AJAX request to create the order and generate Snap token
+    $.ajax({
+        url: '/create-order',  // Adjust the URL to your route
+        method: 'POST',
+        data: {
+            total_payment: totalPayment,  // Send necessary data for order creation
+        },
+        success: function(response) {
+            var snapToken = response.snapToken;
+            var orderID = response.orderID;
+
+            // Use the Snap token to trigger the payment
+            window.snap.pay(snapToken, {
+                onSuccess: function(result) {
+                    alert("Payment successful!");
+                    // Handle success logic (e.g., update order status in database)
+                },
+                onPending: function(result) {
+                    alert("Payment pending!");
+                    // Handle pending logic
+                },
+                onError: function(result) {
+                    alert("Payment failed!");
+                    // Handle error logic
+                }
+            });
+        },
+        error: function(error) {
+            alert("Error creating order. Please try again.");
+        }
+    });
+});
 </script>
 @endsection
