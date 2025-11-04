@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container">
+    <!-- Search Section with Background Image -->
     <div class="search-section position-relative text-white py-5" style="background: url('{{ asset('images/dev/background1.jpg') }}') no-repeat center center/cover; border-radius: 8px;">
         <div class="overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); border-radius: 8px;"></div>
         <div class="mx-auto position-relative" style="max-width: 800px; padding: 20px; z-index: 1;">
@@ -30,14 +31,14 @@
         
                     <!-- Min Price Filter -->
                     <div class="col-md-4 mb-3">
-                        <label for="minPrice" class="form-label">Harga Terendah:</label>
-                        <input type="number" name="minPrice" id="minPrice" class="form-control" value="{{ request()->minPrice }}" placeholder="Harga Terendah">
+                        <label for="minPrice" class="form-label">Min Price:</label>
+                        <input type="number" name="minPrice" id="minPrice" class="form-control" value="{{ request()->minPrice }}" placeholder="Min price">
                     </div>
         
                     <!-- Max Price Filter -->
                     <div class="col-md-4 mb-3">
-                        <label for="maxPrice" class="form-label">Harga Tertinggi:</label>
-                        <input type="number" name="maxPrice" id="maxPrice" class="form-control" value="{{ request()->maxPrice }}" placeholder="Harga Tertinggi">
+                        <label for="maxPrice" class="form-label">Max Price:</label>
+                        <input type="number" name="maxPrice" id="maxPrice" class="form-control" value="{{ request()->maxPrice }}" placeholder="Max price">
                     </div>
                 </div>
         
@@ -59,67 +60,69 @@
             </form>
         </div>
     </div>
-    
-<div class="d-flex justify-content-center align-items-center ps-4" style="min-height: 100vh;">
-    <div class="row justify-content-center">
-        @foreach ($category as $category)
-            @php $categoryItems = $barang->where('fk_kategori', $category->id); @endphp
-            @if ($categoryItems->isNotEmpty())
-                <div class="col-12 mt-3">
-                    <h3>{{ $category->nama_category }}</h3>
-                </div>
-                <div class="col-12 p-1 d-flex flex-wrap">
-                    @foreach ($categoryItems as $k)
-                        <div class="card mb-3 p-2 mx-2 d-flex flex-column align-items-center text-center" style="width: 180px; min-height: 350px;">
-                            <a target="_blank" href="{{ url('/product/' . $k->slugBarang ) }}">
-                                <img class="card-img-top img-thumbnail" src="{{ asset('images/uploads/' . $k->fotoPromosi) }}" alt="Gambar Barang" loading="lazy" style="height: 160px; object-fit: cover;">
-                            </a>
-                            <div class="card-body d-flex flex-column text-center">
-                                <div>
-                                    <a href="{{ url('/product/' . $k->slugBarang ) }}" class="nodecor">
-                                        <h6 class="card-title">{{ $k->namaBarang }}</h6>
-                                    </a>
-                                    <p class="card-text">Rp.{{ number_format($k->hargaKecil, 0, ',', '.') }}</p>
-                                </div>
 
-                                <div class="d-flex justify-content-center align-items-center mt-auto">
-                                    <a href="{{ url('/product/' . $k->slugBarang ) }}" class="btn btn-primary w-75 me-1">Detail</a>
-                                    <button class="wishlist-toggle btn btn-outline-secondary btn-sm d-flex align-items-center justify-content-center" 
-                                        data-product-id="{{ $k->id }}" 
-                                        data-bs-toggle="tooltip" 
-                                        data-bs-placement="top" 
-                                        title="Add to Wishlist" 
-                                        style="width: 40px; height: 40px; padding: 0;">
-                                        @if(Auth::check())
-                                            @if(Auth::user()->wishlists->contains('fkProductID', $k->id))
-                                                <i class="fa-solid fa-heart text-danger"></i>
+    <!-- Product Section -->
+    <div class="d-flex justify-content-center align-items-center ps-4" style="min-height: 100vh;">
+        <div class="row justify-content-center">
+            @foreach ($category as $category)
+                @php $categoryItems = $barang->where('fk_kategori', $category->id); @endphp
+                @if ($categoryItems->isNotEmpty())
+                    <div class="col-12 mt-3">
+                        <h3>{{ $category->nama_category }}</h3>
+                    </div>
+                    <div class="col-12 p-1 d-flex flex-wrap">
+                        @foreach ($categoryItems as $k)
+                            <div class="card mb-3 p-2 mx-2 d-flex flex-column align-items-center text-center" style="width: 180px; min-height: 350px;">
+                                <a target="_blank" href="{{ url('/product/' . $k->slugBarang ) }}">
+                                    <img class="card-img-top img-thumbnail" src="{{ asset('images/uploads/' . $k->fotoPromosi) }}" alt="Gambar Barang" loading="lazy" style="height: 160px; object-fit: cover;">
+                                </a>
+                                <div class="card-body d-flex flex-column text-center">
+                                    <div>
+                                        <a href="{{ url('/product/' . $k->slugBarang ) }}" class="nodecor">
+                                            <h6 class="card-title">{{ $k->namaBarang }}</h6>
+                                        </a>
+                                        <p class="card-text">Rp.{{ number_format($k->hargaKecil, 0, ',', '.') }}</p>
+                                    </div>
+
+                                    <div class="d-flex justify-content-center align-items-center mt-auto">
+                                        <a href="{{ url('/product/' . $k->slugBarang ) }}" class="btn btn-primary w-75 me-1">Detail</a>
+                                        <button class="wishlist-toggle btn btn-outline-secondary btn-sm d-flex align-items-center justify-content-center" 
+                                            data-product-id="{{ $k->id }}" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="top" 
+                                            title="Add to Wishlist" 
+                                            style="width: 40px; height: 40px; padding: 0;">
+                                            @if(Auth::check())
+                                                @if(Auth::user()->wishlists->contains('fkProductID', $k->id))
+                                                    <i class="fa-solid fa-heart text-danger"></i>
+                                                @else
+                                                    <i class="fa-regular fa-heart"></i>
+                                                @endif
                                             @else
                                                 <i class="fa-regular fa-heart"></i>
                                             @endif
-                                        @else
-                                            <i class="fa-regular fa-heart"></i>
-                                        @endif
-                                    </button>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-        @endforeach
+                        @endforeach
+                    </div>
+                @endif
+            @endforeach
+        </div>
     </div>
-</div>
+    
+    <!-- Footer -->
     <footer class="row row-cols-1 row-cols-sm-2 row-cols-md-5 py-5 my-5 border-top">
         <!-- Contact Info -->
         <div class="col mb-3">
-          <h5>Contact</h5>
-          <ul class="nav flex-column">
-            <li class="nav-item mb-2"><span class="text-muted">Email: <a href="mailto:info@tokosandy.com" class="text-decoration-none">info@tokosandy.com</a></span></li>
-            {{-- <li class="nav-item mb-2"><span class="text-muted">Phone: +62 456-7890</span></li> --}}
-            <li class="nav-item mb-2"><span class="text-muted">Address: Jln Lintas Seram, Kobisonta (Serut), Maluku</span></li>
-          </ul>
+            <h5>Contact</h5>
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2"><span class="text-muted">Email: <a href="mailto:info@tokosandy.com" class="text-decoration-none">info@tokosandy.com</a></span></li>
+                <li class="nav-item mb-2"><span class="text-muted">Address: Jln Lintas Seram, Kobisonta (Serut), Maluku</span></li>
+            </ul>
         </div>
-      </footer>
+    </footer>
 </div>
 @endsection
 

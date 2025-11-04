@@ -64,15 +64,7 @@
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="text" 
-                           class="form-control @error('phone_number') is-invalid @enderror" 
-                           id="phone_number" 
-                           name="phone_number" 
-                           value="{{ $user->noHp }}" 
-                           required 
-                           placeholder="Nomor HP" 
-                           pattern="^\d{10,15}$"
-                           title="Nomor HP harus berupa angka dengan panjang 10-15 karakter">
+                    <input type="text" class="form-control @error('phone_number') is-invalid @enderror" id="phone_number" name="phone_number" value="{{ $user->noHp }}" required placeholder="Nomor HP">
                     <label for="phone_number">Nomor HP</label>
                     @error('phone_number')
                         <div class="invalid-feedback">{{ $message }}</div>

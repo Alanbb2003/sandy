@@ -7,7 +7,6 @@ use App\Mail\NewProductNotification;
 use App\Mail\OrderAcceptedMail;
 use App\Mail\ReturAcceptedMail;
 use App\Models\Category;
-use App\Models\Hretur;
 use App\Models\Htrans;
 use App\Models\Membership;
 use App\Models\Pictures;
@@ -107,8 +106,6 @@ class AdminController extends Controller
     }
 
     public function adminTransaksi(Request $request){
-        
-        $admins = User::where('role', 1)->get();
         $query = Htrans::with(['dtrans.product', 'user'])
                     ->orderBy('id', 'desc');
         if ($request->filled('kodeTrans')) {
@@ -147,11 +144,8 @@ class AdminController extends Controller
         }
     
         $transaksi = $query->get();
-        // $transaksi =  $query->where('id','=',1515)->first();
-        // dd($admins);
-        // dd($transaksi);
         
-        return view('admin.manageTransaksi', compact('transaksi','admins'));
+        return view('admin.manageTransaksi', compact('transaksi'));
     }
 
     public function showeditBarang($id){
@@ -168,67 +162,34 @@ class AdminController extends Controller
 
     public function adminPelanggan(){
         $customers = User::where('role', '!=', 1)
-        ->with(['htrans.dtrans.product.category'])
+        ->with(['wishlists.product', 'htrans.dtrans.product.category'])
         ->get()
         ->map(function ($user) {
-            // Filter transactions by status and limit to the latest 5
-            $latestTransactions = $user->htrans
-                ->where('status', 3) // Filter completed transactions
-                ->sortByDesc('tanggalPembelian'); // Sort by purchase date (newest first)
-               
-    
-            $user->total_completed_transactions = $latestTransactions->count(); // Count of latest transactions
-            $user->total_transaction_amount = $latestTransactions->sum('totalPembelian'); // Sum of latest transactions
+            $mostBoughtCategory = $user->htrans->where('status', 3)
+                ->flatMap->dtrans
+                ->groupBy('product.category.id')
+                ->sortByDesc(function ($items) {
+                    return count($items);
+                })
+                ->keys()
+                ->first();
+
+            $user->most_bought_category = $mostBoughtCategory ? Category::find($mostBoughtCategory) : null;
+
+            $user->total_completed_transactions = $user->htrans->where('status', 3)->count();
+            $user->total_transaction_amount = $user->htrans->where('status', 3)->sum('totalPembelian');
             return $user;
         });
         return view('admin.managePelanggan', compact('customers'));
     }
 
     public function adminRetur(){
-        $admins = User::where('role', 1)->get();
-        $returs = Hretur::with('Dretur','htrans','user')->get();
-        return view('admin.manageRetur',compact('returs','admins'));
-    }
-    public function returDetails($hreturID){
-        $retur = Hretur::with(['Dretur', 'user'])->findOrFail($hreturID);
-        $data = [
-            'user' => $retur->user,
-            'TanggalRetur' => $retur->TanggalRetur,
-            'TotalHargaRetur' => $retur->TotalHargaRetur,
-            'Dretur' => $retur->Dretur->map(function ($item) {
-                return [
-                    'namaBarang' => $item->salesDetail->product->namaBarang,
-                    'Jumlah' => $item->Jumlah,
-                    'Satuan' => $item->satuan,
-                    'harga' => $item->harga,
-                    'alasan' => $item->alasan,
-                    'fotobarang' => asset($item->fotobarang), // Ensure image URL is returned
-                ];
-            }),
-        ];
+        $returRequests = Retur::with(['dtrans.product', 'user'])
+        ->get();
         
-        return response()->json($data);
+        return view('admin.manageRetur',compact('returRequests'));
     }
-    public function updateReturnType($hreturID, Request $request)
-    {
-        $retur = Hretur::findOrFail($hreturID);
-    
-        // Check if the status is 0 (waiting for confirmation)
-        if ($retur->Status == 0) {
-            // Update fields in the Hretur table
-            $retur->TipePengembalian = $request->input('tipePengembalian');
-            $retur->AlasanPerubahan = $request->input('reasonChange');
-            $retur->statusPerubahan = $request->input('statusPerubahan');
-            $retur->save();
-    
-            return response()->json(['success' => true]);
-        }
-    
-        return response()->json([
-            'success' => false, 
-            'message' => 'Tidak dapat mengubah tipe pengembalian karena status bukan "Menunggu Konfirmasi"'
-        ]);
-    }
+
 
     //function
     
@@ -483,7 +444,6 @@ class AdminController extends Controller
     }
 
     public function acceptTransaction(Request $request) {
-        $CurrentID = Auth::user()->id;
         $transactionId = $request->input('transaction_id'); 
         $transaksi = Htrans::with(['dtrans.product', 'user'])->where('id', $transactionId)->firstOrFail();
         
@@ -529,7 +489,6 @@ class AdminController extends Controller
                 }
             }
                 $transaksi->status = 2;
-                $transaksi->fkPenyelesaian = $CurrentID;
                 $transaksi->save();
             
                 Mail::to($transaksi->user->email)->send(new OrderAcceptedMail($transaksi->user, $transaksi));
@@ -547,7 +506,6 @@ class AdminController extends Controller
 
         }else{
            $transaksi->status = 3;
-           $transaksi->fkPenyelesaian = $CurrentID;
             $transaksi->save();
             // Mail::to($transaksi->user->email)->send(new OrderAcceptedMail($transaksi->user, $transaksi));
             alert()->success('Success!', 'Transaksi diterima');
@@ -557,7 +515,6 @@ class AdminController extends Controller
 
     public function cancelTransaction(Request $request) {
         $id = $request->input('transaction_idcancel');
-        $CurrentID = Auth::user()->id;
         $order = Htrans::find($id);
         if (!$order) {
             return redirect()->back()->with('error', 'Order not found.');
@@ -570,7 +527,6 @@ class AdminController extends Controller
     
         $order->status = 5; 
         $order->alasanBatal = $request->input('inputAlasan');
-        $order->fkPenyelesaian = $CurrentID;
         $order->save();
         
         alert()->success('Success!', 'Transaksi Ditolak');
@@ -606,43 +562,33 @@ class AdminController extends Controller
     }
 
     public function confirmRetur(Request $request){
-        $hretur = Hretur::find($request->returID); // Using Hretur
-        $currentID = Auth::user()->id;
+        $retur = Retur::find($request->returID);
         
-        if ($hretur) {
-            $hretur->Status = 1;  // Set status to 'accepted'
-            $hretur->FkPenerima = $currentID;  // Update the person responsible
-            $hretur->save();
-            
-            // Send email notification
-            $user = User::find($hretur->fkUserID);
-            if ($user) {
-                Mail::to($user->email)->send(new ReturAcceptedMail($hretur));
-            }
-    
-            alert()->success('Success!', 'Return request confirmed successfully.');
+        if ($retur) {
+            $retur->status = 1; 
+            $retur->save();
+              $user = User::find($retur->fkUserID);
+                if ($user) {
+                    Mail::to($user->email)->send(new ReturAcceptedMail($retur));
+                }
+            alert()->success('Success!','Berhasil Konfirmasi retur');
             return redirect()->back();
         }
-    
-        alert()->error('Error!', 'Return request not found.');
+        alert()->success('error!','Request retur tidak ditemukan');
         return redirect()->back();
     }
     
     public function rejectRetur(Request $request)
     {
-        $hretur = Hretur::find($request->returID);  // Using Hretur
-        $currentID = Auth::user()->id;
+        $retur = Retur::find($request->returID);
         
-        if ($hretur) {
-            $hretur->Status = 2;  // Set status to 'rejected'
-            $hretur->FkPenerima = $currentID;  // Update the person responsible
-            $hretur->save();
-
-            alert()->success('Success!', 'Return request rejected successfully.');
+        if ($retur) {
+            $retur->status = 2; 
+            $retur->save();
+            alert()->success('Success!','Berhasil menolak retur');
             return redirect()->back();
         }
-
-        alert()->error('Error!', 'Return request not found.');
+        alert()->success('error!','Request retur tidak ditemukan');
         return redirect()->back();
     }
 

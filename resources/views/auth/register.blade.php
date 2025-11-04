@@ -57,7 +57,7 @@
                         <div class="col">
                             <div class="form-floating mb-4">
                                 <input id="lastName" type="text" class="form-control @error('lastName') is-invalid @enderror" name="lastName" value="{{ old('lastName') }}"  autofocus placeholder="Nama Belakang">
-                                <label for="lastName" class="form-label">Nama Belakang</label>
+                                <label for="lastName" class="form-label">nama Belakang</label>
                                 @error('lastName')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>

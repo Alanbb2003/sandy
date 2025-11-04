@@ -3,50 +3,62 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Fonts and Styles -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <!-- Fonts -->
+    <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <script src="https://kit.fontawesome.com/4e280bc07f.js" crossorigin="anonymous"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ asset('style.css') }}" rel="stylesheet">
+    <!-- Scripts -->
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> --}}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+   
+    <!-- CDN -->
+
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.dataTables.css" />
-    <link href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/css/lightbox.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/js/lightbox.min.js"></script>
+    {{-- <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css" /> --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    {{-- <link href="https://cdn.datatables.net/v/dt/dt-2.0.3/b-3.0.1/b-colvis-3.0.1/b-html5-3.0.1/fc-5.0.0/r-3.0.0/sb-1.7.0/sp-2.3.0/datatables.min.css" rel="stylesheet"> --}}
+    <link href="{{asset('style.css')}}" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>
-        body {
-            background-color: #f5f5f5;
-        }
-        .whiteTxt {
-            color: white;
-        }
+        body{
+        background-color: #e3e3e3; 
+    }
     </style>
 </head>
 <body>
-<div id="app">
+    <div id="app">
+      <!-- Main Navigation Bar -->
     <nav class="navbar navbar-expand-md navbar-light bg-info shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">
                 {{ config('app.name', 'Laravel') }}
             </a>
-            <ul class="navbar-nav me-auto">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <!-- Left Side Of Navbar -->
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a href="{{ url('/membership') }}" class="nav-link">
                             <i class="fa-regular fa-address-card"></i> Membership
                         </a>
                     </li>
                 </ul>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- Right Side of Navbar -->
+
+                <!-- Right Side Of Navbar -->
                 <ul class="navbar-nav ms-auto d-flex align-items-center">
-                    @guest
-                        <li class="nav-item me-3">
-                            <a href="{{ url('/cart') }}" class="btn position-relative mx-1">
+                    <!-- Cart Icon -->
+                    <li class="nav-item">
+                        <a href="{{ url('/cart') }}" class="btn position-relative mx-1">
                             <i class="fa-solid fa-cart-shopping fa-lg"></i>
                             @if(session('cart'))
                                 @php
@@ -59,48 +71,28 @@
                                 </span>
                             @endif
                         </a>
-                        </li>
-                        <li class="nav-item me-3">
-                            <a class="nav-link" href="{{ url('/wishlist') }}">
-                                <i class="fa-solid fa-heart fa-lg"></i>
-                            </a>
-                        </li>
+                    </li>
+
+                    @guest
                         @if (Route::has('login'))
                             <li class="nav-item">
-                                <a class="nav-link border rounded px-3 py-1" href="{{ route('login') }}">
-                                    <i class="fa-solid fa-user"></i> {{ __('Login') }}
-                                </a>
+                                <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
                             </li>
                         @endif
+                        <!--@if (Route::has('register'))-->
+                        <!--    <li class="nav-item">-->
+                        <!--        <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>-->
+                        <!--    </li>-->
+                        <!--@endif-->
                     @else
-                        <!-- Icons Section -->
-                        <li class="nav-item me-3">
-                            <a href="{{ url('/cart') }}" class="btn position-relative mx-1">
-                            <i class="fa-solid fa-cart-shopping fa-lg"></i>
-                            @if(session('cart'))
-                                @php
-                                    $cartItems = session()->get('cart', []);
-                                    $items_in_cart = array_sum(array_column($cartItems, 'quantity'));
-                                @endphp
-                                <span class="position-absolute top-0 start-100 translate-middle badge bg-danger">
-                                    {{ $items_in_cart }}
-                                    <span class="visually-hidden">items in cart</span>
-                                </span>
-                            @endif
-                        </a>
-                        </li>
-                        <li class="nav-item me-3">
-                            <a class="nav-link" href="{{ url('/wishlist') }}">
-                                <i class="fa-solid fa-heart fa-lg"></i>
-                            </a>
-                        </li>
-                        <li class="nav-item me-3">
-                            <a class="nav-link" href="{{ url('/transaction') }}">
-                                <i class="fa-solid fa-clock-rotate-left fa-lg"></i>
+                        <!-- Wishlist Icon -->
+                        <li class="nav-item">
+                            <a href="{{ url('/wishlist') }}" class="btn mx-1">
+                                <i class="fa-solid fa-heart"></i>
                             </a>
                         </li>
 
-                        <!-- User Dropdown -->
+                        <!-- User Profile Dropdown -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 @if(Auth::user()->picture)
@@ -113,10 +105,13 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="{{ url('/profile') }}">Profile</a></li>
                                 <li><a class="dropdown-item" href="{{ url('/wishlist') }}">Wishlist</a></li>
-                                <li><a class="dropdown-item" href="{{ url('/transaction') }}">Riwayat Transaksi</a></li>
-                                <li><a class="dropdown-item" href="{{ url('/retur') }}">Retur</a></li>
+                                <li><a class="dropdown-item" href="{{ url('/transaction') }}">Riwayat Transaksi</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url('/retur') }}">Retur</a>
+                                </li>
                                 <li>
-                                    <a class="dropdown-item text-danger" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
@@ -130,16 +125,42 @@
             </div>
         </div>
     </nav>
-    <main class="py-4">
-        @include('sweetalert::alert')
-        @yield('content')
-    </main>
-</div>
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.datatables.net/2.1.7/js/dataTables.js"></script>
-@yield('script')
+    <!-- Secondary Navigation Bar -->
+    <!--<nav class="navbar navbar-expand-md navbar-light bg-light" style="padding: 0.25rem 1rem;">-->
+    <!--    <div class="container">-->
+    <!--        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#secondaryNav" aria-controls="secondaryNav" aria-expanded="false" aria-label="Toggle navigation">-->
+    <!--            <span class="navbar-toggler-icon"></span>-->
+    <!--        </button>-->
+    <!--        <div class="collapse navbar-collapse" id="secondaryNav">-->
+    <!--            <ul class="navbar-nav w-100 justify-content-end">-->
+    <!--                <li class="nav-item">-->
+    <!--                    <a class="nav-link" href="{{ url('/wishlist') }}">Wishlist</a>-->
+    <!--                </li>-->
+    <!--                <li class="nav-item">-->
+    <!--                    <a class="nav-link" href="{{ url('/transaction') }}">Transactions</a>-->
+    <!--                </li>-->
+    <!--                <li class="nav-item">-->
+    <!--                    <a class="nav-link" href="{{ url('/retur') }}">Retur</a>-->
+    <!--                </li>-->
+    <!--                <li class="nav-item">-->
+    <!--                    <a class="nav-link" href="{{ url('/profile') }}">Profile</a>-->
+    <!--                </li>-->
+    <!--            </ul>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--</nav>-->
+
+        <main class="py-4">
+            @include('sweetalert::alert')
+            @yield('content')
+        </main>
+    </div>
+
+    @yield("script")
+ <!-- CDN -->
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+ <script src="https://cdn.datatables.net/2.1.7/js/dataTables.js"></script>
+ {{-- <script src="https://cdn.datatables.net/v/dt/dt-2.0.3/b-3.0.1/b-colvis-3.0.1/b-html5-3.0.1/fc-5.0.0/r-3.0.0/sb-1.7.0/sp-2.3.0/datatables.min.js"></script> --}}
 </body>
 </html>

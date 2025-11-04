@@ -60,8 +60,19 @@
               <p><strong>Email:</strong> <span id="modal-email"></span></p>
               <p><strong>Phone:</strong> <span id="modal-phone"></span></p>
               <p><strong>Tanggal Lahir:</strong> <span id="modal-birthdate"></span></p>
-             
-              <h4>Transaksi Terakhir:</h4>
+              <h4>Wishlist</h4>
+              <table class="table table-bordered">
+                  <thead>
+                      <tr>
+                          <th>Nama Produk</th>
+                          <th>Harga</th>
+                      </tr>
+                  </thead>
+                  <tbody id="modal-wishlist">
+                      
+                  </tbody>
+              </table>
+              <h4>Past Transactions</h4>
               <table class="table table-bordered">
                   <thead>
                       <tr>
@@ -92,6 +103,9 @@
                       </tbody>
                   </table>
               </div>
+
+              <h4>Kategori paling banyak dibeli</h4>
+              <p id="modal-most-bought-category"></p>
           </div>
       </div>
   </div>
@@ -139,7 +153,7 @@ $(document).ready(function(){
     document.addEventListener('DOMContentLoaded', function () {
         const detailButtons = document.querySelectorAll('.detail-btn');
         
-         detailButtons.forEach(button => {
+        detailButtons.forEach(button => {
             button.addEventListener('click', function () {
                 const customer = JSON.parse(this.getAttribute('data-customer'));
 
@@ -147,59 +161,71 @@ $(document).ready(function(){
                 document.getElementById('modal-phone').textContent = customer.noHp;
                 document.getElementById('modal-birthdate').textContent = customer.tanggalLahir ? customer.tanggalLahir : '-';
 
-                const transactionsContainer = document.getElementById('modal-transactions');
-                transactionsContainer.innerHTML = ''; 
-
-                const recentTransactions = customer.htrans.slice(-5).reverse(); // Get the newest 5 transactions
-
-                recentTransactions.forEach(transaction => {
-                    const statusClass = (() => {
-                        switch (transaction.status) {
-                            case 0:
-                            case 1:
-                            case 2:
-                                return 'badge bg-warning text-dark'; // Menunggu Pembayaran / Pesanan Sedang Diproses
-                            case 3:
-                                return 'badge bg-success'; // Transaksi Berhasil
-                            case 4:
-                            case 5:
-                                return 'badge bg-danger'; // Dibatalkan Pembeli / Dibatalkan Penjual
-                            default:
-                                return 'badge bg-secondary'; // Status Tidak Diketahui
-                        }
-                    })();
-
-                    const statusText = (() => {
-                        switch (transaction.status) {
-                            case 0:
-                                return 'Menunggu Pembayaran';
-                            case 1:
-                                return 'Pesanan sedang diproses';
-                            case 2:
-                                return 'Pesanan dikirim';
-                            case 3:
-                                return 'Pesanan Selesai';
-                            case 4:
-                                return 'Pesanan Dibatalkan Pembeli';
-                            case 5:
-                                return 'Pesanan Dibatalkan Penjual';
-                            default:
-                                return 'Status Tidak Diketahui';
-                        }
-                    })();
-
+                const wishlistContainer = document.getElementById('modal-wishlist');
+                wishlistContainer.innerHTML = ''; 
+                customer.wishlists.forEach(item => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${transaction.kodeTrans}</td>
-                        <td>${new Date(transaction.tanggalPembelian).toLocaleDateString('id-ID')}</td>
-                        <td>Rp. ${transaction.totalPembelian.toLocaleString('id-ID')}</td>
-                        <td><span class="${statusClass}">${statusText}</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-info" onclick="toggleDtrans('${transaction.kodeTrans}')">View Details</button>
-                        </td>
+                        <td>${item.product ? item.product.namaBarang : 'Product Not Found'}</td>
+                        <td>${item.product ? `Rp. ${item.product.hargaKecil.toLocaleString('id-ID', { minimumFractionDigits: 0 })}` : '-'}</td>
                     `;
-                    transactionsContainer.appendChild(row);
+                    wishlistContainer.appendChild(row);
                 });
+
+              const transactionsContainer = document.getElementById('modal-transactions');
+              transactionsContainer.innerHTML = ''; 
+              customer.htrans.forEach(transaction => {
+                  const statusClass = (() => {
+                      switch (transaction.status) {
+                          case 0:
+                          case 1:
+                          case 2:
+                              return 'badge bg-warning text-dark'; // Menunggu Pembayaran / Pesanan Sedang Diproses
+                          case 3:
+                              return 'badge bg-success'; // Transaksi Berhasil
+                          case 4:
+                          case 5:
+                              return 'badge bg-danger'; // Dibatalkan Pembeli / Dibatalkan Penjual
+                          default:
+                              return 'badge bg-secondary'; // Status Tidak Diketahui
+                      }
+                  })();
+
+                  const statusText = (() => {
+                       switch (transaction.status) {
+                          case 0:
+                              return 'Menunggu Pembayaran';
+                          case 1:
+                              return 'Pesanan sedang diproses';
+                          case 2:
+                              return 'Pesanan dikirim';
+                          case 3:
+                              return 'Pesanan Selesai';
+                          case 4:
+                              return 'Pesanan Dibatalkan Pembeli';
+                          case 5:
+                              return 'Pesanan Dibatalkan Penjual';
+                          default:
+                              return 'Status Tidak Diketahui';
+                      }
+                  })();
+
+                  const row = document.createElement('tr');
+                  row.innerHTML = `
+                      <td>${transaction.kodeTrans}</td>
+                      <td>${new Date(transaction.tanggalPembelian).toLocaleDateString('id-ID')}</td>
+                      <td>Rp. ${transaction.totalPembelian.toLocaleString('id-ID')}</td>
+                      <td><span class="${statusClass}">${statusText}</span></td>
+                      <td>
+                          <button class="btn btn-sm btn-info" onclick="toggleDtrans('${transaction.kodeTrans}')">View Details</button>
+                      </td>
+                  `;
+                  transactionsContainer.appendChild(row);
+              });
+
+              document.getElementById('modal-most-bought-category').textContent = customer.most_bought_category 
+                  ? customer.most_bought_category.nama_category 
+                  : 'No transactions';
 
               window.toggleDtrans = function(kodeTrans) {
                   const dtransContainer = document.getElementById('dtrans-details');
@@ -223,6 +249,9 @@ $(document).ready(function(){
                   }
                   dtransContainer.style.display = dtransTableBody.innerHTML ? 'block' : 'none';
               };
+                document.getElementById('modal-most-bought-category').textContent = customer.most_bought_category 
+                    ? customer.most_bought_category.nama_category 
+                    : 'No transactions';
             });
         });
     });

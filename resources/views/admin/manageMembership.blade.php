@@ -46,7 +46,7 @@
                 <form action="{{ route('admin.membershipAdd') }}" method="POST">
                     @csrf
                     <div class="mb-3">
-                       <!--<label for="userSelect" class="form-label">Pilih Pelanggan</label>-->
+                        <label for="userSelect" class="form-label">Pilih Pelanggan</label>
                         <select id="userSelect" class="form-select selectMember" name="userSelect" required>
                             <option value="">pilih Pelanggan...</option>
                             @foreach($users as $user)
@@ -95,7 +95,7 @@
 @section('script')
 <script>
 $(document).ready(function() {
-     $('.selectMember').select2({
+    $('.selectMember').select2({
         theme: "bootstrap-5",          
         dropdownParent: $('#addMemberModal'), 
         placeholder: "Pilih Pelanggan...",    

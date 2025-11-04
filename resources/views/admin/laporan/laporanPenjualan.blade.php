@@ -41,19 +41,6 @@
 <button type="button" class="btn btn-primary btn-floating" data-bs-toggle="modal" data-bs-target="#filterModal">
     <i class="fa-solid fa-filter"></i>    
 </button>
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-<div class="card container my-2">
-    <h3>Top 5 Produk Terlaris</h3>
-    <canvas id="topProductsChart"></canvas>
-</div>
 
 <div class="card container px-2 py-2">
     <table class="table table-bordered" id="tabelPenjualan">
@@ -85,67 +72,6 @@
 @endsection
 @section('script')
 <script>
-    $(document).ready(function() {
-    $('#tabelPenjualan').dataTable({
-        responsive: true,
-        order: [[0, 'desc']]
-    });});
 
-    const salesData = @json($chartData);
-
-
-    const labels = salesData.map(item => item.product.namaBarang);
-    const data = salesData.map(item => item.total_quantity_sold);
-
-    const ctx = document.getElementById('topProductsChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar', 
-        data: {
-            labels: labels, 
-            datasets: [{
-                label: 'Jumlah Terjual',
-                data: data, 
-                backgroundColor: [
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(153, 102, 255, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(153, 102, 255, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Jumlah Terjual'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Nama Produk'
-                    }
-                }
-            },
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Top 5 Produk Terjual'
-                }
-            }
-        }
-    });
 </script>
 @endsection

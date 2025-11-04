@@ -4,14 +4,9 @@
  @include('admin.partialNav')
 @endsection
 @section('content')
-<h2 class="text-center mb-4">Laporan Status Pemesanan</h2>
-{{-- <div class="card container" style="width: 650px; height: 700px; margin: 0 auto;">
-    <div >
-        <h3>Status Transaksi</h3>
-        <canvas id="statusPieChart" width="100" height="100"></canvas>
-    </div>
-</div> --}}
 <div class="container mt-5">
+    <h2 class="text-center mb-4">Laporan Status Pemesanan</h2>
+   
     
     <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -25,12 +20,12 @@
                         <div class="row g-4">
                             
                             <!-- General Filters Column -->
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 {{-- <h5>General Filters</h5> --}}
                                 <div class="row g-3">
                                     <div class="col-12">
                                         <label for="kodeTrans" class="form-label"><strong>Kode Transaksi</strong></label>
-                                        <input type="text" name="kodeTrans" id="kodeTrans" class="form-control" placeholder="Kode Transaksi" value="{{ request('kodeTrans') }}">
+                                        <input type="text" name="kodeTrans" id="kodeTrans" class="form-control" placeholder="Kode Trans" value="{{ request('kodeTrans') }}">
                                     </div>
                                     
                                     <div class="col-12">
@@ -42,11 +37,16 @@
                                         <label for="alamatPembelian" class="form-label"><strong>Alamat Pembelian</strong></label>
                                         <input type="text" name="alamatPembelian" id="alamatPembelian" class="form-control" placeholder="Alamat Pembelian" value="{{ request('alamatPembelian') }}">
                                     </div>
+                
+                                    <div class="col-12">
+                                        <label for="salesHeaderDate" class="form-label"><strong>Tanggal Pemesanan</strong></label>
+                                        <input type="date" name="salesHeaderDate" id="salesHeaderDate" class="form-control" value="{{ request('salesHeaderDate') }}">
+                                    </div>
                                 </div>
                             </div>
                     
                             <!-- Range Filters Column -->
-                            <div class="col-md-9">
+                            <div class="col-md-6">
                                 {{-- <h5>Range Filters</h5> --}}
                                 <div class="row g-3">
                                     <div class="row-md-4">
@@ -56,35 +56,22 @@
                                             <span class="input-group-text">to</span>
                                             <input type="number" name="total_max" class="form-control" placeholder="Max Total" value="{{ request('total_max') }}">
                                         </div>
-                                        @error('total_min')
-                                        <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                        @error('total_max')
-                                        <div class="text-danger">{{ $message }}</div>
-                                        @enderror
                                     </div>
 
                                     <div class="row-md-4">
                                         <label class="form-label"><strong>Tanggal Pemesanan</strong></label>
                                         <div class="input-group">
-                                            <span class="input-group-text">Tanggal Mulai</span>
-                                            <input type="date" name="salesHeaderDate_start" class="form-control" value="{{ request('salesHeaderDate_start') }}">
-                                            <span class="input-group-text">Tanggal Akhir</span>
-                                            <input type="date" name="salesHeaderDate_end" class="form-control" value="{{ request('salesHeaderDate_end') }}">
+                                            <input type="date" name="salesHeaderDate_start" class="form-control" placeholder="Start Date" value="{{ request('salesHeaderDate_start') }}">
+                                            <span class="input-group-text">to</span>
+                                            <input type="date" name="salesHeaderDate_end" class="form-control" placeholder="End Date" value="{{ request('salesHeaderDate_end') }}">
                                         </div>
-                                        @error('salesHeaderDate_start')
-                                        <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                        @error('salesHeaderDate_end')
-                                        <div class="text-danger">{{ $message }}</div>
-                                        @enderror
                                     </div>
 
                                     <div class="col-12">
                                         <label for="status" class="form-label"><strong>Status</strong></label>
                                         <select name="status" id="status" class="form-select">
-                                            <option value="" {{ request('status') == null ? 'selected' : '' }}>Semua</option>
-                                            <option value="0" {{ request('status') === 0 ? 'selected' : '' }}>Menunggu Pembayaran</option>
+                                             <option value="">Semua</option>
+                                            <option value="0" {{ request('status') == 0 ? 'selected' : '' }}>Menunggu Pembayaran</option>
                                             <option value="1" {{ request('status') == 1 ? 'selected' : '' }}>Pesanan sedang diproses</option>
                                             <option value="2" {{ request('status') == 2 ? 'selected' : '' }}>Pesanan dikirim</option>
                                             <option value="3" {{ request('status') == 3 ? 'selected' : '' }}>Pesanan Selesai</option>
@@ -115,8 +102,8 @@
         <table class="table table-bordered table-striped align-middle" id="tablePemesanan">
             <thead class="text-center">
                 <tr>
-                    {{-- <th>ID</th> --}}
-                    <th>Kode Transaksi</th>
+                    <th>ID</th>
+                    <th>Kode Trans</th>
                     <th>Nama Pembeli</th>
                     <th>Alamat Pembelian</th>
                     <th>Tanggal Pemesanan</th>
@@ -127,25 +114,11 @@
             <tbody>
                 @foreach ($orders as $order)
                 <tr>
-                    {{-- <td class="text-center">{{ $order->salesHeaderID }}</td> --}}
-                    <td class="text-center">
-                        <form action="{{ url('/dashboard/transaksi') }}" method="GET" style="display: inline;">
-                            <input type="hidden" name="kodeTrans" value="{{ $order->kodeTrans }}">
-                            <input type="hidden" name="namaPembeli" value="">
-                            <input type="hidden" name="alamatPembelian" value="">
-                            <input type="hidden" name="salesHeaderDate" value="">
-                            <input type="hidden" name="total_min" value="">
-                            <input type="hidden" name="total_max" value="">
-                            <input type="hidden" name="salesHeaderDate_start" value="">
-                            <input type="hidden" name="salesHeaderDate_end" value="">
-                            <input type="hidden" name="status" value="">
-                            <button type="submit" class="btn btn-link">{{ $order->kodeTrans }}</button>
-                        </form>
-                        {{-- {{ $order->kodeTrans }} --}}
-                    </td>
+                    <td class="text-center">{{ $order->salesHeaderID }}</td>
+                    <td class="text-center">{{ $order->kodeTrans }}</td>
                     <td>{{ $order->namaPembeli }}</td>
                     <td>{{ $order->addressSnapshot }}</td>
-                    <td class="text-center">{{ \Carbon\Carbon::parse($order->tanggalPembelian)->format('d-m-Y') }}</td> 
+                    <td class="text-center">{{ \Carbon\Carbon::parse($order->tanggalPembelian)->format('d-m-Y H:i:s') }}</td> 
                     <td>Rp {{ number_format($order->totalPembelian, 0, ',', '.') }}</td>
                     <td class="text-center">
                         @switch($order->status)
@@ -186,8 +159,7 @@
             language: {
             emptyTable: "No data available in table"
         },
-        responsive: true,
-        order: [[1, 'desc']] 
+        responsive: true
         } );
     });
 </script>
