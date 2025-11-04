@@ -1,0 +1,148 @@
+<?php
+
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReturController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+// Route::get('/', function () {return view('welcome');});
+
+Route::get('/', [HomeController::class,"welcome"])->name('home.main');
+Route::get("/product/{slug}",[HomeController::class,'showdetailBarang']);
+// Route::get('/product/search', [HomeController::class, 'searchProducts'])->name('product.search');
+Auth::routes([
+    'verify'=>true
+]);
+
+Route::prefix('/cart')->group(function() {
+    Route::get('/', [CartController::class, 'view'])->name('cart.view');
+    Route::post('/add', [CartController::class, 'add'])->name('cart.add');
+    Route::get('/addOne/{id}', [CartController::class, 'addOne']);
+    Route::get('/removeOne/{id}', [CartController::class, 'removeOne']);
+    Route::get('/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+});
+
+
+
+//user route
+Route::middleware(['auth', 'user-role:user', 'verified'])->group(function() {
+    Route::get('/checkout', [UserController::class, 'checkoutPage'])->name('checkout.page');
+    Route::post('/checkout', [UserController::class, 'checkoutFunc'])->name('checkout.func');
+    Route::get('/payment/{kodeTrans}', [UserController::class, 'showPaymentPage'])->name('midtrans.payment');
+    Route::get('/payment-success', function () {
+        return view('customer.payment.payment-success');
+    });
+    
+    Route::get('/payment-pending', function () {
+        return view('customer.payment.payment-pending');
+    });
+    Route::get('/payment-expired', function () {
+        return view('customer.payment.payment-failed');
+    });
+    Route::get('/payment-failed', function () {
+        return view('customer.payment.payment-failed');
+    });
+    Route::post('/update-payment-status', [UserController::class, 'updatePaymentStatus'])->name('update-payment-status');
+    Route::get('/address', [UserController::class, 'addressPage'])->name('address.page');
+    Route::post('/address/add', [UserController::class, 'addAlamat'])->name('address.add');
+    Route::put('/address/edit', [UserController::class, 'updateAddress'])->name('address.edit');
+    Route::delete('/address/delete', [UserController::class, 'deleteAddress'])->name('address.delete');
+
+    Route::get('/membership', [UserController::class, 'membershipPage'])->name('membership.page');
+    Route::post('/membership/add',[UserController::class,'AddToMembership'])->name('membership.add');
+    
+    Route::get('/wishlist', [UserController::class, 'wishlistPage'])->name('wishlist.page');
+    Route::post('/wishlist/toggle', [UserController::class, 'toggleWishlist'])->name('wishlist.toggle');
+    
+    Route::get('/transaction', [UserController::class, 'transactionPage'])->name('transaction.page');
+    Route::post('/transaction/upload',[UserController::class,'uploadBuktiPembayaran'])->name('uploadBuktiPembayaran');
+    Route::post('/transaction/cancel',[UserController::class,'cancelOrder'])->name('cancelOrder');
+    
+    Route::prefix('retur')->group(function () {
+        Route::get('/', [ReturController::class, 'index'])->name('retur.index');
+        Route::get('/getCompletedTransactions', [ReturController::class, 'getCompletedTransactions']);
+        Route::get('/getTransactionItems/{id}', [ReturController::class, 'getTransactionItems']);
+        Route::get('/create/{kodeTrans}', [ReturController::class, 'create'])->name('retur.returadd');
+        Route::post('/store', [ReturController::class, 'store'])->name('retur.store');
+        Route::get('/details/{hreturID}', [ReturController::class, 'getDetails']);
+        Route::post('/update-return-type/{returID}', [ReturController::class, 'updateReturnType']);
+        Route::post('/cancel/{id}', [ReturController::class, 'cancelRetur']);
+    });
+
+    // Route::get('/retur', [ReturController::class, 'showReturnHistory'])->name('retur.page');
+    // Route::post('/retur/add', [ReturController::class, 'addRetur'])->name('retur.store');
+    // Route::get('/get-transaction-items/{id}', [ReturController::class, 'getTransactionItems']);
+
+    Route::get('/profile',[UserController::class,'profilePage']);
+    Route::post('/profile/update', [UserController::class, 'updateUser'])->name('user.update');
+    Route::put('/profile/password/update', [HomeController::class, 'updatePassword'])->name('password.user.update');
+});
+
+
+//admin route
+Route::middleware(['auth','user-role:admin'])->group(function(){
+    Route::prefix('/dashboard',)->group(function(){
+        Route::get("/",[AdminController::class,'adminHome'])->name('homeAdmin');
+        Route::post('/changePasswordAdmin', [AdminController::class, 'changePassword'])->name('admin.changePassword');        
+        Route::post('/changeEmailAdmin', [AdminController::class, 'changeEmail'])->name('admin.changeEmail');        
+        Route::post('/adminAdd', [AdminController::class, 'addAdmin'])->name('admin.add');
+        Route::post('/admin/delete', [AdminController::class, 'deleteAdmin'])->name('admin.delete');
+        
+        Route::get('/barang',[AdminController::class,'adminManageStock']);
+        //add new barang
+        Route::get('/barang/new',[AdminController::class,'adminBarangNew']);
+        Route::get('/barang/new/get-categories',[AdminController::class,'getCategories']);
+        Route::post('/barang/new',[AdminController::class,'addBarang']);    
+        Route::post('/barang/new/kategori',[AdminController::class,"addKategori"]);
+        Route::post('/barang/new/kategori/update-category', [AdminController::class, 'updateKategori'])->name('category.update');
+        //edit barang
+        Route::get('/barang/edit/{id}', [AdminController::class, 'showeditBarang'])->name('dashboard.barang.edit');
+        Route::put('/barang/edit/{id}', [AdminController::class, 'updateBarang']);
+        Route::delete('/barang/delete-image/{id}', [AdminController::class, 'deleteImage'])->name('dashboard.barang.deleteImage');
+        Route::get('/barang/toggle-status/{id}', [AdminController::class, 'toggleStatus'])->name('barang.toggleStatus');
+        Route::post('/barang/Tambah',[AdminController::class,'addJumlahBarang'])->name('admin.TambahJumlah');
+
+        Route::get('/transaksi',[AdminController::class,"adminTransaksi"])->name('admin.transaksi');
+        Route::post('/transaksi/accept',[AdminController::class,"acceptTransaction"])->name('admin.acceptTransaction');
+        Route::post('/transaksi/cancel', [AdminController::class, 'cancelTransaction'])->name('admin.cancelOrder');
+
+        route::get('/pelanggan',[AdminController::class,"adminPelanggan"])->name('admin.Pelanggan');
+        Route::get('/pelanggan/{id}', [AdminController::class, 'pelangganDetail'])->name('admin.customer.detail');
+        Route::post('/pelanggan/email', [AdminController::class, 'sendCustomEmail'])->name('admin.customer.email');
+
+        route::get('/retur',[AdminController::class,"adminRetur"])->name('admin.retur');
+        Route::get('/retur/details/{hreturID}', [AdminController::class, 'returDetails']);
+        Route::post('/update-return-type/{hreturID}', [AdminController::class, 'updateReturnType']);
+        Route::post('/retur/confirm-retur', [AdminController::class, 'confirmRetur'])->name('admin.confirmRetur');
+        Route::post('/retur/reject-retur', [AdminController::class, 'rejectRetur'])->name('admin.rejectRetur');
+
+        Route::get('/membership', [AdminController::class, 'adminMembership'])->name('admin.membership.page');
+        Route::post('/membership/add', [AdminController::class, 'adminAddMembership'])->name('admin.membershipAdd');
+        
+        Route::get('/laporan/Stok-barang', [ReportController::class, 'laporanStok'])->name('laporan.stokBarang');
+        Route::get('/laporan/StatusPesanan', [ReportController::class, 'laporanStatusPesanan'])->name('laporan.statusPesanan');
+        Route::get('/laporan/Membership', [ReportController::class, 'laporanMembership'])->name('laporan.membership');
+        Route::get('/laporan/Pendapatan', [ReportController::class, 'laporanPendapatan'])->name('laporan.pendapatan');
+        Route::get('/laporan/Penjualan', [ReportController::class, 'laporanPenjualan'])->name('laporan.penjualan');
+        Route::get('/laporan/Aktif', [ReportController::class, 'laporanAktif'])->name('laporan.Aktif');
+        Route::get('/laporan/retur', [ReportController::class, 'laporanRetur'])->name('laporan.retur');
+        Route::get('/laporan/wishlist', [ReportController::class, 'laporanWishlist'])->name('laporan.wishlist');
+    });
+});
+
+///aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
